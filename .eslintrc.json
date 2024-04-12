@@ -1,0 +1,52 @@
+{
+    "root": true,
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:vue/vue3-recommended",
+        "@nuxtjs/eslint-config-typescript"
+    ],
+    "parserOptions": {
+        "parser": "@typescript-eslint/parser",
+        "sourceType": "module"
+    },
+    "plugins": ["@typescript-eslint", "vue"],
+
+    "rules": {
+        "semi": ["error", "always", { "omitLastInOneLineBlock": true }],
+        "indent": ["error", 4],
+        "eqeqeq": "off",
+        "brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
+        "comma-dangle": ["error", {
+            "arrays": "always-multiline",
+            "objects": "always-multiline",
+            "imports": "always-multiline",
+            "exports": "always-multiline",
+            "functions": "never"
+        }],
+        "no-return-assign": "off",
+        "arrow-parens": ["error", "always"],
+        "space-before-function-paren": ["error", "never"],
+        "import/no-named-as-default": "off",
+        "multiline-ternary": "off",
+        "no-unmodified-loop-condition": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-empty-interface": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "vue/multi-word-component-names": "off",
+        "vue/component-definition-name-casing": "off",
+        "vue/require-default-prop": "off",
+        "vue/multiline-html-element-content-newline": "off",
+        "vue/no-v-html": "off",
+        "vue/no-multiple-template-root": "off",
+        "vue/html-self-closing": "off",
+        "vue/max-attributes-per-line": "off",
+        "vue/html-indent": ["error", 4, {}]
+    }
+}

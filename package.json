@@ -1,0 +1,44 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/image": "^1.5.0",
+    "nuxt": "^3.11.2",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@babylonjs/core": "^7.1.0",
+    "@babylonjs/inspector": "^7.1.0",
+    "@babylonjs/loaders": "^7.1.0",
+    "@babylonjs/materials": "^7.1.0",
+    "@babylonjs/post-processes": "^7.1.0",
+    "@babylonjs/procedural-textures": "^7.1.0",
+    "@babylonjs/serializers": "^7.1.0",
+    "@nuxt/content": "^2.12.1",
+    "@nuxtjs/tailwindcss": "^6.11.4",
+    "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
+    "@pinia/nuxt": "^0.5.1",
+    "@tailwindcss/typography": "^0.5.12",
+    "@types/debug": "^4.1.12",
+    "@vueuse/nuxt": "^10.9.0",
+    "daisyui": "^4.10.1",
+    "dayjs-nuxt": "^2.1.9",
+    "debug": "^4.3.4",
+    "nuxt-icon": "^0.6.10",
+    "posthog-js": "^1.120.2",
+    "sass": "^1.74.1",
+    "typescript": "^5.4.4",
+    "ua-parser-js": "^2.0.0-beta.2",
+    "vite-plugin-glsl": "^1.3.0",
+    "xstate": "^5.9.1"
+  }
+}
