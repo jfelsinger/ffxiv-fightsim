@@ -40,7 +40,7 @@ export default defineNuxtConfig({
     modules: ['@nuxtjs/tailwindcss', ["@pinia/nuxt", {
         autoImports: ['defineStore', 'acceptHMRUpdate'],
     }], '@pinia-plugin-persistedstate/nuxt', '@vueuse/nuxt', [
-        'nuxt-icon',
-        { class: 'nx-icon', },
-    ], 'dayjs-nuxt', '@nuxt/content', "@nuxt/image"]
+            'nuxt-icon',
+            { class: 'nx-icon', },
+        ], 'dayjs-nuxt', '@nuxt/content', "@nuxt/image"]
 })

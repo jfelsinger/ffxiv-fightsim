@@ -33,6 +33,7 @@
     "daisyui": "^4.10.1",
     "dayjs-nuxt": "^2.1.9",
     "debug": "^4.3.4",
+    "eventemitter3": "^5.0.1",
     "nuxt-icon": "^0.6.10",
     "posthog-js": "^1.120.2",
     "sass": "^1.74.1",
