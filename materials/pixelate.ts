@@ -6,10 +6,12 @@ import {
     ShaderMaterial,
     Scene,
     Vector4,
-    Color3, FresnelParameters,
 } from '@babylonjs/core';
 
 export { vertexShader as vert, fragmentShader as frag };
+
+Effect.ShadersStore['pixelateVertexShader'] = vertexShader;
+Effect.ShadersStore['pixelateFragmentShader'] = fragmentShader;
 
 export { createShader as createPixelateShader };
 export default function createShader(scene: Scene, shaderName = 'pixelateShader') {
@@ -48,11 +50,3 @@ export default function createShader(scene: Scene, shaderName = 'pixelateShader'
 
     return material;
 }
-
-export const pixelateVertexShader =
-    Effect.ShadersStore['pixelateVertexShader'] =
-    vertexShader;
-
-export const pixelateFragmentShader =
-    Effect.ShadersStore['pixelateFragmentShader'] =
-    fragmentShader;

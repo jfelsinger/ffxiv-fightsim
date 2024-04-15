@@ -56,14 +56,27 @@ export interface iEffect {
     execute(): Promise<void>
 }
 
+export type EffectTargetType =
+    | 'boss' | 'adds'
+    | 'all' // All players
+    | 'player' | 'party' | 'maintank'
+    | 'tank' | 'healer' | 'dps';
+
 export type EffectTarget =
-    'boss' | 'adds' | 'all' | 'player' | 'party' | 'tank' | 'healer' | 'dps' |
-    Bab.Vector3 | Bab.Mesh;
+    | EffectTargetType | Bab.Mesh;
+
+export type EffectPositionType = 'arena' | 'global';
+
 export type EffectOptions = {
     duration: number
     game: Bab.Engine
     scene: Bab.Scene
     target?: EffectTarget | (EffectTarget[])
+    position?: Bab.Vector3 | (() => Bab.Vector3)
+    positionType?: EffectPositionType
+
+    // Whether or not the same random target can be selected more than once,
+    // when randomly selecting from a group of targets
     repeatTarget?: boolean
 }
 
@@ -72,6 +85,8 @@ export class Effect extends EventEmitter {
     game: Bab.Engine;
     scene: Bab.Scene;
     target: EffectTarget[] = [];
+    position: Bab.Vector3 | (() => Bab.Vector3);
+    positionType: EffectPositionType;
     repeatTarget: boolean;
 
     constructor(options: EffectOptions) {
@@ -86,6 +101,9 @@ export class Effect extends EventEmitter {
         } else if (options.target) {
             this.target = [options.target];
         }
+
+        this.position = options.position || Bab.Vector3.Zero();
+        this.positionType = options.positionType || 'arena';
     }
 
     async start() {

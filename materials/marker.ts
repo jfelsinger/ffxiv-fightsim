@@ -8,13 +8,8 @@ import {
     Color3,
 } from '@babylonjs/core';
 
-export const vert =
-    Effect.ShadersStore['markerVertexShader'] =
-    vertShader;
-
-export const frag =
-    Effect.ShadersStore['markerFragmentShader'] =
-    fragShader;
+Effect.ShadersStore['markerVertexShader'] = vertShader;
+Effect.ShadersStore['markerFragmentShader'] = fragShader;
 
 export default function createShader(scene: Scene, color?: Color3, shaderName = 'markerShader') {
     let material = new ShaderMaterial(

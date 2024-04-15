@@ -8,13 +8,8 @@ import {
     Color3,
 } from '@babylonjs/core';
 
-export const vert =
-    Effect.ShadersStore['standardAoeVertexShader'] =
-    vertShader;
-
-export const frag =
-    Effect.ShadersStore['standardAoeFragmentShader'] =
-    fragShader;
+Effect.ShadersStore['standardAoeVertexShader'] = vertShader;
+Effect.ShadersStore['standardAoeFragmentShader'] = fragShader;
 
 export default function createShader(scene: Scene, color?: Color3, shaderName = 'standardAoeShader') {
     let material = new ShaderMaterial(

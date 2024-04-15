@@ -104,6 +104,8 @@ export class Steering {
 
     lookWhereGoing(shouldSmooth = false) {
         let direction = this.mesh.position.clone().addInPlace(this.velocity);
+        direction.x += (Math.random() - 0.5) * 0.02;
+        direction.z += (Math.random() - 0.5) * 0.02;
         direction.y = this.mesh.position.y;
 
         if (shouldSmooth) {
@@ -112,6 +114,8 @@ export class Steering {
             }
 
             let c = this.velocity.clone();
+            c.x += (Math.random() - 0.5) * 0.02;
+            c.z += (Math.random() - 0.5) * 0.02;
             c.y = this.mesh.position.y;
             this.vSamples.push(c);
             direction.setAll(0);

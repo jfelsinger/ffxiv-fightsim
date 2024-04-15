@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import '@babylonjs/core/Debug/debugLayer';
 import '@babylonjs/inspector';
-import { Engine, Scene, FreeCamera, Vector3 } from '@babylonjs/core';
+import { Engine, Scene, Vector3 } from '@babylonjs/core';
 import * as Bab from '@babylonjs/core';
 import { GridMaterial } from '@babylonjs/materials';
-import PixelateShader from '../materials/pixelate';
 import createMarkerMat from '../materials/marker';
 import createAoeMat from '../materials/standardAoe';
 import { Steering } from '../utils/steering';
+import { yalmsToM } from '../utils/conversions';
+import { Arena } from '../utils/arena';
 
 (window as any).Bab = Bab;
 
@@ -17,14 +18,6 @@ const debug = Debug('game');
 const canvas = ref<HTMLCanvasElement>();
 let game: Engine | undefined;
 
-function yalmsToM(y: number) {
-    return y * 0.86868
-}
-
-function mToYalms(m: number) {
-    return m / 0.86868
-}
-
 function onResize() {
     if (game) {
         game.resize();
@@ -33,21 +26,10 @@ function onResize() {
 
 function makeArena(scene: Scene, yalms = 90) {
 
-    const arenaMat = new GridMaterial('arenaMat', scene);
-    let c = 0.85;
-    arenaMat.mainColor = new Bab.Color3(c, c, c + 0.075)
-    c = 0.735;
-    arenaMat.lineColor = new Bab.Color3(c, c, c)
-    arenaMat.gridRatio = yalmsToM(1); // Make the grid display in yalms
-    arenaMat.majorUnitFrequency = 5; // 5 yalms
-    const size = yalmsToM(yalms);
-    const arena = Bab.MeshBuilder.CreateGround('ground', { width: size, height: size }, scene);
-    arena.checkCollisions = false;
-    arena.position.y += 0.001
-    arena.material = arenaMat;
+    const arena = new Arena('arena', { yalms }, scene);
 
     const gridMat = new GridMaterial('arenaMat', scene);
-    c = 0.83;
+    let c = 0.83;
     gridMat.mainColor = new Bab.Color3(c, c, c + 0.075)
     c = 0.8;
     gridMat.lineColor = new Bab.Color3(c, c, c)
@@ -60,13 +42,9 @@ function makeArena(scene: Scene, yalms = 90) {
     gridFloor.material = gridMat;
     gridFloor.bakeCurrentTransformIntoVertices();
 
-    const ground = Bab.MeshBuilder.CreateGround('ground', { width: 2600, height: 2600 }, scene);
-    ground.checkCollisions = true;
-    ground.isVisible = false;
-
     return {
-        platform: arena,
-        ground,
+        arena,
+        globalFloor: gridFloor,
     }
 }
 
@@ -135,7 +113,6 @@ function makeCharacter(scene: Scene, game: Engine) {
     sphere.position.y -= (height * (1 / heads)) / 2;
     sphere.material = charMat;
     // sphere.position.y += hheads;
-    // sphere.material = PixelateShader(scene);
     sphere.setParent(char);
     sphere.checkCollisions = false;
     sphere.isPickable = false;
@@ -314,16 +291,20 @@ function makeScene(game: Engine) {
 
         if (keydown) {
             movement.normalize();
-            const currentDirection = character.marker.getDirection(Bab.Vector3.Forward());
-            currentDirection.y = 0;
-            currentDirection.normalize();
+            const turnAdjustment = 0.88;
 
             // debug('delta: ', delta, character.speed * delta);
-            character.marker.position.addInPlace(movement.scale(character.speed * delta));
+            character.marker.position.addInPlace(movement.scale(character.speed * delta * turnAdjustment));
             // character.marker.moveWithCollisions(movement.scale(character.speed * delta));
 
             character.steering.velocity = movement;
             character.steering.lookWhereGoing(true);
+
+            const currentDirection = character.marker.getDirection(Bab.Vector3.Forward());
+            currentDirection.y = 0;
+            currentDirection.normalize();
+            character.marker.position.addInPlace(currentDirection.scale(character.speed * delta * (1.0 - turnAdjustment)));
+
             if (character.collider.intersectsMesh(aoe.disc, false)) {
                 if (!isColliding) {
                     isColliding = true;
