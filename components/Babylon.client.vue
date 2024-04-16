@@ -252,7 +252,7 @@ onBeforeUnmount(async () => {
     <div id="game" class="relative max-w-screen max-h-screen game --babylon">
         <h1>Hello!</h1>
 
-        <div class="minimap relative-north absolute top-10 right-10 z-10 bg-slate-700 p-1 rounded-full" :style="{
+        <div class="minimap relative-north absolute top-10 right-10 z-10 bg-slate-700 p-[2px] rounded-full" :style="{
             '--cam-rotation': `${cameraDirection}deg`,
             '--char-rotation': `${characterDirection}deg`,
         }">
@@ -280,9 +280,13 @@ onBeforeUnmount(async () => {
         display: block;
         position: absolute;
         left: 50%;
-        top: -20%;
+        top: -22%;
         z-index: 10;
         transform: translateX(-50%);
+        text-shadow:
+            0 0 1px #ffffffea,
+            0 0 4px #ffffffaa,
+            0 0 2px #ffffff5a;
     }
 
     &.relative-north {
