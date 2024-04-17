@@ -128,9 +128,18 @@ export class Character {
         // const minDist = 14.65;
         const minDist = 17.65;
         const maxDist = 35 - minDist;
-        const distance = Math.max(0, this.camera.position.subtract(this.camMarker.position).length() - minDist);
+
+        const camPosition = this.camera.position.clone();
+        camPosition.y = 0;
+
+        const bounding = this.camMarker.getBoundingInfo();
+        const markerPosition = bounding.boundingBox.centerWorld.clone();
+        markerPosition.y = 0;
+
+
+        const distance = camPosition.subtract(markerPosition).length();
         this.camMarker.position.y = this.head.position.y;
-        this.camMarker.position.y += maxHeight * (distance / maxDist);
+        this.camMarker.position.y += lerp(0, maxHeight, distance / maxDist);
     }
 
     getDirection(v: Bab.Vector3) {

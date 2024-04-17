@@ -101,10 +101,17 @@ function makeScene(game: Engine) {
 
     const camera = new Bab.ArcRotateCamera('cam1', 0, 0, 15.5, new Vector3(0, -7.5, -1.15 - yalmsToM(15)), scene);
     (window as any).cam = camera;
-    camera.upperBetaLimit = Math.PI / 1.5;
+    camera.inertia = 0.835;
+    camera.lowerBetaLimit = Math.PI * 0.025;
+    camera.upperBetaLimit = Math.PI / 1.8;
     camera.lowerRadiusLimit = 1.5;
-    camera.checkCollisions = true;
-    camera.collisionRadius = new Vector3(0.05, 0.05, 0.05);
+    camera.upperRadiusLimit = 24.5;
+    camera.checkCollisions = false;
+    camera.collisionRadius = new Vector3(0.5, .5, .5);
+    camera.onCollide = (e) => {
+        (window as any).onCollide = e;
+        console.log(e);
+    }
     (camera as any).attachControl(null, true, true, 1);
 
     const inputManager = camera.inputs;
@@ -249,8 +256,8 @@ onBeforeUnmount(async () => {
 </script>
 
 <template>
-    <div id="game" class="relative max-w-screen max-h-screen game --babylon">
-        <h1>Hello!</h1>
+    <div id="game" class="relative max-w-screen max-h-screen overflow-hidden h-screen game --babylon">
+        <h1 class="z-20 relative">Hello!</h1>
 
         <div class="minimap relative-north absolute top-10 right-10 z-10 bg-slate-700 p-[2px] rounded-full" :style="{
             '--cam-rotation': `${cameraDirection}deg`,
@@ -260,7 +267,7 @@ onBeforeUnmount(async () => {
             </div>
         </div>
 
-        <div class="absolute top-0 left-0 -z-10">
+        <div class="absolute top-0 left-0 z-10">
             <slot>
                 <canvas class="bg-sky-100 w-screen h-screen" ref="canvas" id="gamecanvas"></canvas>
             </slot>
@@ -275,6 +282,8 @@ onBeforeUnmount(async () => {
 }
 
 .minimap {
+    z-index: 11;
+
     &::before {
         content: "N";
         display: block;
