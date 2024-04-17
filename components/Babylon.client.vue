@@ -10,6 +10,7 @@ import { Steering } from '../utils/steering';
 import { yalmsToM } from '../utils/conversions';
 import { Arena } from '../utils/arena';
 import { Character } from '../utils/character';
+import { Clock } from '../utils/clock';
 
 (window as any).Bab = Bab;
 
@@ -22,6 +23,7 @@ function vectorAngle(v: Bab.Vector3) {
 
 import Debug from 'debug';
 const debug = Debug('game');
+const globalClock = new Clock();
 
 const canvas = ref<HTMLCanvasElement>();
 let game: Engine | undefined;
@@ -127,7 +129,7 @@ function makeScene(game: Engine) {
 
     const aoe = makeAoe(scene);
     scene.collisionsEnabled = true;
-    const character = new Character('player', {}, scene, game);
+    const character = new Character('player', {}, scene, globalClock);
     camera.setTarget(character.camMarker.position.clone());
     camera.lockedTarget = character.camMarker;
 
@@ -147,6 +149,7 @@ function makeScene(game: Engine) {
         let keydown = false;
         const movement = new Bab.Vector3(0, 0, 0);
         const delta = game.getDeltaTime();
+        globalClock.tick(delta);
         character.setMarkerHeight();
 
         if (inputMap['w']) {
@@ -177,14 +180,14 @@ function makeScene(game: Engine) {
             movement.normalize();
             const turnAdjustment = character.speedRotation;
 
-            character.position.addInPlace(movement.scale(character.speed * delta * turnAdjustment));
+            character.position.addInPlace(movement.scale(character.speed * globalClock.lastDelta * turnAdjustment));
             character.steering.velocity = movement;
             character.steering.lookWhereGoing(true);
 
             const currentDirection = character.getDirection(Bab.Vector3.Forward());
             currentDirection.y = 0;
             currentDirection.normalize();
-            character.position.addInPlace(currentDirection.scale(character.speed * delta * (1.0 - turnAdjustment)));
+            character.position.addInPlace(currentDirection.scale(character.speed * globalClock.lastDelta * (1.0 - turnAdjustment)));
 
             const newDirection = character.getDirection(Bab.Vector3.Forward());
             let angle = vectorAngle(newDirection);

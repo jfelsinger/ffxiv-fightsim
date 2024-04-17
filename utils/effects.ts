@@ -1,6 +1,7 @@
 import * as Bab from '@babylonjs/core';
 import { wait } from './wait';
 import { EventEmitter } from 'eventemitter3';
+import { Clock } from './clock';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:steering');
@@ -19,20 +20,20 @@ function isScheduled<T>(v: unknown): v is Scheduled<T> {
     return typeof v === 'object' && v != null && 'item' in v;
 }
 
-async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T) => Promise<void>, repeatNumber = 0) {
+async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T) => Promise<void>, clock: Clock, repeatNumber = 0) {
     if (scheduled.startDelay) {
-        await wait(scheduled.startDelay);
+        await clock.wait(scheduled.startDelay);
     }
 
     await func(scheduled.item);
 
     if (scheduled.endDelay) {
-        await wait(scheduled.endDelay);
+        await clock.wait(scheduled.endDelay);
     }
 
     if (scheduled.after) {
         if (isScheduled(scheduled.after)) {
-            await executeScheduled(scheduled.after, func)
+            await executeScheduled(scheduled.after, func, clock)
         } else {
             await func(scheduled.after);
         }
@@ -40,10 +41,10 @@ async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T) => P
 
     if (scheduled.repeat) {
         if (scheduled.repeat < repeatNumber) {
-            await executeScheduled(scheduled, func, (repeatNumber || 0) + 1)
+            await executeScheduled(scheduled, func, clock, (repeatNumber || 0) + 1)
         } else if (scheduled.afterRepeats) {
             if (isScheduled(scheduled.afterRepeats)) {
-                await executeScheduled(scheduled.afterRepeats, func)
+                await executeScheduled(scheduled.afterRepeats, func, clock)
             } else {
                 await func(scheduled.afterRepeats);
             }
@@ -69,7 +70,7 @@ export type EffectPositionType = 'arena' | 'global';
 
 export type EffectOptions = {
     duration: number
-    game: Bab.Engine
+    clock: Clock
     scene: Bab.Scene
     target?: EffectTarget | (EffectTarget[])
     position?: Bab.Vector3 | (() => Bab.Vector3)
@@ -82,7 +83,7 @@ export type EffectOptions = {
 
 export class Effect extends EventEmitter {
     duration: number;
-    game: Bab.Engine;
+    clock: Clock
     scene: Bab.Scene;
     target: EffectTarget[] = [];
     position: Bab.Vector3 | (() => Bab.Vector3);
@@ -92,7 +93,7 @@ export class Effect extends EventEmitter {
     constructor(options: EffectOptions) {
         super();
         this.duration = options.duration ?? 0;
-        this.game = options.game;
+        this.clock = options.clock;
         this.scene = options.scene;
         this.repeatTarget = options.repeatTarget ?? false;
 
@@ -118,7 +119,7 @@ export class Effect extends EventEmitter {
 
     async execute() {
         if (this.duration) {
-            await wait(this.duration);
+            await this.clock.wait(this.duration);
         }
     }
 
@@ -130,20 +131,23 @@ export class Effect extends EventEmitter {
 }
 
 export type MechanicOptions = {
-    name?: string;
-    scheduling?: ScheduleMode;
+    name?: string
+    scheduling?: ScheduleMode
     effects: Scheduled<iEffect>[]
+    clock: Clock
 }
 
 export class Mechanic extends EventEmitter {
     name?: string;
     scheduling: ScheduleMode;
     effects: Scheduled<iEffect>[];
+    clock: Clock;
 
     constructor(options: MechanicOptions) {
         super();
         this.effects = options.effects || [];
         this.scheduling = options.scheduling || 'parallel';
+        this.clock = options.clock;
 
         if (options.name) {
             this.name = options.name;
@@ -167,7 +171,7 @@ export class Mechanic extends EventEmitter {
 
     async executeEffect(effect: Scheduled<iEffect>) {
         this.emit('start-effect', { effect });
-        await executeScheduled(effect, (item) => item.execute())
+        await executeScheduled(effect, (item) => item.execute(), this.clock)
         this.emit('end-effect', { effect });
     }
 }
@@ -176,17 +180,20 @@ export type SectionOptions = {
     name?: string;
     scheduling?: ScheduleMode;
     mechanics: Scheduled<Mechanic>[]
+    clock: Clock
 }
 
 export class FightSection extends EventEmitter {
     name?: string;
     scheduling: ScheduleMode;
     mechanics: Scheduled<Mechanic>[];
+    clock: Clock;
 
     constructor(options: SectionOptions) {
         super();
         this.mechanics = options.mechanics || [];
         this.scheduling = options.scheduling || 'sequential';
+        this.clock = options.clock;
 
         if (options.name) {
             this.name = options.name;
@@ -208,7 +215,7 @@ export class FightSection extends EventEmitter {
 
     async executeMechanic(mechanic: Scheduled<Mechanic>) {
         this.emit('start-mechanic', { mechanic });
-        await executeScheduled(mechanic, (item) => item.execute())
+        await executeScheduled(mechanic, (item) => item.execute(), this.clock)
         this.emit('end-mechanic', { mechanic });
     }
 }
@@ -217,17 +224,20 @@ export type FightOptions = {
     name?: string
     scheduling?: ScheduleMode;
     sections: Scheduled<FightSection>[]
+    clock: Clock
 }
 
 export class Fight extends EventEmitter {
     name?: string;
     scheduling: ScheduleMode;
     sections: Scheduled<FightSection>[];
+    clock: Clock;
 
     constructor(options: FightOptions) {
         super();
         this.sections = options.sections || [];
         this.scheduling = options.scheduling || 'sequential';
+        this.clock = options.clock;
 
         if (options.name) {
             this.name = options.name;
@@ -249,7 +259,7 @@ export class Fight extends EventEmitter {
 
     async executeSection(section: Scheduled<FightSection>) {
         this.emit('start-section', { section });
-        await executeScheduled(section, (item) => item.execute())
+        await executeScheduled(section, (item) => item.execute(), this.clock)
         this.emit('end-section', { section });
     }
 }

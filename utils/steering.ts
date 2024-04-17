@@ -1,4 +1,5 @@
 import * as Bab from '@babylonjs/core';
+import { Clock } from './clock';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:steering');
@@ -34,7 +35,7 @@ const DefaultSteeringOptions: SteeringOptions = {
 
 export class Steering {
     mesh: Bab.Mesh;
-    game: Bab.Engine;
+    clock: Clock;
     options: SteeringOptions;
 
     steeringForce: Bab.Vector3 = Bab.Vector3.Zero();
@@ -45,10 +46,10 @@ export class Steering {
     vSamples: Bab.Vector3[] = [];
 
     get delta() {
-        return this.game.getDeltaTime();
+        return this.clock.lastDelta;
     }
 
-    constructor(mesh: Bab.Mesh, game: Bab.Engine, options: Partial<SteeringOptions> = {}) {
+    constructor(mesh: Bab.Mesh, clock: Clock, options: Partial<SteeringOptions> = {}) {
         this.options = {
             ...DefaultSteeringOptions,
             ...options,
@@ -59,7 +60,7 @@ export class Steering {
         // this.mass = opts.mass;
 
         this.mesh = mesh;
-        this.game = game;
+        this.clock = clock;
 
 
         debug('Steering| ', mesh, options);

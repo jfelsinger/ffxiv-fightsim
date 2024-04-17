@@ -42,5 +42,10 @@ export default defineNuxtConfig({
     }], '@pinia-plugin-persistedstate/nuxt', '@vueuse/nuxt', [
             'nuxt-icon',
             { class: 'nx-icon', },
-        ], 'dayjs-nuxt', '@nuxt/content', "@nuxt/image"]
+        ], [
+            'dayjs-nuxt',
+            {
+                plugins: ['duration'],
+            }
+        ], '@nuxt/content', "@nuxt/image"]
 })
