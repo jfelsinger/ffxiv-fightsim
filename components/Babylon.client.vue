@@ -105,7 +105,7 @@ function makeScene(game: Engine) {
     camera.lowerBetaLimit = Math.PI * 0.025;
     camera.upperBetaLimit = Math.PI / 1.8;
     camera.lowerRadiusLimit = 1.5;
-    camera.upperRadiusLimit = 24.5;
+    camera.upperRadiusLimit = 24;
     camera.checkCollisions = false;
     camera.collisionRadius = new Vector3(0.5, .5, .5);
     camera.onCollide = (e) => {
