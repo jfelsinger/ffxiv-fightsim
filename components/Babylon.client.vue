@@ -23,7 +23,26 @@ function vectorAngle(v: Bab.Vector3) {
 
 import Debug from 'debug';
 const debug = Debug('game');
-const globalClock = new Clock();
+
+const playerTimeScaling = ref(1.0);
+const playerClock = new Clock({ scaling: playerTimeScaling.value });
+watch(playerTimeScaling, (scaling) => { playerClock.scaling = scaling });
+
+const worldTime = ref(0);
+const worldPaused = ref(true);
+const worldTimeScaling = ref(1.0);
+const worldClock = new Clock({ paused: worldPaused.value, scaling: worldTimeScaling.value });
+worldClock.on('tick', (time) => {
+    worldTime.value = time;
+});
+watch(worldTimeScaling, (scaling) => { worldClock.scaling = scaling });
+watch(worldPaused, (isPaused) => {
+    if (isPaused) {
+        worldClock.pause();
+    } else {
+        worldClock.start();
+    }
+});
 
 const canvas = ref<HTMLCanvasElement>();
 let game: Engine | undefined;
@@ -129,7 +148,7 @@ function makeScene(game: Engine) {
 
     const aoe = makeAoe(scene);
     scene.collisionsEnabled = true;
-    const character = new Character('player', {}, scene, globalClock);
+    const character = new Character('player', {}, scene, playerClock);
     camera.setTarget(character.camMarker.position.clone());
     camera.lockedTarget = character.camMarker;
 
@@ -149,7 +168,8 @@ function makeScene(game: Engine) {
         let keydown = false;
         const movement = new Bab.Vector3(0, 0, 0);
         const delta = game.getDeltaTime();
-        globalClock.tick(delta);
+        worldClock.tick(delta);
+        playerClock.tick(delta);
         character.setMarkerHeight();
 
         if (inputMap['w']) {
@@ -180,18 +200,14 @@ function makeScene(game: Engine) {
             movement.normalize();
             const turnAdjustment = character.speedRotation;
 
-            character.position.addInPlace(movement.scale(character.speed * globalClock.lastDelta * turnAdjustment));
+            character.position.addInPlace(movement.scale(character.speed * playerClock.lastDelta * turnAdjustment));
             character.steering.velocity = movement;
             character.steering.lookWhereGoing(true);
 
             const currentDirection = character.getDirection(Bab.Vector3.Forward());
             currentDirection.y = 0;
             currentDirection.normalize();
-            character.position.addInPlace(currentDirection.scale(character.speed * globalClock.lastDelta * (1.0 - turnAdjustment)));
-
-            const newDirection = character.getDirection(Bab.Vector3.Forward());
-            let angle = vectorAngle(newDirection);
-            debug('angle: ', newDirection, angle);
+            character.position.addInPlace(currentDirection.scale(character.speed * playerClock.lastDelta * (1.0 - turnAdjustment)));
 
             if (character.collider.intersectsMesh(aoe.disc, false)) {
                 if (!isColliding) {

@@ -17,12 +17,14 @@ type ClockOptions = {
     startTime: number,
     scaling: number,
     duration: number,
+    paused: boolean,
 }
 
 const DefaultClockOptions: ClockOptions = {
     startTime: 0,
     scaling: 1.0,
     duration: 0,
+    paused: false,
 } as const;
 
 export class Clock extends EventEmitter {
@@ -31,6 +33,7 @@ export class Clock extends EventEmitter {
     #prevTime: number;
     scaling: number;
     duration?: number;
+    isPaused: boolean;
 
     timeouts: ClockTimeoutEntry[] = [];
 
@@ -45,9 +48,27 @@ export class Clock extends EventEmitter {
         this.#prevTime = opts.startTime;
         this.scaling = opts.scaling;
         this.duration = opts.duration;
+        this.isPaused = opts.paused;
+        if (!this.isPaused) {
+            this.start(); // To make sure the event is emitted
+        }
+    }
+
+    start() {
+        this.emit('start', this.time, this);
+        this.isPaused = false;
+    }
+
+    pause() {
+        this.emit('pause', this.time, this);
+        this.isPaused = true;
     }
 
     tick(delta: number = 1) {
+        if (this.isPaused) {
+            return;
+        } // else:
+
         delta *= this.scaling;
         this.#prevTime = this.time;
         this.time += delta;
