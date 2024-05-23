@@ -27,6 +27,7 @@ export default function createShader(scene: Scene, color?: Color3, shaderName = 
                 'world',
                 'worldView',
                 'worldViewProjection',
+                'characterPosition',
                 'view',
                 'projection',
                 'time',
@@ -36,6 +37,7 @@ export default function createShader(scene: Scene, color?: Color3, shaderName = 
         }
     )
 
+    material.setArray3('characterPosition', [0, 0, 0]);
     material.setColor3('color', color || new Color3(0.2, 0.6, 1.0));
     return material;
 }

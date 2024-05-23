@@ -4,6 +4,7 @@ varying vec3 vPos;
 uniform sampler2D textureSampler;
 uniform vec3 color;
 uniform float time;
+varying float charDist;
 #define PI 3.14159265359
 #define TAU 6.28318530718
 #define MAX_ITER 5
@@ -75,6 +76,9 @@ void main(void) {
     // gl_FragColor = vec4(0.2, 0.6, 1.0, alpha);
     // gl_FragColor = vec4(color * caustic, alpha);
     gl_FragColor = vec4(color, alpha);
+
+    gl_FragColor.a *= smoothstep(26.0, 10.0, charDist);
+
     // gl_FragColor = vec4(vec3(dist, 1.0, 1.0), 1.0);
     // gl_FragColor = vec4(vec3(st.x, 1.0, 0.0), dist);
     // gl_FragColor = vec4(vec3(vuv.y, vuv.x, 0.0), alpha);

@@ -55,9 +55,9 @@ function onResize() {
     }
 }
 
-function makeArena(scene: Scene, yalms = 90) {
+function makeArena(scene: Scene, character: Character, yalms = 90) {
 
-    const arena = new Arena('arena', { yalms }, scene);
+    const arena = new Arena('arena', { yalms, character }, scene);
 
     const gridMat = new GridMaterial('arenaMat', scene);
     let c = 0.83;
@@ -245,7 +245,7 @@ function makeScene(game: Engine) {
     char2.position.z = yalmsToM(25);
     char2.position.y = (torsoHeight * 1.20) / 2;
 
-    const arena = makeArena(scene);
+    const arena = makeArena(scene, character);
 
     return {
         scene, camera, light, character, arena

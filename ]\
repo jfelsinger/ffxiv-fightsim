@@ -114,7 +114,7 @@ export class Arena {
         }, this.scene);
         boundary.checkCollisions = false;
         boundary.position.y += height / 2;
-        boundary.position.z += 0;
+        boundary.position.z += 20;
         boundary.material = boundaryMat;
 
         return { floor };
