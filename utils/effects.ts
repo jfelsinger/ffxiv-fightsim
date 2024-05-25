@@ -162,16 +162,14 @@ export class Mechanic extends EventEmitter {
                 await this.executeEffect(this.effects[i])
             }
         } else {
-            await Promise.all(this.effects.map(effect => {
-                this.executeEffect(effect)
-            }));
+            await Promise.all(this.effects.map(effect => this.executeEffect(effect)));
         }
         this.emit('end-execute');
     }
 
     async executeEffect(effect: Scheduled<iEffect>) {
         this.emit('start-effect', { effect });
-        await executeScheduled(effect, (item) => item.execute(), this.clock)
+        await executeScheduled(effect, (item) => item.start(), this.clock)
         this.emit('end-effect', { effect });
     }
 }

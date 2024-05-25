@@ -34,6 +34,7 @@ export class Clock extends EventEmitter {
     scaling: number;
     duration?: number;
     isPaused: boolean;
+    executeOnTick: boolean = true;
 
     timeouts: ClockTimeoutEntry[] = [];
 
@@ -78,6 +79,10 @@ export class Clock extends EventEmitter {
             this.time = this.duration;
         }
         this.emit('tick', this.time, delta, this);
+
+        if (this.executeOnTick) {
+            this.executeTick();
+        }
     }
 
     setTime(time: number, setPrevToo = false) {

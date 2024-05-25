@@ -11,6 +11,12 @@ import { yalmsToM } from '../utils/conversions';
 import { Arena } from '../utils/arena';
 import { Character } from '../utils/character';
 import { Clock } from '../utils/clock';
+import {
+    Fight,
+    FightSection,
+    Mechanic,
+    Effect,
+} from '../utils/effects';
 
 (window as any).Bab = Bab;
 
@@ -29,9 +35,10 @@ const playerClock = new Clock({ scaling: playerTimeScaling.value });
 watch(playerTimeScaling, (scaling) => { playerClock.scaling = scaling });
 
 const worldTime = ref(0);
-const worldPaused = ref(true);
+const worldPaused = ref(false);
 const worldTimeScaling = ref(1.0);
 const worldClock = new Clock({ paused: worldPaused.value, scaling: worldTimeScaling.value });
+worldClock.start();
 worldClock.on('tick', (time) => {
     worldTime.value = time;
 });
@@ -53,6 +60,57 @@ function onResize() {
     if (game) {
         game.resize();
     }
+}
+
+function createFight(scene: Scene) {
+    const clock = worldClock;
+
+    // TODO: use a real effect
+    const testEffect = new Effect({
+        duration: 500,
+        clock,
+        scene,
+    });
+    testEffect.on('start', () => { debug('effect:start'); });
+    testEffect.on('end', () => { debug('effect:end'); });
+
+    const testMechanic = new Mechanic({
+        name: 'test-mechanic',
+        clock,
+        effects: [{
+            startDelay: 1000,
+            endDelay: 1000,
+            // TODO: use a real effect
+            item: testEffect,
+        }],
+    });
+    testMechanic.on('start-execute', () => { debug('mechanic:start'); });
+    testMechanic.on('end-execute', () => { debug('mechanic:end'); });
+    testMechanic.on('start-effect', ({ effect }) => { debug('mechanic:start-effect', effect); });
+    testMechanic.on('end-effect', ({ effect }) => { debug('mechanic:end-effect', effect); });
+
+    const testSection = new FightSection({
+        name: 'test-section',
+        clock,
+        mechanics: [{
+            item: testMechanic,
+        }],
+    });
+    testSection.on('start-execute', () => { debug('section:start'); });
+    testSection.on('end-execute', () => { debug('section:end'); });
+
+    const fight = new Fight({
+        name: 'test-fight',
+        clock,
+        sections: [{
+            item: testSection,
+        }],
+    });
+    fight.on('start-execute', () => { debug('fight:start'); });
+    fight.on('end-execute', () => { debug('fight:end'); });
+
+    debug('get fight!', fight);
+    return fight;
 }
 
 function makeArena(scene: Scene, character: Character, yalms = 90) {
@@ -246,6 +304,8 @@ function makeScene(game: Engine) {
     char2.position.y = (torsoHeight * 1.20) / 2;
 
     const arena = makeArena(scene, character);
+    const fight = createFight(scene);
+    fight.execute();
 
     return {
         scene, camera, light, character, arena
