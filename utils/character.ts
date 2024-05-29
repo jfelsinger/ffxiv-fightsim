@@ -85,7 +85,8 @@ export class Character {
             ...options,
         }
 
-        const yalmsPerMs = opts.speed / (5034 / 30)
+        // const yalmsPerMs = opts.speed / (5034 / 30);
+        const yalmsPerMs = opts.speed / (5034 / 31);
         this.speed = yalmsToM(yalmsPerMs);
         this.speedRotation = clamp(opts.speedRotation);
 

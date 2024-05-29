@@ -77,7 +77,7 @@ void main(void) {
     // gl_FragColor = vec4(color * caustic, alpha);
     gl_FragColor = vec4(color, alpha);
 
-    gl_FragColor.a *= smoothstep(26.0, 10.0, charDist);
+    gl_FragColor.a *= smoothstep(26.0, 10.0, charDist) + 0.125;
 
     // gl_FragColor = vec4(vec3(dist, 1.0, 1.0), 1.0);
     // gl_FragColor = vec4(vec3(st.x, 1.0, 0.0), dist);

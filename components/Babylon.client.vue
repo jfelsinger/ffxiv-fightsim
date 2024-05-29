@@ -5,17 +5,18 @@ import { Engine, Scene, Vector3 } from '@babylonjs/core';
 import * as Bab from '@babylonjs/core';
 import { GridMaterial } from '@babylonjs/materials';
 import createMarkerMat from '../materials/marker';
-import createAoeMat from '../materials/standardAoe';
 import { Steering } from '../utils/steering';
 import { yalmsToM } from '../utils/conversions';
 import { Arena } from '../utils/arena';
 import { Character } from '../utils/character';
 import { Clock } from '../utils/clock';
 import {
+    TestAoeEffect,
+} from '../utils/effects.testaoe';
+import {
     Fight,
     FightSection,
     Mechanic,
-    Effect,
 } from '../utils/effects';
 
 (window as any).Bab = Bab;
@@ -66,8 +67,9 @@ function createFight(scene: Scene) {
     const clock = worldClock;
 
     // TODO: use a real effect
-    const testEffect = new Effect({
-        duration: 500,
+    const testEffect = new TestAoeEffect({
+        position: new Bab.Vector3(10, 0, 0),
+        duration: 1500,
         clock,
         scene,
     });
@@ -78,8 +80,9 @@ function createFight(scene: Scene) {
         name: 'test-mechanic',
         clock,
         effects: [{
-            startDelay: 1000,
-            endDelay: 1000,
+            repeat: 1,
+            startDelay: 500,
+            endDelay: 500,
             // TODO: use a real effect
             item: testEffect,
         }],
@@ -110,6 +113,7 @@ function createFight(scene: Scene) {
     fight.on('end-execute', () => { debug('fight:end'); });
 
     debug('get fight!', fight);
+    debug('FIGHT TIME: ', fight.getDuration());
     return fight;
 }
 
@@ -137,19 +141,7 @@ function makeArena(scene: Scene, character: Character, yalms = 90) {
     }
 }
 
-function makeAoe(scene: Scene, yalms = 15) {
-    const discMat = createAoeMat(scene, Bab.Color3.FromInts(255, 150, 20), 'discMat');
-    discMat.alpha = 0.7;
-    const disc = Bab.MeshBuilder.CreateDisc('area', { radius: yalmsToM(yalms) }, scene);
-    disc.position.y = 0.01;
-    disc.material = discMat;
-    disc.rotation.x = Math.PI / 2;
-    disc.checkCollisions = true;
-
-    return {
-        disc,
-    }
-}
+const currentFight = ref<Fight | undefined>();
 
 function makeScene(game: Engine) {
     const scene = new Scene(game);
@@ -204,7 +196,6 @@ function makeScene(game: Engine) {
 
 
 
-    const aoe = makeAoe(scene);
     scene.collisionsEnabled = true;
     const character = new Character('player', {}, scene, playerClock);
     camera.setTarget(character.camMarker.position.clone());
@@ -222,9 +213,11 @@ function makeScene(game: Engine) {
 
     let isColliding = false;
     let collisionTime = Date.now();
+    let arena: Arena | undefined;
+
     scene.onBeforeRenderObservable.add(() => {
         let keydown = false;
-        const movement = new Bab.Vector3(0, 0, 0);
+        let movement = new Bab.Vector3(0, 0, 0);
         const delta = game.getDeltaTime();
         worldClock.tick(delta);
         playerClock.tick(delta);
@@ -258,28 +251,43 @@ function makeScene(game: Engine) {
             movement.normalize();
             const turnAdjustment = character.speedRotation;
 
-            character.position.addInPlace(movement.scale(character.speed * playerClock.lastDelta * turnAdjustment));
-            character.steering.velocity = movement;
-            character.steering.lookWhereGoing(true);
+            if (arena?.boundary) {
+                if (!arena.isPositionWithinBoundary(character.position)) {
+                    const boundaryPosition = arena.boundary.position.clone();
+                    const currentPos = boundaryPosition.addInPlace(character.position).length();
+                    const newPos = boundaryPosition.addInPlace(movement).length();
 
-            const currentDirection = character.getDirection(Bab.Vector3.Forward());
-            currentDirection.y = 0;
-            currentDirection.normalize();
-            character.position.addInPlace(currentDirection.scale(character.speed * playerClock.lastDelta * (1.0 - turnAdjustment)));
-
-            if (character.collider.intersectsMesh(aoe.disc, false)) {
-                if (!isColliding) {
-                    isColliding = true;
-                    collisionTime = Date.now();
-                    debug('colission started!', collisionTime);
-                }
-            } else {
-                if (isColliding) {
-                    isColliding = false;
-                    const now = Date.now();
-                    debug('colission ended!', collisionTime, now, now - collisionTime);
+                    if (newPos >= currentPos) {
+                        movement = Bab.Vector3.Zero();
+                    }
                 }
             }
+
+            if (movement.length()) {
+                character.position.addInPlace(movement.scale(character.speed * playerClock.lastDelta * turnAdjustment));
+                character.steering.velocity = movement;
+                character.steering.lookWhereGoing(true);
+
+                const currentDirection = character.getDirection(Bab.Vector3.Forward());
+                currentDirection.y = 0;
+                currentDirection.normalize();
+                character.position.addInPlace(currentDirection.scale(character.speed * playerClock.lastDelta * (1.0 - turnAdjustment)));
+            }
+
+            // TODO: Replace AOE collider with that from the fight aoe.
+            // if (character.collider.intersectsMesh(aoe.disc, false)) {
+            //     if (!isColliding) {
+            //         isColliding = true;
+            //         collisionTime = Date.now();
+            //         debug('colission started!', collisionTime);
+            //     }
+            // } else {
+            //     if (isColliding) {
+            //         isColliding = false;
+            //         const now = Date.now();
+            //         debug('colission ended!', collisionTime, now, now - collisionTime);
+            //     }
+            // }
         } else {
             const currentDirection = character.getDirection(Bab.Vector3.Forward());
             currentDirection.y = 0;
@@ -300,15 +308,18 @@ function makeScene(game: Engine) {
         diameterTop: height / (heads / 1.35),
         diameterBottom: height / (heads / 3),
     }, scene);
-    char2.position.z = yalmsToM(25);
+    char2.position.z = yalmsToM(0);
     char2.position.y = (torsoHeight * 1.20) / 2;
 
-    const arena = makeArena(scene, character);
+    const arenaResult = makeArena(scene, character);
+    arena = arenaResult?.arena;
+
     const fight = createFight(scene);
     fight.execute();
+    currentFight.value = fight;
 
     return {
-        scene, camera, light, character, arena
+        scene, camera, light, character, arena: arenaResult,
     }
 }
 
@@ -336,7 +347,7 @@ onBeforeUnmount(async () => {
 
 <template>
     <div id="game" class="relative max-w-screen max-h-screen overflow-hidden h-screen game --babylon">
-        <h1 class="z-20 relative">Hello!</h1>
+        <FightUi v-if="currentFight" :fight="currentFight" />
 
         <div class="minimap relative-north absolute top-10 right-10 z-10 bg-slate-700 p-[2px] rounded-full" :style="{
             '--cam-rotation': `${cameraDirection}deg`,

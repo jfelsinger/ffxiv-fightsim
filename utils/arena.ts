@@ -53,6 +53,18 @@ export class Arena {
         }
     }
 
+    isPositionWithinBoundary(position: Bab.Vector3) {
+        if (this.shape === 'round') {
+            const size = yalmsToM(this.yalms);
+            const radius = size / 2;
+            if (position.length() < radius) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     makeSquareFloor(mat: Bab.Material): { floor: Bab.Mesh, boundary?: Bab.Mesh } {
         const size = yalmsToM(this.yalms);
         const floor = Bab.MeshBuilder.CreateGround(`${this.name}Floor`, { width: size, height: size }, this.scene);
@@ -117,7 +129,7 @@ export class Arena {
         boundary.position.z += 0;
         boundary.material = boundaryMat;
 
-        return { floor };
+        return { floor, boundary };
     }
 
     makeRingFloor(mat: Bab.Material): { floor: Bab.Mesh, boundary?: Bab.Mesh } {

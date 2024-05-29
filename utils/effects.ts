@@ -20,6 +20,34 @@ function isScheduled<T>(v: unknown): v is Scheduled<T> {
     return typeof v === 'object' && v != null && 'item' in v;
 }
 
+function getScheduledDuration<T>(scheduled: Scheduled<T>, getItemDuration: (item: T) => number = (() => 0)) {
+    let duration = 0;
+    duration += scheduled?.startDelay || 0;
+    duration += getItemDuration(scheduled.item);
+    duration += scheduled?.endDelay || 0;
+
+    if (scheduled.after) {
+        if (isScheduled(scheduled.after)) {
+            duration += getScheduledDuration(scheduled.after, getItemDuration)
+        } else {
+            duration += getItemDuration(scheduled.after);
+        }
+    }
+
+    if (scheduled.repeat) {
+        duration += duration * scheduled.repeat;
+        if (scheduled.afterRepeats) {
+            if (isScheduled(scheduled.afterRepeats)) {
+                duration += getScheduledDuration(scheduled.afterRepeats, getItemDuration)
+            } else {
+                duration += getItemDuration(scheduled.afterRepeats);
+            }
+        }
+    }
+
+    return duration;
+}
+
 async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T) => Promise<void>, clock: Clock, repeatNumber = 0) {
     if (scheduled.startDelay) {
         await clock.wait(scheduled.startDelay);
@@ -40,7 +68,7 @@ async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T) => P
     }
 
     if (scheduled.repeat) {
-        if (scheduled.repeat < repeatNumber) {
+        if (scheduled.repeat > repeatNumber) {
             await executeScheduled(scheduled, func, clock, (repeatNumber || 0) + 1)
         } else if (scheduled.afterRepeats) {
             if (isScheduled(scheduled.afterRepeats)) {
@@ -55,6 +83,7 @@ async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T) => P
 export interface iEffect {
     start(): Promise<void>
     execute(): Promise<void>
+    getDuration(): number
 }
 
 export type EffectTargetType =
@@ -89,9 +118,34 @@ export class Effect extends EventEmitter {
     position: Bab.Vector3 | (() => Bab.Vector3);
     positionType: EffectPositionType;
     repeatTarget: boolean;
+    mesh?: Bab.Mesh;
+    isActive: boolean = false;
+
+    options: EffectOptions;
+
+    toJSON() {
+        const { x, y, z } = this.getPosition();
+        return {
+            duration: this.duration,
+
+            position: { v3: [x, y, z] },
+            positionType: this.positionType,
+
+            repeatTarget: this.repeatTarget,
+        }
+    }
+
+    getDuration() {
+        return this.duration || 0;
+    }
+
+    getPosition() {
+        return typeof (this.position) === 'function' ? this.position() : this.position;
+    }
 
     constructor(options: EffectOptions) {
         super();
+        this.options = options;
         this.duration = options.duration ?? 0;
         this.clock = options.clock;
         this.scene = options.scene;
@@ -121,12 +175,15 @@ export class Effect extends EventEmitter {
         if (this.duration) {
             await this.clock.wait(this.duration);
         }
+        this.emit('snapshot', { mesh: this.mesh });
     }
 
     async startup() {
+        this.isActive = true;
     }
 
     async cleanup() {
+        this.isActive = false;
     }
 }
 
@@ -142,9 +199,39 @@ export class Mechanic extends EventEmitter {
     scheduling: ScheduleMode;
     effects: Scheduled<iEffect>[];
     clock: Clock;
+    isActive: boolean = false;
+    options: MechanicOptions;
+
+    toJSON() {
+        return {
+            name: this.name,
+            scheduling: this.scheduling,
+            effects: this.effects,
+        };
+    }
+
+    getDuration() {
+        let duration = 0;
+        if (this.scheduling === 'sequential') {
+            const len = this.effects.length;
+            for (let i = 0; i < len; i++) {
+                const effect = this.effects[i];
+                duration += getScheduledDuration(effect, ((i) => i?.getDuration() || 0));
+            }
+        } else {
+            duration += Math.max(
+                ...this.effects.map(
+                    (effect) => getScheduledDuration(effect, ((i) => i?.getDuration() || -0))
+                )
+            );
+        }
+
+        return duration;
+    }
 
     constructor(options: MechanicOptions) {
         super();
+        this.options = options;
         this.effects = options.effects || [];
         this.scheduling = options.scheduling || 'parallel';
         this.clock = options.clock;
@@ -155,7 +242,9 @@ export class Mechanic extends EventEmitter {
     }
 
     async execute() {
+        this.isActive = true;
         this.emit('start-execute');
+
         if (this.scheduling === 'sequential') {
             const len = this.effects.length;
             for (let i = 0; i < len; i++) {
@@ -164,6 +253,8 @@ export class Mechanic extends EventEmitter {
         } else {
             await Promise.all(this.effects.map(effect => this.executeEffect(effect)));
         }
+
+        this.isActive = false;
         this.emit('end-execute');
     }
 
@@ -186,9 +277,39 @@ export class FightSection extends EventEmitter {
     scheduling: ScheduleMode;
     mechanics: Scheduled<Mechanic>[];
     clock: Clock;
+    isActive: boolean = false;
+    options: SectionOptions;
+
+    toJSON() {
+        return {
+            name: this.name,
+            scheduling: this.scheduling,
+            mechanics: this.mechanics,
+        };
+    }
+
+    getDuration() {
+        let duration = 0;
+        if (this.scheduling === 'sequential') {
+            const len = this.mechanics.length;
+            for (let i = 0; i < len; i++) {
+                const mechanic = this.mechanics[i];
+                duration += getScheduledDuration(mechanic, ((i) => i?.getDuration() || 0));
+            }
+        } else {
+            duration += Math.max(
+                ...this.mechanics.map(
+                    (mechanic) => getScheduledDuration(mechanic, ((i) => i?.getDuration() || -0))
+                )
+            );
+        }
+
+        return duration;
+    }
 
     constructor(options: SectionOptions) {
         super();
+        this.options = options;
         this.mechanics = options.mechanics || [];
         this.scheduling = options.scheduling || 'sequential';
         this.clock = options.clock;
@@ -199,7 +320,9 @@ export class FightSection extends EventEmitter {
     }
 
     async execute() {
+        this.isActive = true;
         this.emit('start-execute');
+
         if (this.scheduling === 'sequential') {
             const len = this.mechanics.length;
             for (let i = 0; i < len; i++) {
@@ -208,6 +331,8 @@ export class FightSection extends EventEmitter {
         } else {
             await Promise.all(this.mechanics.map(m => this.executeMechanic(m)));
         }
+
+        this.isActive = false;
         this.emit('end-execute');
     }
 
@@ -230,9 +355,40 @@ export class Fight extends EventEmitter {
     scheduling: ScheduleMode;
     sections: Scheduled<FightSection>[];
     clock: Clock;
+    isActive: boolean = false;
+    options: FightOptions;
+
+    getDuration() {
+        let duration = 0;
+        if (this.scheduling === 'sequential') {
+            const len = this.sections.length;
+            for (let i = 0; i < len; i++) {
+                const section = this.sections[i];
+                duration += getScheduledDuration(section, ((i) => i?.getDuration() || 0));
+            }
+        } else {
+            duration += Math.max(
+                ...this.sections.map(
+                    (section) => getScheduledDuration(section, ((i) => i?.getDuration() || -0))
+                )
+            );
+        }
+
+        return duration;
+    }
+
+    toJSON() {
+        return {
+            name: this.name,
+            scheduling: this.scheduling,
+            isActive: this.isActive,
+            sections: this.sections,
+        };
+    }
 
     constructor(options: FightOptions) {
         super();
+        this.options = options;
         this.sections = options.sections || [];
         this.scheduling = options.scheduling || 'sequential';
         this.clock = options.clock;
@@ -243,7 +399,9 @@ export class Fight extends EventEmitter {
     }
 
     async execute() {
+        this.isActive = true;
         this.emit('start-execute');
+
         if (this.scheduling === 'sequential') {
             const len = this.sections.length;
             for (let i = 0; i < len; i++) {
@@ -252,6 +410,8 @@ export class Fight extends EventEmitter {
         } else {
             await Promise.all(this.sections.map(s => this.executeSection(s)));
         }
+
+        this.isActive = false;
         this.emit('end-execute');
     }
 
