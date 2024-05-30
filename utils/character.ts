@@ -18,6 +18,7 @@ export type CharacterOptions = {
     speed: number
     speedRotation: number
     role?: 'dps' | 'tank' | 'healer';
+    tags?: string[];
 }
 
 export const MinPlayerHeight = 0.525;
@@ -42,6 +43,7 @@ export class Character {
     heads: number;
     diffuseColor: Bab.Color3;
     specularColor: Bab.Color3;
+    tags: Set<string> = new Set();
 
     camera?: Bab.ArcRotateCamera;
 
@@ -54,6 +56,7 @@ export class Character {
     collider: Bab.Mesh;
     marker: Bab.Mesh;
     steering: Steering;
+
 
     get position(): Bab.Vector3 {
         return this.marker?.position;
@@ -94,6 +97,14 @@ export class Character {
         this.diffuseColor = opts.diffuseColor;
         this.specularColor = opts.specularColor;
         this.role = opts.role;
+
+        if (options.tags) {
+            for (const tag of options.tags) {
+                if (tag) {
+                    this.tags.add(tag);
+                }
+            }
+        }
 
         // 0.6 | 1.2125
         this.height = lerp(MinPlayerHeight, MaxPlayerHeight, opts.height);

@@ -41,6 +41,7 @@ export default defineNuxtConfig({
                         `
                         @use 'sass:math';
                         @use 'sass:color';
+                        @import '~/assets/styles/vars.scss';
                         `,
                 },
             },

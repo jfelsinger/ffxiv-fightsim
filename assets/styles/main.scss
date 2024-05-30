@@ -1,0 +1,11 @@
+@import 'vars.scss';
+
+.clip-collapse.clip-collapse {
+    overflow: visible;
+
+    /* closed */
+    > input[type="checkbox"]:not(:checked) ~ .collapse-content
+    {
+        clip-path: inset(0 0 100% 0px);
+    }
+}

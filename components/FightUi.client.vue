@@ -1,17 +1,11 @@
 <script setup lang="ts">
-import { yaml as langYaml } from '@codemirror/lang-yaml';
-import { json as langJson } from '@codemirror/lang-json';
-import { oneDarkTheme } from '@codemirror/theme-one-dark';
-import CodeMirror from 'vue-codemirror6';
-
 import * as YAML from 'yaml';
-// import hljs from 'highlight.js';
-import {
-    Fight,
-    FightSection,
-    Mechanic,
-    Effect,
-} from '../utils/effects';
+import { Fight } from '../utils/effects';
+import { decodeFight } from '../utils/decode-fight';
+
+const emit = defineEmits<{
+    (e: 'update', value: Fight): void,
+}>();
 
 const props = defineProps({
     fight: Fight,
@@ -31,7 +25,32 @@ props.fight?.clock.on('tick', () => {
 
 const language = ref('yaml');
 const encoded = ref(YAML.stringify(props.fight).trim());
-const cmLanguage = computed(() => language.value === 'yaml' ? langYaml() : langJson());
+
+const encodedChanged = computed(() => {
+    if (language.value === 'yaml') {
+        const encodeCurrent = YAML.stringify(props.fight).trim();
+        return YAML.stringify(YAML.parse(encoded.value))?.trim() !== encodeCurrent;
+    } else {
+        const encodeCurrent = JSON.stringify(props.fight).trim();
+        return JSON.stringify(JSON.parse(encoded.value))?.trim() !== encodeCurrent;
+    }
+});
+
+function onSave() {
+    if (encodedChanged.value && encoded.value && props.fight) {
+        try {
+            const updatedFight = decodeFight(encoded.value, {
+                collection: props.fight.collection,
+                clock: props.fight?.clock,
+            });
+
+            console.log('Save: ', updatedFight);
+            emit('update', updatedFight);
+        } catch (err) {
+            console.error('Save fail: ', err);
+        }
+    }
+}
 
 watch(language, (newValue: string, oldValue: string) => {
     if (newValue !== oldValue) {
@@ -43,73 +62,41 @@ watch(language, (newValue: string, oldValue: string) => {
     }
 });
 
-function updateLanguage(updatedLang: string) {
-    console.log('Update Language: ', updatedLang);
-    language.value = updatedLang;
-}
-
-
-// const json = computed({
-//     get() {
-//         if (language.value === 'json') {
-//             return encoded.value
-//         }
-//         return JSON.stringify(YAML.parse(encoded.value), null, 2);
-//     },
-//
-//     set(newValue) {
-//         if (language.value === 'json') {
-//             encoded.value = newValue;
-//         }
-//         encoded.value = JSON.stringify(YAML.parse(newValue), null, 2).trim();
-//     },
-// });
-
-// const yaml = computed({
-//     get() {
-//         if (language.value === 'yaml') {
-//             return encoded.value
-//         }
-//         return YAML.stringify(JSON.parse(encoded.value));
-//     },
-//
-//     set(newValue) {
-//         if (language.value === 'yaml') {
-//             encoded.value = newValue.trim();
-//         }
-//         encoded.value = YAML.stringify(JSON.parse(newValue)).trim();
-//     },
-// });
-
 </script>
 
 <template>
-    <div class="fight-ui">
-        <h2>{{ name }}</h2>
-        <p>Duration: {{ duration / 1000 }}s</p>
-        <p>Elapsed: {{ Math.round(elapsed / 100) / 10 }}s</p>
-        <div class="radial-progress" :style="{
-            '--value': elapsedPercent,
-            '--size': '1rem',
-            '--thickness': '0.25rem',
-        }" role="progressbar"></div>
-        <progress class="progress" :value="elapsedPercent" max="100"></progress>
+    <div class="fight-ui p-2 bg-slate-100/25 rounded collapse clip-collapse collapse-arrow max-w-md">
+        <input type="checkbox" />
 
-        <div v-if="fight" class="fight__sections join join-vertical w-36">
-            <ScheduledFightSection v-for="(section, i) in sections" :index="i" :fight="fight" :scheduled="section"
-                class="collapse collapse-arrow join-item border border-base-300" />
+        <div class="collapse-title relative flex items-center gap-4">
+            <h2 class="flex-grow-2 min-w-fit">{{ name }}</h2>
+            <!--
+            <div class="radial-progress" :style="{
+                '--value': elapsedPercent,
+                '--size': '1rem',
+                '--thickness': '0.25rem',
+            }" role="progressbar"></div>
+            -->
+            <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
+            <CodeButton class=" dropdown-right float-right relative z-30">
+                <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language" v-model="encoded" />
+            </CodeButton>
         </div>
 
-        <div class="codemirror-container bg-slate-200 max-h-[200px] flex flex-column">
-            <div class="p-1 border-b-[1px] border-b-slate-300">
-                <select class="select select-bordered select-xs w-20 z-20 xabsolute top-1 right-5" v-model="language">
-                    <option>yaml</option>
-                    <option>json</option>
-                </select>
+        <div class="collapse-content">
+            <CodeButton class=" dropdown-right float-right">
+                <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language" v-model="encoded" />
+            </CodeButton>
+
+            <p>Duration: {{ duration / 1000 }}s</p>
+            <p>Elapsed: {{ Math.round(elapsed / 100) / 10 }}s</p>
+
+            <h4>Fight Sections:</h4>
+            <div v-if="fight" class="fight__sections join join-vertical w-full">
+                <ScheduledFightSection v-for="(section, i) in sections" :index="i" :fight="fight" :scheduled="section"
+                    class="w-full join-item border border-base-300" />
             </div>
-            <div class="overflow-y-scroll">
-                <CodeMirror tab wrap basic :tab-size="2" :dark="false" v-model="encoded" :lang="cmLanguage" />
-            </div>
+
         </div>
     </div>
 </template>
@@ -120,22 +107,9 @@ function updateLanguage(updatedLang: string) {
     z-index: 20;
     top: 1rem;
     left: 1rem;
+    backdrop-filter: blur(5px) brightness(1.15);
 }
 
-.codemirror-container {
-    display: flex;
-    flex-direction: column;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    position: relative;
-
-    .vue-codemirror {
-
-        >.cm-editor {
-            padding-right: 0.5rem;
-        }
-    }
-}
 
 // .fight__sections {
 //     // display: flex;

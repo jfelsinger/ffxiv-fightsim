@@ -15,6 +15,10 @@ const props = defineProps<{
     index: number,
 }>();
 
+const emit = defineEmits<{
+    (e: 'update', value: Scheduled<Effect>): void,
+}>();
+
 const effect = computed(() => props.scheduled.item);
 </script>
 

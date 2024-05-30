@@ -10,6 +10,7 @@ import { yalmsToM } from '../utils/conversions';
 import { Arena } from '../utils/arena';
 import { Character } from '../utils/character';
 import { Clock } from '../utils/clock';
+import { FightCollection } from '../utils/fight-collection';
 import {
     TestAoeEffect,
 } from '../utils/effects.testaoe';
@@ -63,22 +64,20 @@ function onResize() {
     }
 }
 
-function createFight(scene: Scene) {
-    const clock = worldClock;
+function createFight(collection: FightCollection) {
 
     // TODO: use a real effect
     const testEffect = new TestAoeEffect({
         position: new Bab.Vector3(10, 0, 0),
         duration: 1500,
-        clock,
-        scene,
+        collection,
     });
     testEffect.on('start', () => { debug('effect:start'); });
     testEffect.on('end', () => { debug('effect:end'); });
 
     const testMechanic = new Mechanic({
         name: 'test-mechanic',
-        clock,
+        collection,
         effects: [{
             repeat: 1,
             startDelay: 500,
@@ -94,7 +93,7 @@ function createFight(scene: Scene) {
 
     const testSection = new FightSection({
         name: 'test-section',
-        clock,
+        collection,
         mechanics: [{
             item: testMechanic,
         }],
@@ -104,7 +103,7 @@ function createFight(scene: Scene) {
 
     const fight = new Fight({
         name: 'test-fight',
-        clock,
+        collection,
         sections: [{
             item: testSection,
         }],
@@ -314,9 +313,23 @@ function makeScene(game: Engine) {
     const arenaResult = makeArena(scene, character);
     arena = arenaResult?.arena;
 
-    const fight = createFight(scene);
+    const collection = new FightCollection({
+        scene,
+        worldClock,
+        playerClock,
+        arena,
+    });
+
+    const fight = createFight(collection);
     fight.execute();
     currentFight.value = fight;
+
+    (window as any).__scenery = {
+        collection,
+        scene,
+        character,
+        arenaResult,
+    };
 
     return {
         scene, camera, light, character, arena: arenaResult,
@@ -343,11 +356,18 @@ onMounted(async () => {
 onBeforeUnmount(async () => {
     window.removeEventListener('resize', onResize);
 });
+
+function onFightUpdate(updatedFight: Fight) {
+    currentFight.value = updatedFight;
+    updatedFight.collection.worldClock.time = 0;
+    (window as any).__fight = updatedFight;
+    updatedFight.execute();
+}
 </script>
 
 <template>
     <div id="game" class="relative max-w-screen max-h-screen overflow-hidden h-screen game --babylon">
-        <FightUi v-if="currentFight" :fight="currentFight" />
+        <FightUi @update="onFightUpdate" v-if="currentFight" :fight="currentFight" />
 
         <div class="minimap relative-north absolute top-10 right-10 z-10 bg-slate-700 p-[2px] rounded-full" :style="{
             '--cam-rotation': `${cameraDirection}deg`,

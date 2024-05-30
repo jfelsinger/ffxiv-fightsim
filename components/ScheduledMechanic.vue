@@ -14,6 +14,10 @@ const props = defineProps<{
     index: number,
 }>();
 
+const emit = defineEmits<{
+    (e: 'update', value: Scheduled<Mechanic>): void,
+}>();
+
 const mechanic = computed(() => props.scheduled.item);
 const effects = computed(() => mechanic.value.effects || []);
 </script>

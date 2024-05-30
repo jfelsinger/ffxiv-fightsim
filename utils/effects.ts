@@ -2,83 +2,18 @@ import * as Bab from '@babylonjs/core';
 import { wait } from './wait';
 import { EventEmitter } from 'eventemitter3';
 import { Clock } from './clock';
+import { FightCollection } from './fight-collection';
+
+import {
+    type ScheduleMode,
+    type Scheduled,
+    getScheduledDuration,
+    executeScheduled,
+} from './scheduled';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:steering');
 
-export type ScheduleMode = 'sequential' | 'parallel';
-export type Scheduled<T> = {
-    item: T
-    repeat?: number
-    startDelay?: number
-    endDelay?: number
-    after?: Scheduled<T> | T
-    afterRepeats?: Scheduled<T> | T
-}
-
-function isScheduled<T>(v: unknown): v is Scheduled<T> {
-    return typeof v === 'object' && v != null && 'item' in v;
-}
-
-function getScheduledDuration<T>(scheduled: Scheduled<T>, getItemDuration: (item: T) => number = (() => 0)) {
-    let duration = 0;
-    duration += scheduled?.startDelay || 0;
-    duration += getItemDuration(scheduled.item);
-    duration += scheduled?.endDelay || 0;
-
-    if (scheduled.after) {
-        if (isScheduled(scheduled.after)) {
-            duration += getScheduledDuration(scheduled.after, getItemDuration)
-        } else {
-            duration += getItemDuration(scheduled.after);
-        }
-    }
-
-    if (scheduled.repeat) {
-        duration += duration * scheduled.repeat;
-        if (scheduled.afterRepeats) {
-            if (isScheduled(scheduled.afterRepeats)) {
-                duration += getScheduledDuration(scheduled.afterRepeats, getItemDuration)
-            } else {
-                duration += getItemDuration(scheduled.afterRepeats);
-            }
-        }
-    }
-
-    return duration;
-}
-
-async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T) => Promise<void>, clock: Clock, repeatNumber = 0) {
-    if (scheduled.startDelay) {
-        await clock.wait(scheduled.startDelay);
-    }
-
-    await func(scheduled.item);
-
-    if (scheduled.endDelay) {
-        await clock.wait(scheduled.endDelay);
-    }
-
-    if (scheduled.after) {
-        if (isScheduled(scheduled.after)) {
-            await executeScheduled(scheduled.after, func, clock)
-        } else {
-            await func(scheduled.after);
-        }
-    }
-
-    if (scheduled.repeat) {
-        if (scheduled.repeat > repeatNumber) {
-            await executeScheduled(scheduled, func, clock, (repeatNumber || 0) + 1)
-        } else if (scheduled.afterRepeats) {
-            if (isScheduled(scheduled.afterRepeats)) {
-                await executeScheduled(scheduled.afterRepeats, func, clock)
-            } else {
-                await func(scheduled.afterRepeats);
-            }
-        }
-    }
-}
 
 export interface iEffect {
     start(): Promise<void>
@@ -95,14 +30,15 @@ export type EffectTargetType =
 export type EffectTarget =
     | EffectTargetType | Bab.Mesh;
 
-export type EffectPositionType = 'arena' | 'global';
+export type EffectPositionType = 'arena' | 'global' | 'mesh' | 'character';
 
 export type EffectOptions = {
     duration: number
-    clock: Clock
-    scene: Bab.Scene
+    collection: FightCollection
+    clock?: Clock
+
     target?: EffectTarget | (EffectTarget[])
-    position?: Bab.Vector3 | (() => Bab.Vector3)
+    position?: Bab.Vector3 | string | (() => Bab.Vector3 | string)
     positionType?: EffectPositionType
 
     // Whether or not the same random target can be selected more than once,
@@ -111,44 +47,38 @@ export type EffectOptions = {
 }
 
 export class Effect extends EventEmitter {
-    duration: number;
+    name: string = 'default';
     clock: Clock
-    scene: Bab.Scene;
-    target: EffectTarget[] = [];
-    position: Bab.Vector3 | (() => Bab.Vector3);
-    positionType: EffectPositionType;
-    repeatTarget: boolean;
-    mesh?: Bab.Mesh;
+    collection: FightCollection;
     isActive: boolean = false;
 
+    duration: number;
+    target: EffectTarget[] = [];
+    position: Bab.Vector3 | string | (() => Bab.Vector3 | string)
+    positionType: EffectPositionType;
+    repeatTarget: boolean;
+
+    // The mesh for the effect itself
+    mesh?: Bab.Mesh;
     options: EffectOptions;
 
-    toJSON() {
-        const { x, y, z } = this.getPosition();
-        return {
-            duration: this.duration,
+    get scene() { return this.collection.scene; }
 
-            position: { v3: [x, y, z] },
-            positionType: this.positionType,
+    getTargets() {
+    }
 
-            repeatTarget: this.repeatTarget,
+    getTarget(targetType: EffectTargetType) {
+        if (targetType === 'player') {
+            return this.collection.player;
         }
-    }
-
-    getDuration() {
-        return this.duration || 0;
-    }
-
-    getPosition() {
-        return typeof (this.position) === 'function' ? this.position() : this.position;
     }
 
     constructor(options: EffectOptions) {
         super();
         this.options = options;
         this.duration = options.duration ?? 0;
-        this.clock = options.clock;
-        this.scene = options.scene;
+        this.collection = options.collection;
+        this.clock = options.clock || this.collection.worldClock;
         this.repeatTarget = options.repeatTarget ?? false;
 
         if (Array.isArray(options.target)) {
@@ -159,6 +89,50 @@ export class Effect extends EventEmitter {
 
         this.position = options.position || Bab.Vector3.Zero();
         this.positionType = options.positionType || 'arena';
+    }
+
+    getDuration() {
+        return this.duration || 0;
+    }
+
+    getPosition(): Bab.Vector3 {
+        const positionValue = typeof (this.position) === 'function' ? this.position() : this.position;
+
+        if (typeof positionValue === 'string') {
+            if (this.positionType === 'mesh') {
+                const mesh = this.scene.getMeshByName(positionValue);
+                if (mesh) { return mesh.position; }
+
+                const character = this.collection.characters[positionValue as any];
+                if (character?.position) { return character.position; }
+            } else if (this.positionType === 'character') {
+                const character = this.collection.characters[positionValue as any];
+                if (character?.position) { return character.position; }
+
+                const mesh = this.scene.getMeshByName(positionValue);
+                if (mesh) { return mesh.position; }
+            }
+
+            // Convert to number value
+            const split = positionValue.split(',').map((value) => +value);
+            if (
+                split.length >= 2 &&
+                split.length <= 3 &&
+                split.every(val => !isNaN(val))
+            ) {
+                if (split.length === 2) {
+                    // Assume that we want the x,y on the arena plane: z is what we would think as the y plane kinda...
+                    return new Bab.Vector3(split[0], 0, split[1]);
+                } else {
+                    // A regular Vector3
+                    return new Bab.Vector3(split[0], split[1], split[3]);
+                }
+            }
+
+            return Bab.Vector3.Zero();
+        }
+
+        return positionValue;
     }
 
     async start() {
@@ -185,19 +159,42 @@ export class Effect extends EventEmitter {
     async cleanup() {
         this.isActive = false;
     }
+
+    toJSON() {
+        let positionValue = typeof (this.position) === 'function' ? this.position() : this.position;
+        if (typeof (positionValue) !== 'string') {
+            positionValue = [
+                positionValue.x,
+                positionValue.y,
+                positionValue.z,
+            ].join(',');
+        }
+
+        return {
+            name: this.name,
+            duration: this.duration,
+
+            position: positionValue,
+            positionType: this.positionType,
+
+            repeatTarget: this.repeatTarget,
+        }
+    }
 }
 
 export type MechanicOptions = {
     name?: string
     scheduling?: ScheduleMode
     effects: Scheduled<iEffect>[]
-    clock: Clock
+    collection: FightCollection
+    clock?: Clock
 }
 
 export class Mechanic extends EventEmitter {
-    name?: string;
+    name: string = 'default';
     scheduling: ScheduleMode;
     effects: Scheduled<iEffect>[];
+    collection: FightCollection;
     clock: Clock;
     isActive: boolean = false;
     options: MechanicOptions;
@@ -234,7 +231,8 @@ export class Mechanic extends EventEmitter {
         this.options = options;
         this.effects = options.effects || [];
         this.scheduling = options.scheduling || 'parallel';
-        this.clock = options.clock;
+        this.collection = options.collection;
+        this.clock = options.clock || this.collection.worldClock;
 
         if (options.name) {
             this.name = options.name;
@@ -269,13 +267,15 @@ export type SectionOptions = {
     name?: string;
     scheduling?: ScheduleMode;
     mechanics: Scheduled<Mechanic>[]
-    clock: Clock
+    collection: FightCollection
+    clock?: Clock
 }
 
 export class FightSection extends EventEmitter {
-    name?: string;
+    name: string = 'default';
     scheduling: ScheduleMode;
     mechanics: Scheduled<Mechanic>[];
+    collection: FightCollection;
     clock: Clock;
     isActive: boolean = false;
     options: SectionOptions;
@@ -312,7 +312,8 @@ export class FightSection extends EventEmitter {
         this.options = options;
         this.mechanics = options.mechanics || [];
         this.scheduling = options.scheduling || 'sequential';
-        this.clock = options.clock;
+        this.collection = options.collection;
+        this.clock = options.clock || this.collection.worldClock;
 
         if (options.name) {
             this.name = options.name;
@@ -347,13 +348,15 @@ export type FightOptions = {
     name?: string
     scheduling?: ScheduleMode;
     sections: Scheduled<FightSection>[]
-    clock: Clock
+    collection: FightCollection
+    clock?: Clock
 }
 
 export class Fight extends EventEmitter {
     name?: string;
     scheduling: ScheduleMode;
     sections: Scheduled<FightSection>[];
+    collection: FightCollection;
     clock: Clock;
     isActive: boolean = false;
     options: FightOptions;
@@ -391,7 +394,8 @@ export class Fight extends EventEmitter {
         this.options = options;
         this.sections = options.sections || [];
         this.scheduling = options.scheduling || 'sequential';
-        this.clock = options.clock;
+        this.collection = options.collection;
+        this.clock = options.clock || this.collection.worldClock;
 
         if (options.name) {
             this.name = options.name;

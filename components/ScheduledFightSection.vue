@@ -13,6 +13,10 @@ const props = defineProps<{
     index: number,
 }>();
 
+const emit = defineEmits<{
+    (e: 'update', value: Scheduled<FightSection>): void,
+}>();
+
 const section = computed(() => props.scheduled.item);
 const mechanics = computed(() => section.value.mechanics || []);
 
@@ -20,21 +24,28 @@ const duration = computed(() => section.value?.getDuration() || 0);
 const currentTime = ref(props.fight?.clock?.time || 0);
 const elapsed = computed(() => Math.min(duration.value, currentTime.value));
 const elapsedPercent = computed(() => (elapsed.value || 0) / (duration.value || 1) * 100);
+
+props.fight?.clock.on('tick', () => {
+    currentTime.value = props.fight?.clock.time || 0;
+});
 </script>
 
 <template>
-    <div class="fight-section collapse collapse-arrow join-item border-border-base-300 w-full">
+    <div class="fight-section collapse clip-collapse collapse-arrow join-item border-border-base-300 w-full">
         <input type="checkbox" />
-        <progress class="progress" :value="10" max="100"></progress>
-        <div class="collapse-title">
-            <div class="radial-progress" :style="{
-                '--value': elapsedPercent,
-                '--size': '1rem',
-                '--thickness': '0.25rem',
-            }" role="progressbar"></div>
-            <h2>
+        <div class="collapse-title flex gap-2 items-center">
+            <!--
+            <div class="radial-progress text-[#1f2937] xbg-slate-200 shadow-[0_0_0_6px_rgb(199,202,214)_inset] border-[rgb(199,202,214)] border-2"
+                :style="{
+                    '--value': elapsedPercent,
+                    '--size': '1.5rem',
+                    '--thickness': '4px',
+                }" role="progressbar"></div>
+            -->
+            <h2 class="min-w-fit">
                 Fight Section ({{ index + 1 }})
             </h2>
+            <progress class="progress flex-shrink" :value="elapsedPercent" max="150"></progress>
         </div>
 
         <div class="collapse-content">
