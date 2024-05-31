@@ -30,6 +30,7 @@ const duration = computed(() => props.scheduled ? getScheduledDuration(props.sch
 const currentTime = useState<number>('worldTime', () => 0);
 const elapsed = computed(() => Math.min(duration.value, currentTime.value));
 const elapsedPercent = computed(() => (elapsed.value || 0) / (duration.value || 1) * 100);
+const repeats = computed(() => props.scheduled.repeat || 0);
 
 const language = ref('yaml');
 const encoded = ref(YAML.stringify(props.scheduled).trim());
@@ -108,8 +109,13 @@ function onSave() {
 <template>
     <div class="fight-effect">
         <div class="flex gap-2 items-center">
-            <p class="min-w-fit">effect {{ index + 1 }}.</p>
-            <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
+            <p class="min-w-fit">{{ effect?.name || 'Effect' }} {{ index + 1 }}</p>
+            <div class="progress-marks h-3  w-full flex items-center" :style="{ '--runs': 1 + (repeats || 0) }">
+                <div class="marks__container">
+                    <i class="bg-slate-800" v-for="_ in (repeats || 0)"></i>
+                </div>
+                <progress class="progress" :value="elapsedPercent" max="100"></progress>
+            </div>
             <CodeButton @open="() => resetEncoded(true)" class=" dropdown-right float-right relative z-30">
                 <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language" v-model="encoded" />
             </CodeButton>
@@ -117,4 +123,34 @@ function onSave() {
     </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.progress-marks {
+
+    position: relative;
+    overflow: hidden;
+
+    .marks__container {
+        display: flex;
+        align-items: center;
+        position: absolute;
+        z-index: 2;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: translateY(-50%);
+        justify-content: space-evenly;
+
+        i {
+            display: block;
+            width: 1px;
+            height: 100%;
+            opacity: 0.5;
+        }
+    }
+
+    progress {
+        position: relative;
+    }
+}
+</style>
