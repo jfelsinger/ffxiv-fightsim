@@ -141,7 +141,6 @@ function makeArena(scene: Scene, character: Character, yalms = 90) {
 }
 
 const currentFight = ref<Fight | undefined>();
-const fightId = computed(() => JSON.stringify(currentFight.value));
 
 function makeScene(game: Engine) {
     const scene = new Scene(game);

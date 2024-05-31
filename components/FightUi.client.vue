@@ -32,7 +32,8 @@ const elapsedPercent = computed(() => (elapsed.value || 0) / (duration.value || 
 
 const language = ref('yaml');
 const encoded = ref(YAML.stringify(props.fight).trim());
-const encodedChanged = computed(() => {
+
+function isEncodedChanged() {
     if (language.value === 'yaml') {
         const encodeCurrent = YAML.stringify(props.fight).trim();
         return YAML.stringify(YAML.parse(encoded.value))?.trim() !== encodeCurrent;
@@ -40,7 +41,7 @@ const encodedChanged = computed(() => {
         const encodeCurrent = JSON.stringify(props.fight).trim();
         return JSON.stringify(JSON.parse(encoded.value))?.trim() !== encodeCurrent;
     }
-});
+}
 
 function resetEncoded(force = false) {
     if (language.value === 'yaml') {
@@ -51,7 +52,7 @@ function resetEncoded(force = false) {
         }
 
         try {
-            if (encodedChanged.value) {
+            if (isEncodedChanged()) {
                 console.log('reset encoded!');
                 encoded.value = resetValue;
             }
@@ -67,7 +68,7 @@ function resetEncoded(force = false) {
         }
 
         try {
-            if (encodedChanged.value) {
+            if (isEncodedChanged()) {
                 encoded.value = resetValue;
             }
         } catch (err) {
@@ -76,18 +77,8 @@ function resetEncoded(force = false) {
     }
 }
 
-watch(props.fight, (newOne, oldOne) => {
-    const jsonNew = JSON.stringify(newOne);
-    const jsonOld = JSON.stringify(oldOne);
-    if (jsonNew !== jsonOld) {
-        console.log('updated- old: ', JSON.stringify(newOne));
-        console.log('updated- new: ', JSON.stringify(oldOne));
-        resetEncoded(true);
-    }
-});
-
 function onSave() {
-    if (encodedChanged.value && encoded.value && props.fight) {
+    if (isEncodedChanged() && encoded.value && props.fight) {
         try {
             const updatedFight = decodeFight(encoded.value, {
                 collection: props.fight.collection,
@@ -101,24 +92,6 @@ function onSave() {
         }
     }
 }
-
-// watch(props.fight, (newValue: Fight) => {
-//     if (language.value === 'yaml') {
-//         const newEncoded = YAML.stringify(newValue).trim();
-//         const oldEncoded = YAML.stringify(YAML.parse(encoded.value)).trim();
-//         if (newEncoded != oldEncoded) {
-//             console.log('update fight!', newValue);
-//             encoded.value = newEncoded;
-//         }
-//     } else if (language.value === 'json') {
-//         const newEncoded = JSON.stringify(newValue, null, 2);
-//         const oldEncoded = JSON.stringify(JSON.parse(encoded.value), null, 2).trim();
-//         if (newEncoded != oldEncoded) {
-//             console.log('update fight!', newValue);
-//             encoded.value = newEncoded;
-//         }
-//     }
-// });
 
 watch(language, (newValue: string, oldValue: string) => {
     if (newValue !== oldValue) {
