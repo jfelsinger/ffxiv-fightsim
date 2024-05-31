@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import * as YAML from 'yaml';
+import { decodeScheduledMechanic } from '../utils/decode-fight';
+import {
+    type Scheduled,
+    getScheduledDuration,
+} from '../utils/scheduled';
 import {
     Fight,
     FightSection,
     Mechanic,
-    Effect,
-    type Scheduled,
+    Effect
 } from '../utils/effects';
 
 const props = defineProps<{
@@ -20,14 +25,128 @@ const emit = defineEmits<{
 
 const mechanic = computed(() => props.scheduled.item);
 const effects = computed(() => mechanic.value.effects || []);
+
+const duration = computed(() => props.scheduled ? getScheduledDuration(props.scheduled, (i) => i.getDuration()) : 0 || 0);
+const currentTime = useState<number>('worldTime', () => 0);
+const elapsed = computed(() => Math.min(duration.value, currentTime.value));
+const elapsedPercent = computed(() => (elapsed.value || 0) / (duration.value || 1) * 100);
+
+const language = ref('yaml');
+const encoded = ref(YAML.stringify(props.scheduled).trim());
+const encodedChanged = computed(() => {
+    if (language.value === 'yaml') {
+        const encodeCurrent = YAML.stringify(props.scheduled).trim();
+        return YAML.stringify(YAML.parse(encoded.value))?.trim() !== encodeCurrent;
+    } else {
+        const encodeCurrent = JSON.stringify(props.scheduled).trim();
+        return JSON.stringify(JSON.parse(encoded.value))?.trim() !== encodeCurrent;
+    }
+});
+
+function resetEncoded(force = false) {
+    if (language.value === 'yaml') {
+        const resetValue = YAML.stringify(props.scheduled).trim();
+        if (force) {
+            encoded.value = resetValue;
+            return;
+        }
+
+        try {
+            if (encodedChanged.value) {
+                console.log('reset encoded!');
+                encoded.value = resetValue;
+            }
+        } catch (err) {
+            console.log('reset encoded!', err);
+            encoded.value = resetValue;
+        }
+    } else if (language.value === 'json') {
+        const resetValue = JSON.stringify(props.scheduled).trim();
+        if (force) {
+            encoded.value = resetValue;
+            return;
+        }
+
+        try {
+            if (encodedChanged.value) {
+                encoded.value = resetValue;
+            }
+        } catch (err) {
+            encoded.value = resetValue;
+        }
+    }
+}
+
+// watch(props.fight, (newValue: Fight) => {
+//     if (language.value === 'yaml') {
+//         const newEncoded = YAML.stringify(newValue).trim();
+//         const oldEncoded = YAML.stringify(YAML.parse(encoded.value)).trim();
+//         if (newEncoded != oldEncoded) {
+//             encoded.value = newEncoded;
+//         }
+//     } else if (language.value === 'json') {
+//         const newEncoded = JSON.stringify(newValue, null, 2);
+//         const oldEncoded = JSON.stringify(JSON.parse(encoded.value), null, 2).trim();
+//         if (newEncoded != oldEncoded) {
+//             encoded.value = newEncoded;
+//         }
+//     }
+// });
+
+watch(language, (newValue: string, oldValue: string) => {
+    if (newValue !== oldValue) {
+        if (newValue === 'json' && oldValue === 'yaml') {
+            encoded.value = JSON.stringify(YAML.parse(encoded.value), null, 2).trim();
+        } else if (newValue === 'yaml' && oldValue === 'json') {
+            encoded.value = YAML.stringify(JSON.parse(encoded.value)).trim();
+        }
+    }
+});
+
+function onSave() {
+    if (encodedChanged.value && encoded.value && props.scheduled) {
+        try {
+            const updated = decodeScheduledMechanic(encoded.value, {
+                collection: props.fight.collection,
+                clock: props.fight?.clock,
+            });
+
+            console.log('Save: ', updated);
+            emit('update', updated);
+        } catch (err) {
+            console.error('Save fail: ', err);
+        }
+    }
+
+}
+
+function updateEffect(effect: Scheduled<Effect>, i: number) {
+    console.log('update effect: ', effect, i);
+    const scheduled = props.scheduled;
+    if (scheduled?.item?.effects) {
+        scheduled.item.effects[i] = effect;
+        emit('update', scheduled);
+    }
+}
 </script>
 
 <template>
-    <div class="fight-mechanic">
-        <p>Mechanic {{ index + 1 }}.</p>
-        <div v-if="section && mechanic" class="mechanic__effects">
-            <div v-for="(effect, i) in effects">
-                <ScheduledEffect :index="i" :fight="fight" :section="section" :mechanic="mechanic" :scheduled="effect" />
+    <div class="fight-mechanic collapse clip-collapse collapse-arrow join-item border border-base-300 w-full">
+        <input type="checkbox" />
+        <div class="collapse-title flex gap-2 items-center">
+            <h3 class="min-w-fit">Mechanic {{ index + 1 }}.</h3>
+            <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
+            <CodeButton @open="() => resetEncoded(true)" class=" dropdown-right float-right relative z-30">
+                <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language" v-model="encoded" />
+            </CodeButton>
+        </div>
+
+        <div class="collapse-content">
+            <div v-if="section && effects" class="mechanic__effects">
+                <div v-for="(effect, i) in effects">
+                    <ScheduledEffect @update="(effect) => updateEffect(effect, i)" :index="i" :fight="fight"
+                        :section="section" :mechanic="mechanic" :scheduled="effect as any" />
+                </div>
             </div>
         </div>
     </div>

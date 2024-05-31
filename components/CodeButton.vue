@@ -4,6 +4,10 @@ const dropdown = ref<HTMLElement | undefined>();
 const button = ref<HTMLElement | undefined>();
 const isOpen = ref(false);
 
+const emit = defineEmits<{
+    (e: 'open'): void,
+}>();
+
 function close() {
     dropdown.value?.blur();
     button.value?.blur();
@@ -23,6 +27,7 @@ function handleClick() {
         close();
     } else {
         isOpen.value = true;
+        emit('open');
     }
 }
 

@@ -384,7 +384,6 @@ export class Fight extends EventEmitter {
         return {
             name: this.name,
             scheduling: this.scheduling,
-            isActive: this.isActive,
             sections: this.sections,
         };
     }

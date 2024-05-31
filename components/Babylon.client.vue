@@ -13,7 +13,7 @@ import { Clock } from '../utils/clock';
 import { FightCollection } from '../utils/fight-collection';
 import {
     TestAoeEffect,
-} from '../utils/effects.testaoe';
+} from '../utils/fight-effects/testaoe';
 import {
     Fight,
     FightSection,
@@ -34,16 +34,16 @@ const debug = Debug('game');
 
 const playerTimeScaling = ref(1.0);
 const playerClock = new Clock({ scaling: playerTimeScaling.value });
+const playerTime = useState<number>('playerTime', () => playerClock.time || 0);
+playerClock.on('tick', (time) => { playerTime.value = time });
 watch(playerTimeScaling, (scaling) => { playerClock.scaling = scaling });
 
-const worldTime = ref(0);
 const worldPaused = ref(false);
 const worldTimeScaling = ref(1.0);
 const worldClock = new Clock({ paused: worldPaused.value, scaling: worldTimeScaling.value });
+const worldTime = useState<number>('worldTime', () => worldClock.time || 0);
+worldClock.on('tick', (time) => { worldTime.value = time });
 worldClock.start();
-worldClock.on('tick', (time) => {
-    worldTime.value = time;
-});
 watch(worldTimeScaling, (scaling) => { worldClock.scaling = scaling });
 watch(worldPaused, (isPaused) => {
     if (isPaused) {
@@ -141,6 +141,7 @@ function makeArena(scene: Scene, character: Character, yalms = 90) {
 }
 
 const currentFight = ref<Fight | undefined>();
+const fightId = computed(() => JSON.stringify(currentFight.value));
 
 function makeScene(game: Engine) {
     const scene = new Scene(game);
@@ -358,6 +359,7 @@ onBeforeUnmount(async () => {
 });
 
 function onFightUpdate(updatedFight: Fight) {
+    console.log('UPDATE FIGHT!');
     currentFight.value = updatedFight;
     updatedFight.collection.worldClock.time = 0;
     (window as any).__fight = updatedFight;

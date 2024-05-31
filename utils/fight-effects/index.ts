@@ -1,6 +1,6 @@
 import { Effect } from '../effects';
 
-import { TestAoeEffect } from '../effects.testaoe';
+import { TestAoeEffect } from './testaoe';
 
 export const effectsCollection: Partial<Record<string, typeof Effect>> = {
     'default': Effect,

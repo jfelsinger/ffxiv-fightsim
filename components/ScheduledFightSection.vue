@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import * as YAML from 'yaml';
+import { decodeScheduledFightSection } from '../utils/decode-fight';
+import {
+    type Scheduled,
+    getScheduledDuration,
+} from '../utils/scheduled';
 import {
     Fight,
     FightSection,
     Mechanic,
     Effect,
-    type Scheduled,
 } from '../utils/effects';
 
 const props = defineProps<{
@@ -20,18 +25,110 @@ const emit = defineEmits<{
 const section = computed(() => props.scheduled.item);
 const mechanics = computed(() => section.value.mechanics || []);
 
-const duration = computed(() => section.value?.getDuration() || 0);
-const currentTime = ref(props.fight?.clock?.time || 0);
+const duration = computed(() => props.scheduled ? getScheduledDuration(props.scheduled, (i) => i.getDuration()) : 0 || 0);
+const currentTime = useState<number>('worldTime', () => 0);
 const elapsed = computed(() => Math.min(duration.value, currentTime.value));
 const elapsedPercent = computed(() => (elapsed.value || 0) / (duration.value || 1) * 100);
 
-props.fight?.clock.on('tick', () => {
-    currentTime.value = props.fight?.clock.time || 0;
+const language = ref('yaml');
+const encoded = ref(YAML.stringify(props.scheduled).trim());
+const encodedChanged = computed(() => {
+    if (language.value === 'yaml') {
+        const encodeCurrent = YAML.stringify(props.scheduled).trim();
+        return YAML.stringify(YAML.parse(encoded.value))?.trim() !== encodeCurrent;
+    } else {
+        const encodeCurrent = JSON.stringify(props.scheduled).trim();
+        return JSON.stringify(JSON.parse(encoded.value))?.trim() !== encodeCurrent;
+    }
 });
+
+function resetEncoded(force = false) {
+    if (language.value === 'yaml') {
+        const resetValue = YAML.stringify(props.scheduled).trim();
+        if (force) {
+            encoded.value = resetValue;
+            return;
+        }
+
+        try {
+            if (encodedChanged.value) {
+                console.log('reset encoded!');
+                encoded.value = resetValue;
+            }
+        } catch (err) {
+            console.log('reset encoded!', err);
+            encoded.value = resetValue;
+        }
+    } else if (language.value === 'json') {
+        const resetValue = JSON.stringify(props.scheduled).trim();
+        if (force) {
+            encoded.value = resetValue;
+            return;
+        }
+
+        try {
+            if (encodedChanged.value) {
+                encoded.value = resetValue;
+            }
+        } catch (err) {
+            encoded.value = resetValue;
+        }
+    }
+}
+
+// watch(props.fight, (newValue: Fight) => {
+//     if (language.value === 'yaml') {
+//         const newEncoded = YAML.stringify(newValue).trim();
+//         const oldEncoded = YAML.stringify(YAML.parse(encoded.value)).trim();
+//         if (newEncoded != oldEncoded) {
+//             encoded.value = newEncoded;
+//         }
+//     } else if (language.value === 'json') {
+//         const newEncoded = JSON.stringify(newValue, null, 2);
+//         const oldEncoded = JSON.stringify(JSON.parse(encoded.value), null, 2).trim();
+//         if (newEncoded != oldEncoded) {
+//             encoded.value = newEncoded;
+//         }
+//     }
+// });
+
+watch(language, (newValue: string, oldValue: string) => {
+    if (newValue !== oldValue) {
+        if (newValue === 'json' && oldValue === 'yaml') {
+            encoded.value = JSON.stringify(YAML.parse(encoded.value), null, 2).trim();
+        } else if (newValue === 'yaml' && oldValue === 'json') {
+            encoded.value = YAML.stringify(JSON.parse(encoded.value)).trim();
+        }
+    }
+});
+function onSave() {
+    if (encodedChanged.value && encoded.value && props.scheduled) {
+        try {
+            const updated = decodeScheduledFightSection(encoded.value, {
+                collection: props.fight.collection,
+                clock: props.fight?.clock,
+            });
+
+            console.log('Save: ', updated);
+            emit('update', updated);
+        } catch (err) {
+            console.error('Save fail: ', err);
+        }
+    }
+}
+
+function updateMechanic(effect: Scheduled<Mechanic>, i: number) {
+    console.log('update mechanic: ', effect, i);
+    const scheduled = props.scheduled;
+    if (scheduled?.item?.mechanics) {
+        scheduled.item.mechanics[i] = effect;
+        emit('update', scheduled);
+    }
+}
 </script>
 
 <template>
-    <div class="fight-section collapse clip-collapse collapse-arrow join-item border-border-base-300 w-full">
+    <div class="fight-section collapse clip-collapse collapse-arrow join-item border border-base-300 w-full">
         <input type="checkbox" />
         <div class="collapse-title flex gap-2 items-center">
             <!--
@@ -45,13 +142,17 @@ props.fight?.clock.on('tick', () => {
             <h2 class="min-w-fit">
                 Fight Section ({{ index + 1 }})
             </h2>
-            <progress class="progress flex-shrink" :value="elapsedPercent" max="150"></progress>
+            <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
+            <CodeButton @open="() => resetEncoded(true)" class=" dropdown-right float-right relative z-30">
+                <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language" v-model="encoded" />
+            </CodeButton>
         </div>
 
         <div class="collapse-content">
             <div v-if="section && mechanics" class="section__mechanics">
                 <div v-for="(mechanic, i) in mechanics">
-                    <ScheduledMechanic :index="i" :fight="fight" :section="section" :scheduled="mechanic" />
+                    <ScheduledMechanic @update="(m) => updateMechanic(m, i)" :index="i" :fight="fight" :section="section"
+                        :scheduled="mechanic" />
                 </div>
             </div>
         </div>
@@ -60,7 +161,7 @@ props.fight?.clock.on('tick', () => {
 
 <style lang="scss">
 .fight-section {
-    contain: content;
+    // contain: content; // This will keep stuff contained, like overflow hidden
     container-name: fight-section;
 }
 

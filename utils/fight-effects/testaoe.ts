@@ -1,11 +1,11 @@
-import createAoeMat from '../materials/standardAoe';
-import { yalmsToM } from './conversions';
+import createAoeMat from '../../materials/standardAoe';
+import { yalmsToM } from '../conversions';
 import * as Bab from '@babylonjs/core';
 
 import {
     Effect,
     type EffectOptions,
-} from './effects';
+} from '../effects';
 
 export type TestAoeEffectOptions = EffectOptions & {
     yalms?: number,
