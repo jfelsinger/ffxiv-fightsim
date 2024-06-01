@@ -14,6 +14,10 @@ import {
 import Debug from 'debug';
 const debug = Debug('game:utils:steering');
 
+const DefaultFightSchedulingMode = 'sequential';
+const DefaultFightSectionSchedulingMode = 'sequential';
+const DefaultMechanicSchedulingMode = 'parallel';
+
 
 export interface iEffect {
     start(): Promise<void>
@@ -230,7 +234,7 @@ export class Mechanic extends EventEmitter {
         super();
         this.options = options;
         this.effects = options.effects || [];
-        this.scheduling = options.scheduling || 'parallel';
+        this.scheduling = options.scheduling || DefaultMechanicSchedulingMode;
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
 
@@ -311,7 +315,7 @@ export class FightSection extends EventEmitter {
         super();
         this.options = options;
         this.mechanics = options.mechanics || [];
-        this.scheduling = options.scheduling || 'sequential';
+        this.scheduling = options.scheduling || DefaultFightSectionSchedulingMode;
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
 
@@ -392,7 +396,7 @@ export class Fight extends EventEmitter {
         super();
         this.options = options;
         this.sections = options.sections || [];
-        this.scheduling = options.scheduling || 'sequential';
+        this.scheduling = options.scheduling || DefaultFightSchedulingMode;
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
 

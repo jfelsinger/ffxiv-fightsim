@@ -44,6 +44,7 @@ export class Character {
     diffuseColor: Bab.Color3;
     specularColor: Bab.Color3;
     tags: Set<string> = new Set();
+    stacks: Partial<Record<string, number>> = {};
 
     camera?: Bab.ArcRotateCamera;
 
@@ -57,6 +58,19 @@ export class Character {
     marker: Bab.Mesh;
     steering: Steering;
 
+    addStacks(name: string, count = 1) {
+        this.stacks[name] = (this.stacks[name] || 0) + count;
+        return this.stacks[name];
+    }
+
+    removeStacks(name: string, count = 1) {
+        this.stacks[name] = Math.max(0, (this.stacks[name] || 0) - count);
+        return this.stacks[name];
+    }
+
+    clearStacks(name: string) {
+        this.stacks[name] = 0;
+    }
 
     get position(): Bab.Vector3 {
         return this.marker?.position;
