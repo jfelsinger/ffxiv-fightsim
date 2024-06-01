@@ -7,15 +7,15 @@ import {
     type EffectOptions,
 } from '../effects';
 
-export type TestAoeEffectOptions = EffectOptions & {
+export type AoeDiscEffectOptions = EffectOptions & {
     yalms?: number,
 };
 
-export class TestAoeEffect extends Effect {
-    name = 'test-aoe';
+export class AoeDiscEffect extends Effect {
+    name = 'aoe-disc';
     yalms: number;
 
-    constructor(options: TestAoeEffectOptions) {
+    constructor(options: AoeDiscEffectOptions) {
         super(options);
         this.yalms = options.yalms || 15;
     }

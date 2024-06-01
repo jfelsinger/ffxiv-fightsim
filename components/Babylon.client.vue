@@ -11,6 +11,7 @@ import { Arena } from '../utils/arena';
 import { Character } from '../utils/character';
 import { Clock } from '../utils/clock';
 import { FightCollection } from '../utils/fight-collection';
+import { effectsCollection } from '../utils/fight-effects/index';
 import {
     TestAoeEffect,
 } from '../utils/fight-effects/testaoe';
@@ -67,24 +68,72 @@ function onResize() {
 function createFight(collection: FightCollection) {
 
     // TODO: use a real effect
-    const testEffect = new TestAoeEffect({
-        position: new Bab.Vector3(10, 0, 0),
+    const testEffect = new effectsCollection['aoe-disc']({
+        position: new Bab.Vector3(0, 0, 0),
         duration: 1500,
         collection,
     });
     testEffect.on('start', () => { debug('effect:start'); });
     testEffect.on('end', () => { debug('effect:end'); });
 
+
+    let startDelay = 0;
+    let endDelay = 1500;
+    let duration = 4500;
+    const checkboard1: any[] = [];
+    const checkboard2: any[] = [];
+
+    const limit = 8 * 2;
+    for (let i = 0; i < limit; i++) {
+        for (let j = 0; j < limit; j++) {
+
+            if (
+                (i % 2 === 0 && j % 2 === 1) ||
+                (i % 2 === 1 && j % 2 === 0)
+            ) {
+                const x = yalmsToM(2.5 + 5 * (i - limit / 2));
+                const z = yalmsToM(2.5 + 5 * (j - limit / 2));
+                checkboard1.push({
+                    startDelay: 0,
+                    endDelay,
+                    item: new effectsCollection['aoe-square']({
+                        duration,
+                        yalms: 5,
+                        position: new Bab.Vector3(x, 0, z),
+                        collection,
+                    } as any),
+                });
+            } else {
+                const x = yalmsToM(2.5 + 5 * (i - limit / 2));
+                const z = yalmsToM(2.5 + 5 * (j - limit / 2));
+                checkboard2.push({
+                    startDelay: duration - 1000,
+                    endDelay,
+                    item: new effectsCollection['aoe-square']({
+                        duration,
+                        yalms: 5,
+                        position: new Bab.Vector3(x, 0, z),
+                        collection,
+                    } as any),
+                });
+            }
+        }
+    }
+
     const testMechanic = new Mechanic({
         name: 'test-mechanic',
         collection,
-        effects: [{
-            repeat: 1,
-            startDelay: 500,
-            endDelay: 500,
-            // TODO: use a real effect
-            item: testEffect,
-        }],
+        effects: [
+            ...checkboard1,
+            ...checkboard2,
+            {
+                repeat: 1,
+                startDelay: 2500,
+                endDelay: 500,
+                // TODO: use a real effect
+                item: testEffect,
+            },
+        ],
     });
     testMechanic.on('start-execute', () => { debug('mechanic:start'); });
     testMechanic.on('end-execute', () => { debug('mechanic:end'); });
