@@ -76,11 +76,7 @@ export function decodeEffect(data: any, options: FightDecodeOptions) {
 
     const resultEffect = new effectClass({
         ...options,
-
-        duration: data.duration,
-        position: data.position,
-        positionType: data.positionType,
-        repeatTarget: data.repeatTarget,
+        ...data,
     });
 
     return resultEffect;
@@ -103,11 +99,10 @@ export function decodeMechanic(data: any, options: FightDecodeOptions) {
 
     const effects = data?.effects?.map((effect: any) => decodeScheduledEffect(effect, options)) || [];
 
+    console.log('DATA: ', data);
     return new mechanicClass({
         ...options,
-
-        name: data.name,
-        scheduling: data.scheduling,
+        ...data,
         effects,
     });
 }
@@ -125,9 +120,7 @@ export function decodeFightSection(data: any, options: FightDecodeOptions) {
 
     return new FightSection({
         ...options,
-
-        name: data.name,
-        scheduling: data.scheduling,
+        ...data,
         mechanics,
     });
 }
@@ -145,9 +138,7 @@ export function decodeFight(data: any, options: FightDecodeOptions) {
 
     return new Fight({
         ...options,
-
-        name: data.name,
-        scheduling: data.scheduling,
+        ...data,
         sections,
     });
 }

@@ -40,7 +40,7 @@ export function getScheduledDuration<T>(scheduled: Scheduled<T>, getItemDuration
     return duration;
 }
 
-export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T) => Promise<void>, clock: Clock, repeatNumber = 0) {
+export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T) => Promise<any>, clock: Clock, repeatNumber = 0) {
     if (scheduled.startDelay) {
         await clock.wait(scheduled.startDelay);
     }

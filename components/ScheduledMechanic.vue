@@ -62,7 +62,7 @@ function resetEncoded(force = false) {
             encoded.value = resetValue;
         }
     } else if (language.value === 'json') {
-        const resetValue = JSON.stringify(props.scheduled).trim();
+        const resetValue = JSON.stringify(props.scheduled, null, 2).trim();
         if (force) {
             encoded.value = resetValue;
             return;

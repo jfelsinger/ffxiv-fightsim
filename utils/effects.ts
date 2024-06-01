@@ -3,6 +3,7 @@ import { wait } from './wait';
 import { EventEmitter } from 'eventemitter3';
 import { Clock } from './clock';
 import { FightCollection } from './fight-collection';
+import { decodeFight } from './decode-fight';
 
 import {
     type ScheduleMode,
@@ -18,12 +19,6 @@ const DefaultFightSchedulingMode = 'sequential';
 const DefaultFightSectionSchedulingMode = 'sequential';
 const DefaultMechanicSchedulingMode = 'parallel';
 
-
-export interface iEffect {
-    start(): Promise<void>
-    execute(): Promise<void>
-    getDuration(): number
-}
 
 export type EffectTargetType =
     | 'boss' | 'adds'
@@ -129,7 +124,7 @@ export class Effect extends EventEmitter {
                     return new Bab.Vector3(split[0], 0, split[1]);
                 } else {
                     // A regular Vector3
-                    return new Bab.Vector3(split[0], split[1], split[3]);
+                    return new Bab.Vector3(split[0], split[1], split[2]);
                 }
             }
 
@@ -139,13 +134,36 @@ export class Effect extends EventEmitter {
         return positionValue;
     }
 
+    startTime: number = 0;
+    endTime: number = 0;
+    get elapsed() { return this.clock.time - this.startTime; }
+
+    getDurationPercent() {
+        const duration = this.getDuration();
+        if (!duration || !this.isActive) {
+            return 0;
+        }
+
+        if (this.endTime > this.startTime) {
+            return 1.0;
+        }
+
+        const elapsed = Math.min(duration, this.elapsed);
+        return Math.min(1.0, Math.max(0.0, elapsed / duration));
+    }
+
+
     async start() {
+        this.startTime = this.clock.time;
         this.emit('start');
         await this.startup();
+
         this.emit('post-startup');
         await this.execute();
         this.emit('pre-cleanup');
+
         await this.cleanup();
+        this.endTime = this.clock.time;
         this.emit('end');
     }
 
@@ -153,7 +171,10 @@ export class Effect extends EventEmitter {
         if (this.duration) {
             await this.clock.wait(this.duration);
         }
-        this.emit('snapshot', { mesh: this.mesh });
+
+        if (this.isActive) {
+            this.emit('snapshot', { mesh: this.mesh });
+        }
     }
 
     async startup() {
@@ -162,6 +183,11 @@ export class Effect extends EventEmitter {
 
     async cleanup() {
         this.isActive = false;
+    }
+
+    async dispose() {
+        this.isActive = false;
+        await this.cleanup();
     }
 
     toJSON() {
@@ -189,7 +215,7 @@ export class Effect extends EventEmitter {
 export type MechanicOptions = {
     name?: string
     scheduling?: ScheduleMode
-    effects: Scheduled<iEffect>[]
+    effects: Scheduled<Effect>[]
     collection: FightCollection
     clock?: Clock
 }
@@ -197,7 +223,7 @@ export type MechanicOptions = {
 export class Mechanic extends EventEmitter {
     name: string = 'default';
     scheduling: ScheduleMode;
-    effects: Scheduled<iEffect>[];
+    effects: Scheduled<Effect>[];
     collection: FightCollection;
     clock: Clock;
     isActive: boolean = false;
@@ -250,9 +276,10 @@ export class Mechanic extends EventEmitter {
         if (this.scheduling === 'sequential') {
             const len = this.effects.length;
             for (let i = 0; i < len; i++) {
+                if (!this.isActive) break;
                 await this.executeEffect(this.effects[i])
             }
-        } else {
+        } else if (this.isActive) {
             await Promise.all(this.effects.map(effect => this.executeEffect(effect)));
         }
 
@@ -260,10 +287,20 @@ export class Mechanic extends EventEmitter {
         this.emit('end-execute');
     }
 
-    async executeEffect(effect: Scheduled<iEffect>) {
+    async executeEffect(effect: Scheduled<Effect>) {
         this.emit('start-effect', { effect });
-        await executeScheduled(effect, (item) => item.start(), this.clock)
+        await executeScheduled(effect, (item) => Promise.resolve(this.isActive && item.start()), this.clock)
         this.emit('end-effect', { effect });
+    }
+
+    async dispose() {
+        this.isActive = false;
+        const len = this.effects.length;
+        const promises: Promise<void>[] = [];
+        for (let i = 0; i < len; i++) {
+            promises.push(this.effects[i]?.item?.dispose());
+        }
+        await Promise.all(promises);
     }
 }
 
@@ -331,9 +368,10 @@ export class FightSection extends EventEmitter {
         if (this.scheduling === 'sequential') {
             const len = this.mechanics.length;
             for (let i = 0; i < len; i++) {
+                if (!this.isActive) break;
                 await this.executeMechanic(this.mechanics[i])
             }
-        } else {
+        } else if (this.isActive) {
             await Promise.all(this.mechanics.map(m => this.executeMechanic(m)));
         }
 
@@ -343,8 +381,18 @@ export class FightSection extends EventEmitter {
 
     async executeMechanic(mechanic: Scheduled<Mechanic>) {
         this.emit('start-mechanic', { mechanic });
-        await executeScheduled(mechanic, (item) => item.execute(), this.clock)
+        await executeScheduled(mechanic, (item) => Promise.resolve(this.isActive && item.execute()), this.clock)
         this.emit('end-mechanic', { mechanic });
+    }
+
+    async dispose() {
+        this.isActive = false;
+        const len = this.mechanics.length;
+        const promises: Promise<void>[] = [];
+        for (let i = 0; i < len; i++) {
+            promises.push(this.mechanics[i]?.item?.dispose());
+        }
+        await Promise.all(promises);
     }
 }
 
@@ -412,9 +460,10 @@ export class Fight extends EventEmitter {
         if (this.scheduling === 'sequential') {
             const len = this.sections.length;
             for (let i = 0; i < len; i++) {
+                if (!this.isActive) break;
                 await this.executeSection(this.sections[i])
             }
-        } else {
+        } else if (this.isActive) {
             await Promise.all(this.sections.map(s => this.executeSection(s)));
         }
 
@@ -424,7 +473,24 @@ export class Fight extends EventEmitter {
 
     async executeSection(section: Scheduled<FightSection>) {
         this.emit('start-section', { section });
-        await executeScheduled(section, (item) => item.execute(), this.clock)
+        await executeScheduled(section, (item) => Promise.resolve(this.isActive && item.execute()), this.clock)
         this.emit('end-section', { section });
+    }
+
+    async dispose() {
+        this.isActive = false;
+        const len = this.sections.length;
+        const promises: Promise<void>[] = [];
+        for (let i = 0; i < len; i++) {
+            promises.push(this.sections[i]?.item?.dispose());
+        }
+        await Promise.all(promises);
+    }
+
+    clone() {
+        return decodeFight(JSON.parse(JSON.stringify(this)), {
+            collection: this.collection,
+            clock: this.clock,
+        });
     }
 }

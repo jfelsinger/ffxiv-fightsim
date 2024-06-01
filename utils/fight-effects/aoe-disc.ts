@@ -21,16 +21,22 @@ export class AoeDiscEffect extends Effect {
     }
 
     async startup() {
+        await super.startup();
         this.mesh = this.makeAoe().disc;
     }
 
     async cleanup() {
         this.mesh?.dispose()
+        await super.cleanup();
     }
 
     makeAoe() {
         const discMat = createAoeMat(this.scene, Bab.Color3.FromInts(255, 150, 20), 'discMat');
         discMat.alpha = 0.7;
+        this.clock.on('tick', (time) => {
+            discMat.setFloat('time', time);
+            discMat.setFloat('elapsed', this.getDurationPercent());
+        });
 
         const disc = Bab.MeshBuilder.CreateDisc('area', { radius: yalmsToM(this.yalms) }, this.scene);
         disc.position = this.getPosition() || Bab.Vector3.Zero();
@@ -41,6 +47,13 @@ export class AoeDiscEffect extends Effect {
 
         return {
             disc
+        };
+    }
+
+    toJSON() {
+        return {
+            ...super.toJSON(),
+            yalms: this.yalms,
         };
     }
 }

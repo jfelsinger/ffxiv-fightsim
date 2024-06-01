@@ -21,16 +21,29 @@ export class AoeSquareEffect extends Effect {
     }
 
     async startup() {
+        await super.startup();
         this.mesh = this.makeAoe().square;
     }
 
     async cleanup() {
         this.mesh?.dispose()
+        await super.cleanup();
+    }
+
+    toJSON() {
+        return {
+            ...super.toJSON(),
+            yalms: this.yalms,
+        };
     }
 
     makeAoe() {
         const squareMat = createAoeMat(this.scene, Bab.Color3.FromInts(255, 150, 20), 'squareMat');
         squareMat.alpha = 0.7;
+        this.clock.on('tick', (time) => {
+            squareMat.setFloat('time', time);
+            squareMat.setFloat('elapsed', this.getDurationPercent());
+        });
 
         const square = Bab.MeshBuilder.CreatePlane('area', { size: yalmsToM(this.yalms) }, this.scene);
         square.position = this.getPosition() || Bab.Vector3.Zero();

@@ -13,9 +13,6 @@ import { Clock } from '../utils/clock';
 import { FightCollection } from '../utils/fight-collection';
 import { effectsCollection } from '../utils/fight-effects/index';
 import {
-    TestAoeEffect,
-} from '../utils/fight-effects/testaoe';
-import {
     Fight,
     FightSection,
     Mechanic,
@@ -83,7 +80,8 @@ function createFight(collection: FightCollection) {
     const checkboard1: any[] = [];
     const checkboard2: any[] = [];
 
-    const limit = 8 * 2;
+    // TODO: Create a checkerboard effect class using instances
+    const limit = 4 * 2;
     for (let i = 0; i < limit; i++) {
         for (let j = 0; j < limit; j++) {
 
@@ -406,10 +404,13 @@ onBeforeUnmount(async () => {
     window.removeEventListener('resize', onResize);
 });
 
-function onFightUpdate(updatedFight: Fight) {
+async function onFightUpdate(updatedFight: Fight) {
     console.log('UPDATE FIGHT!');
+    await currentFight.value?.dispose();
+
     currentFight.value = updatedFight;
     updatedFight.collection.worldClock.time = 0;
+    worldTime.value = 0;
     (window as any).__fight = updatedFight;
     updatedFight.execute();
 }
