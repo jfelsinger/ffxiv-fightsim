@@ -82,7 +82,7 @@ function createFight(collection: FightCollection) {
     let repDuration = 1325;
     let repDelay = repDuration * 0.85;
     let repOffset = (repDelay + repDuration) / 2;
-    let startAfter = 3;
+    let startAfter = 0;
     let repeat = 11;
 
     checkboard1.push({
@@ -116,7 +116,7 @@ function createFight(collection: FightCollection) {
     repDuration = 1250;
     repDelay = repDuration * 0.5;
     repOffset = (repDelay + repDuration) / 3;
-    startAfter = 12;
+    startAfter = 4;
     repeat = 10;
     const yalms = 4;
 
