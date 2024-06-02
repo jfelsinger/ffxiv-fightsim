@@ -31,25 +31,16 @@ import Debug from 'debug';
 const debug = Debug('game');
 
 const playerTimeScaling = ref(1.0);
-const playerClock = new Clock({ scaling: playerTimeScaling.value });
+const playerClock = new Clock({ name: 'player', scaling: playerTimeScaling.value });
 const playerTime = useState<number>('playerTime', () => playerClock.time || 0);
 playerClock.on('tick', (time) => { playerTime.value = time });
 watch(playerTimeScaling, (scaling) => { playerClock.scaling = scaling });
 
-const worldPaused = ref(false);
 const worldTimeScaling = ref(1.0);
-const worldClock = new Clock({ paused: worldPaused.value, scaling: worldTimeScaling.value });
+const worldClock = new Clock({ name: 'world', paused: true, scaling: worldTimeScaling.value });
 const worldTime = useState<number>('worldTime', () => worldClock.time || 0);
 worldClock.on('tick', (time) => { worldTime.value = time });
-worldClock.start();
 watch(worldTimeScaling, (scaling) => { worldClock.scaling = scaling });
-watch(worldPaused, (isPaused) => {
-    if (isPaused) {
-        worldClock.pause();
-    } else {
-        worldClock.start();
-    }
-});
 
 const canvas = ref<HTMLCanvasElement>();
 let game: Engine | undefined;

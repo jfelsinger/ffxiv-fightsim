@@ -14,6 +14,7 @@ type ClockTimeoutEntry = {
 }
 
 type ClockOptions = {
+    name?: string,
     startTime: number,
     scaling: number,
     duration: number,
@@ -28,6 +29,7 @@ const DefaultClockOptions: ClockOptions = {
 } as const;
 
 export class Clock extends EventEmitter {
+    name?: string;
     time: number;
     lastDelta: number = 0;
     #prevTime: number;
@@ -45,6 +47,7 @@ export class Clock extends EventEmitter {
             ...options,
         }
 
+        this.name = opts.name;
         this.time = opts.startTime;
         this.#prevTime = opts.startTime;
         this.scaling = opts.scaling;

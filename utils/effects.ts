@@ -1,5 +1,4 @@
 import * as Bab from '@babylonjs/core';
-import { wait } from './wait';
 import { EventEmitter } from 'eventemitter3';
 import { Clock } from './clock';
 import { FightCollection } from './fight-collection';
@@ -331,7 +330,7 @@ export class Mechanic extends EventEmitter {
 
     async executeEffect(effect: Scheduled<Effect>) {
         this.emit('start-effect', { effect });
-        if (effect?.preStartDelay) { await wait(effect.preStartDelay); }
+        if (effect?.preStartDelay) { await this.clock.wait(effect.preStartDelay); }
         await executeScheduled(effect, (item) => Promise.resolve(this.isActive && item.start()), this.clock)
         this.emit('end-effect', { effect });
     }
@@ -435,7 +434,7 @@ export class FightSection extends EventEmitter {
 
     async executeMechanic(mechanic: Scheduled<Mechanic>) {
         this.emit('start-mechanic', { mechanic });
-        if (mechanic?.preStartDelay) { await wait(mechanic.preStartDelay); }
+        if (mechanic?.preStartDelay) { await this.clock.wait(mechanic.preStartDelay); }
         await executeScheduled(mechanic, (item) => Promise.resolve(this.isActive && item.execute()), this.clock)
         this.emit('end-mechanic', { mechanic });
     }
@@ -538,7 +537,7 @@ export class Fight extends EventEmitter {
 
     async executeSection(section: Scheduled<FightSection>) {
         this.emit('start-section', { section });
-        if (section?.preStartDelay) { await wait(section.preStartDelay); }
+        if (section?.preStartDelay) { await this.clock.wait(section.preStartDelay); }
         await executeScheduled(section, (item) => Promise.resolve(this.isActive && item.execute()), this.clock)
         this.emit('end-section', { section });
     }

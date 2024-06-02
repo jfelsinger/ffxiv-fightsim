@@ -12,11 +12,15 @@ import { decodeFight } from '../utils/decode-fight';
 const emit = defineEmits<{
     (e: 'update', value: Fight): void,
     (e: 'reset-position'): void,
+    (e: 'start'): void,
+    (e: 'pause'): void,
 }>();
 
 const props = defineProps({
     fight: Fight,
 });
+
+const isPaused = ref(true);
 
 const name = computed(() => props.fight?.name || 'Unnamed');
 const sections = computed(() => props.fight?.sections || []);
@@ -137,74 +141,131 @@ function reset() {
 function resetPosition() {
     emit('reset-position');
 }
+
+if (props.fight?.clock) {
+    props.fight.clock.on('start', () => {
+        console.log('CLOCK START!');
+        isPaused.value = false;
+    });
+    props.fight.clock.on('pause', () => {
+        console.log('CLOCK PAUSE!');
+        isPaused.value = true;
+    });
+}
+function togglePause() {
+    if (isPaused.value) {
+        if (props.fight?.clock) {
+            props.fight.clock.start();
+        }
+    } else {
+        if (props.fight?.clock) {
+            props.fight.clock.pause();
+        }
+    }
+}
+
+function handleKeyPress(event: KeyboardEvent) {
+    if (event.code === 'Space') {
+        event.preventDefault();
+        event.stopPropagation();
+        togglePause();
+        return false;
+    }
+}
+
+onMounted(() => {
+    document.addEventListener('keydown', handleKeyPress);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('keydown', handleKeyPress);
+});
 </script>
 
 <template>
-    <div class="fight__sidebar z-20">
-        <div class="fight__sidebar-content p-2">
-            <ul class="menu bg-slate-100/45  rounded-box">
-                <li>
-                    <button @click="open('ui')" class="tooltip tooltip-right px-2" data-tip="Open UI">
-                        <Icon name="solar:round-alt-arrow-right-broken" />
-                    </button>
-                </li>
-                <li>
-                    <button @click="open('code')" class="tooltip tooltip-right px-2" data-tip="Edit Fight Code">
-                        <Icon name="solar:code-square-broken" />
-                    </button>
-                </li>
-                <li>
-                    <button @click="resetPosition()" class="tooltip tooltip-right px-2" data-tip="Reset Position">
-                        <Icon name="solar:map-point-broken" />
-                    </button>
-                </li>
-                <li>
-                    <button @click="reset()" class="tooltip tooltip-right px-2" data-tip="Restart Fight">
-                        <Icon name="solar:refresh-bold" />
-                    </button>
-                </li>
-            </ul>
+    <div>
+        <div class="fight-bot-center flex flex-col absolute bottom-12 z-20">
+
+            <div class="flex p-2 bg-slate-100/45 rounded-box min-w-96 gap-2 items-center">
+                <label @click="togglePause()" class="swap swap-rotate px-2" :class="{ 'swap-active': isPaused }">
+                    <Icon class="swap-on" name="solar:play-circle-linear" />
+                    <Icon class="swap-off" name="solar:pause-circle-linear" />
+                </label>
+                <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
+                <button @click="reset()" class="tooltip tooltip-top px-2" data-tip="Restart Fight">
+                    <Icon name="solar:refresh-bold" />
+                </button>
+            </div>
+
         </div>
 
-        <div class="fight__drawer-side mt-2 ml-[4.125rem] max-w-md min-w-[20rem]" :class="{ '--open': openSide === 'ui' }">
-            <div
-                class="fight-ui p-2 bg-slate-100/45 rounded collapse clip-collapse collapse-arrow w-full max-w-md min-w-[20rem]">
-                <input type="checkbox" />
+        <div class="fight__sidebar z-20">
+            <div class="fight__sidebar-content p-2">
+                <ul class="menu bg-slate-100/45  rounded-box">
+                    <li>
+                        <button @click="open('ui')" class="tooltip tooltip-right px-2" data-tip="Open UI">
+                            <Icon name="solar:round-alt-arrow-right-broken" />
+                        </button>
+                    </li>
+                    <li>
+                        <button @click="open('code')" class="tooltip tooltip-right px-2" data-tip="Edit Fight Code">
+                            <Icon name="solar:code-square-broken" />
+                        </button>
+                    </li>
+                    <li>
+                        <button @click="resetPosition()" class="tooltip tooltip-right px-2" data-tip="Reset Position">
+                            <Icon name="solar:map-point-broken" />
+                        </button>
+                    </li>
+                    <li>
+                        <button @click="reset()" class="tooltip tooltip-right px-2" data-tip="Restart Fight">
+                            <Icon name="solar:refresh-bold" />
+                        </button>
+                    </li>
+                </ul>
+            </div>
 
-                <div class="collapse-title relative flex items-center gap-4">
-                    <h2 class="flex-grow-2 min-w-fit">{{ name }}</h2>
-                    <!--
-                    <div class="radial-progress" :style="{
-                        '--value': elapsedPercent,
-                        '--size': '1rem',
-                        '--thickness': '0.25rem',
-                    }" role="progressbar"></div>
-                    -->
-                    <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
-                    <CodeButton @open="() => resetEncoded(true)" class=" dropdown-right float-right relative z-30">
-                        <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language"
-                            v-model="encoded" />
-                    </CodeButton>
-                </div>
+            <div class="fight__drawer-side mt-2 ml-[4.125rem] max-w-md min-w-[20rem]"
+                :class="{ '--open': openSide === 'ui' }">
+                <div
+                    class="fight-ui p-2 bg-slate-100/45 rounded collapse clip-collapse collapse-arrow w-full max-w-md min-w-[20rem]">
+                    <input type="checkbox" />
 
-                <div class="collapse-content">
-                    <p>Duration: {{ duration / 1000 }}s</p>
-                    <p>Elapsed: {{ Math.round(elapsed / 100) / 10 }}s</p>
-
-                    <h4>Fight Sections:</h4>
-                    <div v-if="fight" class="fight__sections join join-vertical w-full">
-                        <ScheduledFightSection @update="(value) => updateSection(value, i)" v-for="(section, i) in sections"
-                            :index="i" :fight="fight" :scheduled="section" />
+                    <div class="collapse-title relative flex items-center gap-4">
+                        <h2 class="flex-grow-2 min-w-fit">{{ name }}</h2>
+                        <!--
+                        <div class="radial-progress" :style="{
+                            '--value': elapsedPercent,
+                            '--size': '1rem',
+                            '--thickness': '0.25rem',
+                        }" role="progressbar"></div>
+                        -->
+                        <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
+                        <CodeButton @open="() => resetEncoded(true)" class=" dropdown-right float-right relative z-30">
+                            <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language"
+                                v-model="encoded" />
+                        </CodeButton>
                     </div>
 
+                    <div class="collapse-content">
+                        <p>Duration: {{ duration / 1000 }}s</p>
+                        <p>Elapsed: {{ Math.round(elapsed / 100) / 10 }}s</p>
+
+                        <h4>Fight Sections:</h4>
+                        <div v-if="fight" class="fight__sections join join-vertical w-full">
+                            <ScheduledFightSection @update="(value) => updateSection(value, i)"
+                                v-for="(section, i) in sections" :index="i" :fight="fight" :scheduled="section" />
+                        </div>
+
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="fight__drawer-side mt-2 ml-[4.125rem] max-w-xl min-w-[20rem]"
-            :class="{ '--open': openSide === 'code' }">
-            <CodeArea class="max-h-[80vh]" @save="() => { onSave(); openSide = ''; }"
-                @update:lang="(l: string) => language = l" :lang="language" v-model="encoded" />
+            <div class="fight__drawer-side mt-2 ml-[4.125rem] max-w-xl min-w-[20rem]"
+                :class="{ '--open': openSide === 'code' }">
+                <CodeArea class="max-h-[80vh]" @save="() => { onSave(); openSide = ''; }"
+                    @update:lang="(l: string) => language = l" :lang="language" v-model="encoded" />
+            </div>
         </div>
     </div>
 </template>
@@ -216,6 +277,11 @@ function resetPosition() {
     // top: 0rem;
     // left: 1rem;
     backdrop-filter: blur(5px) brightness(1.15);
+}
+
+.fight-bot-center {
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .fight__sidebar {
