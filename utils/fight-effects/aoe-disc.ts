@@ -37,11 +37,7 @@ export class AoeDiscEffect extends Effect {
         const adjustedPos = targetPosition.subtract(aoePosition);
         const distFromAoe = adjustedPos.length();
 
-        if (distFromAoe <= radius) {
-            return true;
-        }
-
-        return false;
+        return distFromAoe <= radius;
     }
 
     async cleanup() {

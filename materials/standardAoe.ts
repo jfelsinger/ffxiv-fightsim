@@ -24,14 +24,12 @@ export default function createShader(scene: Scene, color?: Color3, shaderName = 
             defines: [],
             samplers: [],
             uniforms: [
-                'world',
-                'worldView',
-                'worldViewProjection',
-                'view',
-                'projection',
+                'world', 'worldView', 'worldViewProjection',
+                'view', 'projection', 'viewProjection',
+                'direction',
+
                 'time',
                 'elapsed',
-                'direction',
                 'color',
             ],
         }

@@ -1,9 +1,12 @@
 precision highp float;
-varying vec2 vuv;
-varying vec3 vPos;
+
 uniform sampler2D textureSampler;
 uniform float elapsed;
 uniform vec3 color;
+
+varying vec2 vuv;
+varying vec3 vPos;
+varying float iid;
 
 float cubicInOut(float t) {
     return t < 0.5
@@ -34,7 +37,7 @@ void main(void) {
     alpha = clamp(alpha + smoothstep(1.0 - borderWidth, 1.001 - borderWidth, vuv.y), 0.0, 1.0);
     alpha *= borderOpacity;
     // alpha = step(0.5, 1.0 - distCenter); // Outer ring
-    alpha = clamp(alpha + distCenter, 0.0, 1.0);
+    alpha = clamp(alpha + distCenter, 0.2, 1.0);
     alpha *= 0.8; // Set a max transparency
     // alpha *= (step(0.5 - distCenter, 0.025) * 0.2) + smoothstep(-0.15, 0.7, distCenter);
 
@@ -57,4 +60,7 @@ void main(void) {
     float g = clamp((color.g) - (adj * 0.25), 0.0, 1.0);
     float b = clamp((color.b) - (adj * 0.25), 0.0, 1.0);
     gl_FragColor = vec4(r, g, b, alpha);
+
+    // gl_FragColor = vec4(color, 1.0);
+    // gl_FragColor = vec4(0.2, 0.6, 1.0, 0.5);
 }

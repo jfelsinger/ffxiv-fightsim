@@ -84,59 +84,55 @@ function createFight(collection: FightCollection) {
 
     let startDelay = 0;
     let endDelay = 1500;
-    let duration = 4500;
+    let duration = 1500;
     const checkboard1: any[] = [];
-    const checkboard2: any[] = [];
 
     // TODO: Create a checkerboard effect class using instances
-    const limit = 4 * 2;
-    for (let i = 0; i < limit; i++) {
-        for (let j = 0; j < limit; j++) {
+    let repDuration = 1325;
+    let repDelay = repDuration * 0.85;
+    let repOffset = (repDelay + repDuration) / 2;
+    let repeat = 10;
 
-            if (
-                (i % 2 === 0 && j % 2 === 1) ||
-                (i % 2 === 1 && j % 2 === 0)
-            ) {
-                const x = yalmsToM(2.5 + 5 * (i - limit / 2));
-                const z = yalmsToM(2.5 + 5 * (j - limit / 2));
-                checkboard1.push({
-                    startDelay: 0,
-                    endDelay,
-                    item: new effectsCollection['aoe-square']({
-                        duration,
-                        yalms: 5,
-                        position: new Bab.Vector3(x, 0, z),
-                        collection,
-                    } as any),
-                });
-            } else {
-                const x = yalmsToM(2.5 + 5 * (i - limit / 2));
-                const z = yalmsToM(2.5 + 5 * (j - limit / 2));
-                checkboard2.push({
-                    startDelay: duration - 1000,
-                    endDelay,
-                    item: new effectsCollection['aoe-square']({
-                        duration,
-                        yalms: 5,
-                        position: new Bab.Vector3(x, 0, z),
-                        collection,
-                    } as any),
-                });
-            }
-        }
-    }
+    checkboard1.push({
+        repeat,
+        preStartDelay: repOffset * 0,
+        startDelay: repDelay,
+        endDelay: 0,
+        item: new effectsCollection['aoe-square-grid']({
+            duration: repDuration,
+            yalms: 5,
+            size: 12,
+            pattern: 'checkered',
+            collection,
+        } as any),
+    });
 
-    const repDuration = 1250;
-    const repDelay = repDuration * 0.5;
-    const repOffset = (repDelay + repDuration) / 3;
-    const repeat = 8;
+    checkboard1.push({
+        repeat,
+        preStartDelay: repOffset * 1,
+        startDelay: repDelay,
+        endDelay: 0,
+        item: new effectsCollection['aoe-square-grid']({
+            duration: repDuration,
+            yalms: 5,
+            size: 12,
+            pattern: 'checkered-alt',
+            collection,
+        } as any),
+    });
+
+    repDuration = 1250;
+    repDelay = repDuration * 0.5;
+    repOffset = (repDelay + repDuration) / 3;
+    repeat = 10;
+    const yalms = 4;
 
     const testMechanic = new Mechanic({
         name: 'test-mechanic',
         collection,
         effects: [
             ...checkboard1,
-            ...checkboard2,
+            // ...checkboard2,
             // {
             //     repeat: 1,
             //     startDelay: 2500,
@@ -144,6 +140,7 @@ function createFight(collection: FightCollection) {
             //     // TODO: use a real effect
             //     item: testEffect,
             // },
+
             {
                 repeat,
                 preStartDelay: repOffset,
@@ -151,7 +148,7 @@ function createFight(collection: FightCollection) {
                 endDelay: 0,
                 // TODO: use a real effect
                 item: new effectsCollection['aoe-disc']({
-                    yalms: 5,
+                    yalms,
                     position: 'player',
                     positionType: 'character',
                     duration: repDuration,
@@ -165,7 +162,7 @@ function createFight(collection: FightCollection) {
                 endDelay: 0,
                 // TODO: use a real effect
                 item: new effectsCollection['aoe-disc']({
-                    yalms: 5,
+                    yalms,
                     position: 'player',
                     positionType: 'character',
                     duration: repDuration,
@@ -179,7 +176,7 @@ function createFight(collection: FightCollection) {
                 endDelay: 0,
                 // TODO: use a real effect
                 item: new effectsCollection['aoe-disc']({
-                    yalms: 5,
+                    yalms,
                     position: 'player',
                     positionType: 'character',
                     duration: repDuration,
@@ -218,7 +215,8 @@ function createFight(collection: FightCollection) {
     return fight;
 }
 
-function makeArena(scene: Scene, character: Character, yalms = 90) {
+// function makeArena(scene: Scene, character: Character, yalms = 90) {
+function makeArena(scene: Scene, character: Character, yalms = 60) {
 
     const arena = new Arena('arena', { yalms, character }, scene);
 

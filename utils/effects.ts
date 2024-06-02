@@ -101,16 +101,16 @@ export class Effect extends EventEmitter {
         if (typeof positionValue === 'string') {
             if (this.positionType === 'mesh') {
                 const mesh = this.scene.getMeshByName(positionValue);
-                if (mesh) { return mesh.position; }
+                if (mesh) { return mesh.position.clone(); }
 
                 const character = this.collection.characters[positionValue as any];
-                if (character?.position) { return character.position; }
+                if (character?.position) { return character.position.clone(); }
             } else if (this.positionType === 'character') {
                 const character = this.collection.characters[positionValue as any];
-                if (character?.position) { return character.position; }
+                if (character?.position) { return character.position.clone(); }
 
                 const mesh = this.scene.getMeshByName(positionValue);
-                if (mesh) { return mesh.position; }
+                if (mesh) { return mesh.position.clone(); }
             }
 
             // Convert to number value
@@ -132,7 +132,7 @@ export class Effect extends EventEmitter {
             return Bab.Vector3.Zero();
         }
 
-        return positionValue;
+        return positionValue.clone();
     }
 
     startTime: number = 0;
