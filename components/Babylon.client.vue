@@ -82,11 +82,12 @@ function createFight(collection: FightCollection) {
     let repDuration = 1325;
     let repDelay = repDuration * 0.85;
     let repOffset = (repDelay + repDuration) / 2;
-    let repeat = 10;
+    let startAfter = 3;
+    let repeat = 11;
 
     checkboard1.push({
         repeat,
-        preStartDelay: repOffset * 0,
+        preStartDelay: repOffset * (0 + startAfter),
         startDelay: repDelay,
         endDelay: 0,
         item: new effectsCollection['aoe-square-grid']({
@@ -100,7 +101,7 @@ function createFight(collection: FightCollection) {
 
     checkboard1.push({
         repeat,
-        preStartDelay: repOffset * 1,
+        preStartDelay: repOffset * (1 + startAfter),
         startDelay: repDelay,
         endDelay: 0,
         item: new effectsCollection['aoe-square-grid']({
@@ -115,6 +116,7 @@ function createFight(collection: FightCollection) {
     repDuration = 1250;
     repDelay = repDuration * 0.5;
     repOffset = (repDelay + repDuration) / 3;
+    startAfter = 12;
     repeat = 10;
     const yalms = 4;
 
@@ -134,7 +136,7 @@ function createFight(collection: FightCollection) {
 
             {
                 repeat,
-                preStartDelay: repOffset,
+                preStartDelay: repOffset * (1 + startAfter),
                 startDelay: repDelay,
                 endDelay: 0,
                 // TODO: use a real effect
@@ -148,7 +150,7 @@ function createFight(collection: FightCollection) {
             },
             {
                 repeat,
-                preStartDelay: repOffset * 2,
+                preStartDelay: repOffset * (2 + startAfter),
                 startDelay: repDelay,
                 endDelay: 0,
                 // TODO: use a real effect
@@ -162,7 +164,7 @@ function createFight(collection: FightCollection) {
             },
             {
                 repeat,
-                preStartDelay: repOffset * 3,
+                preStartDelay: repOffset * (3 + startAfter),
                 startDelay: repDelay,
                 endDelay: 0,
                 // TODO: use a real effect
