@@ -4,6 +4,7 @@ import { EventEmitter } from 'eventemitter3';
 import { Clock } from './clock';
 import { FightCollection } from './fight-collection';
 import { decodeFight } from './decode-fight';
+import { Character } from './character';
 
 import {
     type ScheduleMode,
@@ -173,8 +174,38 @@ export class Effect extends EventEmitter {
         }
 
         if (this.isActive) {
-            this.emit('snapshot', { mesh: this.mesh });
+            this.snapshot();
         }
+    }
+
+    snapshot() {
+        this.emit('snapshot', { mesh: this.mesh });
+        this.checkCollisions();
+    }
+
+    checkCollisions() {
+        // TODO: Add checks for different party members later
+
+        const target = this.collection.player;
+        if (target && this.checkCharacterCollision(target)) {
+            this.emit('effect-hit', {
+                effect: this,
+                target: this.collection.player,
+            });
+        }
+    }
+
+    checkCharacterCollision(target: Character) {
+        return this.checkMeshCollision(target.collider);
+    }
+
+    checkMeshCollision(target: Bab.Mesh) {
+        const mesh = this.mesh;
+        if (mesh && target?.intersectsMesh(mesh, false)) {
+            return true;
+        }
+
+        return false;
     }
 
     async startup() {
@@ -264,6 +295,17 @@ export class Mechanic extends EventEmitter {
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
 
+        const len = this.effects.length;
+        for (let i = 0; i < len; i++) {
+            const effect = this.effects[i];
+            effect.item.on('effect-hit', (data) => {
+                this.emit('effect-hit', {
+                    ...data,
+                    mechanic: this,
+                });
+            });
+        }
+
         if (options.name) {
             this.name = options.name;
         }
@@ -289,6 +331,7 @@ export class Mechanic extends EventEmitter {
 
     async executeEffect(effect: Scheduled<Effect>) {
         this.emit('start-effect', { effect });
+        if (effect?.preStartDelay) { await wait(effect.preStartDelay); }
         await executeScheduled(effect, (item) => Promise.resolve(this.isActive && item.start()), this.clock)
         this.emit('end-effect', { effect });
     }
@@ -356,6 +399,17 @@ export class FightSection extends EventEmitter {
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
 
+        const len = this.mechanics.length;
+        for (let i = 0; i < len; i++) {
+            const mechanic = this.mechanics[i];
+            mechanic.item.on('effect-hit', (data) => {
+                this.emit('effect-hit', {
+                    ...data,
+                    section: this,
+                });
+            });
+        }
+
         if (options.name) {
             this.name = options.name;
         }
@@ -381,6 +435,7 @@ export class FightSection extends EventEmitter {
 
     async executeMechanic(mechanic: Scheduled<Mechanic>) {
         this.emit('start-mechanic', { mechanic });
+        if (mechanic?.preStartDelay) { await wait(mechanic.preStartDelay); }
         await executeScheduled(mechanic, (item) => Promise.resolve(this.isActive && item.execute()), this.clock)
         this.emit('end-mechanic', { mechanic });
     }
@@ -448,6 +503,16 @@ export class Fight extends EventEmitter {
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
 
+        const len = this.sections.length;
+        for (let i = 0; i < len; i++) {
+            const section = this.sections[i];
+            section.item.on('effect-hit', (data) => {
+                this.emit('effect-hit', {
+                    ...data,
+                });
+            });
+        }
+
         if (options.name) {
             this.name = options.name;
         }
@@ -473,6 +538,7 @@ export class Fight extends EventEmitter {
 
     async executeSection(section: Scheduled<FightSection>) {
         this.emit('start-section', { section });
+        if (section?.preStartDelay) { await wait(section.preStartDelay); }
         await executeScheduled(section, (item) => Promise.resolve(this.isActive && item.execute()), this.clock)
         this.emit('end-section', { section });
     }

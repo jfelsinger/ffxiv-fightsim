@@ -2,6 +2,7 @@ export type ScheduleMode = 'sequential' | 'parallel';
 export type Scheduled<T> = {
     item: T
     repeat?: number
+    preStartDelay?: number
     startDelay?: number
     endDelay?: number
     after?: Scheduled<T> | T
@@ -53,6 +54,7 @@ export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: 
 
     if (scheduled.after) {
         if (isScheduled(scheduled.after)) {
+            if (scheduled.after.preStartDelay) { await wait(scheduled.after.preStartDelay); }
             await executeScheduled(scheduled.after, func, clock)
         } else {
             await func(scheduled.after);
@@ -64,6 +66,7 @@ export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: 
             await executeScheduled(scheduled, func, clock, (repeatNumber || 0) + 1)
         } else if (scheduled.afterRepeats) {
             if (isScheduled(scheduled.afterRepeats)) {
+                if (scheduled.afterRepeats.preStartDelay) { await wait(scheduled.afterRepeats.preStartDelay); }
                 await executeScheduled(scheduled.afterRepeats, func, clock)
             } else {
                 await func(scheduled.afterRepeats);

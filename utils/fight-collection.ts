@@ -28,6 +28,13 @@ export class FightCollection {
 
     get groundMesh() { return this.scene.getMeshByName('ground'); }
 
+    addCharacter(character: Character, name?: CharacterName) {
+        name = name || (character.name as CharacterName);
+        if (name) {
+            this.characters[name] = character;
+        }
+    }
+
     filterCharacters(func: (key: string, char: Character) => boolean) {
         const results: Character[] = [];
 

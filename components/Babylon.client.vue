@@ -55,6 +55,7 @@ const canvas = ref<HTMLCanvasElement>();
 let game: Engine | undefined;
 const cameraDirection = ref(0);
 const characterDirection = ref(0);
+const hits = ref(0);
 
 function onResize() {
     if (game) {
@@ -62,12 +63,19 @@ function onResize() {
     }
 }
 
+function registerFight(fight: Fight) {
+    fight.on('effect-hit', ({ effect }) => {
+        console.log('hit by: ', effect.name, effect);
+        hits.value++;
+    });
+}
+
 function createFight(collection: FightCollection) {
 
     // TODO: use a real effect
     const testEffect = new effectsCollection['aoe-disc']({
-        position: new Bab.Vector3(0, 0, 0),
-        duration: 1500,
+        position: new Bab.Vector3(0, 0, -1.5),
+        duration: 2500,
         collection,
     });
     testEffect.on('start', () => { debug('effect:start'); });
@@ -118,18 +126,65 @@ function createFight(collection: FightCollection) {
         }
     }
 
+    const repDuration = 1250;
+    const repDelay = repDuration * 0.5;
+    const repOffset = (repDelay + repDuration) / 3;
+    const repeat = 8;
+
     const testMechanic = new Mechanic({
         name: 'test-mechanic',
         collection,
         effects: [
             ...checkboard1,
             ...checkboard2,
+            // {
+            //     repeat: 1,
+            //     startDelay: 2500,
+            //     endDelay: 500,
+            //     // TODO: use a real effect
+            //     item: testEffect,
+            // },
             {
-                repeat: 1,
-                startDelay: 2500,
-                endDelay: 500,
+                repeat,
+                preStartDelay: repOffset,
+                startDelay: repDelay,
+                endDelay: 0,
                 // TODO: use a real effect
-                item: testEffect,
+                item: new effectsCollection['aoe-disc']({
+                    yalms: 5,
+                    position: 'player',
+                    positionType: 'character',
+                    duration: repDuration,
+                    collection,
+                }),
+            },
+            {
+                repeat,
+                preStartDelay: repOffset * 2,
+                startDelay: repDelay,
+                endDelay: 0,
+                // TODO: use a real effect
+                item: new effectsCollection['aoe-disc']({
+                    yalms: 5,
+                    position: 'player',
+                    positionType: 'character',
+                    duration: repDuration,
+                    collection,
+                }),
+            },
+            {
+                repeat,
+                preStartDelay: repOffset * 3,
+                startDelay: repDelay,
+                endDelay: 0,
+                // TODO: use a real effect
+                item: new effectsCollection['aoe-disc']({
+                    yalms: 5,
+                    position: 'player',
+                    positionType: 'character',
+                    duration: repDuration,
+                    collection,
+                }),
             },
         ],
     });
@@ -367,7 +422,10 @@ function makeScene(game: Engine) {
         arena,
     });
 
+    collection.addCharacter(character);
+
     const fight = createFight(collection);
+    registerFight(fight);
     fight.execute();
     currentFight.value = fight;
 
@@ -412,6 +470,8 @@ async function onFightUpdate(updatedFight: Fight) {
     updatedFight.collection.worldClock.time = 0;
     worldTime.value = 0;
     (window as any).__fight = updatedFight;
+    registerFight(updatedFight);
+    hits.value = 0;
     updatedFight.execute();
 }
 </script>
@@ -428,6 +488,10 @@ async function onFightUpdate(updatedFight: Fight) {
             </div>
         </div>
 
+        <div class="ui-extras absolute top-6 flex justify-center items-center p-2 px-4 rounded bg-slate-100/50">
+            <p>Hits: {{ hits }}</p>
+        </div>
+
         <div class="absolute top-0 left-0 z-10">
             <slot>
                 <canvas class="bg-sky-100 w-screen h-screen" ref="canvas" id="gamecanvas"></canvas>
@@ -440,6 +504,12 @@ async function onFightUpdate(updatedFight: Fight) {
 :root {
     --char-rotation: 0deg;
     --cam-rotation: 0deg;
+}
+
+.ui-extras {
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
 }
 
 .minimap {

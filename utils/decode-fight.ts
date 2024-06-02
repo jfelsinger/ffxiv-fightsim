@@ -44,10 +44,8 @@ function tryParse(data: any) {
 
 export function decodeScheduled<T>(data: any, func: (data: any, optons: FightDecodeOptions) => T, options: FightDecodeOptions): Scheduled<T> {
     const scheduledResult: Scheduled<T> = {
+        ...data,
         item: func(data.item, options),
-        repeat: data.repeat,
-        startDelay: data.startDelay,
-        endDelay: data.endDelay,
     };
 
     if (data.after) {

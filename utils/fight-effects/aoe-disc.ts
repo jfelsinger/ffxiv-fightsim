@@ -25,6 +25,25 @@ export class AoeDiscEffect extends Effect {
         this.mesh = this.makeAoe().disc;
     }
 
+    checkMeshCollision(target: Bab.Mesh) {
+        const mesh = this.mesh;
+        if (!mesh || !target) {
+            return false;
+        }
+
+        const radius = yalmsToM(this.yalms);
+        const aoePosition = new Bab.Vector2(mesh.absolutePosition.x, mesh.absolutePosition.z);
+        const targetPosition = new Bab.Vector2(target.absolutePosition.x, target.absolutePosition.z);
+        const adjustedPos = targetPosition.subtract(aoePosition);
+        const distFromAoe = adjustedPos.length();
+
+        if (distFromAoe <= radius) {
+            return true;
+        }
+
+        return false;
+    }
+
     async cleanup() {
         this.mesh?.dispose()
         await super.cleanup();

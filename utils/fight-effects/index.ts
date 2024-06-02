@@ -3,7 +3,7 @@ import { Effect } from '../effects';
 import { AoeDiscEffect } from './aoe-disc';
 import { AoeSquareEffect } from './aoe-square';
 
-export const effectsCollection: Record<string, typeof Effect> = {
+export const effectsCollection = {
     'default': Effect,
     'aoe-square': AoeSquareEffect,
     'aoe-disc': AoeDiscEffect,
