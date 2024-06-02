@@ -1,0 +1,27 @@
+image:
+  file: gitpod.Dockerfile
+
+ports:
+  - name: Web Server
+    description: Web Server Environment
+    port: 3000
+    onOpen: notify
+
+  - name: Sockets Server
+    description: Sockets Server Environment
+    port: 3200
+    onOpen: notify
+
+  - name: Info Server
+    description: Info Server Environment
+    port: 3201
+    onOpen: notify
+
+tasks:
+  - name: DevWeb
+    init: |
+      bun install
+    command: DEBUG=gam* bun run dev
+
+gitConfig:
+  core.autocrlf: input
