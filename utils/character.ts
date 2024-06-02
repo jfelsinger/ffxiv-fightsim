@@ -137,7 +137,7 @@ export class Character {
 
         this.marker = this.makeMarker(charMat);
         this.steering = new Steering(this.marker, this.clock);
-        this.position.z -= yalmsToM(15);
+        this.position.z -= yalmsToM(20);
     }
 
     setCamera(camera: Bab.ArcRotateCamera) {

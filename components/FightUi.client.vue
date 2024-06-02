@@ -11,6 +11,7 @@ import { decodeFight } from '../utils/decode-fight';
 
 const emit = defineEmits<{
     (e: 'update', value: Fight): void,
+    (e: 'reset-position'): void,
 }>();
 
 const props = defineProps({
@@ -132,6 +133,10 @@ function reset() {
         emit('update', props.fight.clone());
     }
 }
+
+function resetPosition() {
+    emit('reset-position');
+}
 </script>
 
 <template>
@@ -146,6 +151,11 @@ function reset() {
                 <li>
                     <button @click="open('code')" class="tooltip tooltip-right px-2" data-tip="Edit Fight Code">
                         <Icon name="solar:code-square-broken" />
+                    </button>
+                </li>
+                <li>
+                    <button @click="resetPosition()" class="tooltip tooltip-right px-2" data-tip="Reset Position">
+                        <Icon name="solar:map-point-broken" />
                     </button>
                 </li>
                 <li>

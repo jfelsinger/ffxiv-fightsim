@@ -398,17 +398,17 @@ function makeScene(game: Engine) {
         cameraDirection.value = vectorAngle(camera.getDirection(Bab.Vector3.Forward()));
     });
 
-    const height = 1.67;
-    const heads = 6;
-    const torsoHeight = height * ((heads - 1) / heads);
-    const char2 = Bab.MeshBuilder.CreateCylinder('char2', {
-        tessellation: 3,
-        height: (torsoHeight * 0.945) * 0.75,
-        diameterTop: height / (heads / 1.35),
-        diameterBottom: height / (heads / 3),
-    }, scene);
-    char2.position.z = yalmsToM(0);
-    char2.position.y = (torsoHeight * 1.20) / 2;
+    // const height = 1.67;
+    // const heads = 6;
+    // const torsoHeight = height * ((heads - 1) / heads);
+    // const char2 = Bab.MeshBuilder.CreateCylinder('char2', {
+    //     tessellation: 3,
+    //     height: (torsoHeight * 0.945) * 0.75,
+    //     diameterTop: height / (heads / 1.35),
+    //     diameterBottom: height / (heads / 3),
+    // }, scene);
+    // char2.position.z = yalmsToM(0);
+    // char2.position.y = (torsoHeight * 1.20) / 2;
 
     const arenaResult = makeArena(scene, character);
     arena = arenaResult?.arena;
@@ -472,11 +472,19 @@ async function onFightUpdate(updatedFight: Fight) {
     hits.value = 0;
     updatedFight.execute();
 }
+
+function onResetPosition() {
+    const player = currentFight.value?.collection?.player;
+    if (player) {
+        player.position = new Bab.Vector3(0, 0, yalmsToM(-20));
+    }
+}
+
 </script>
 
 <template>
     <div id="game" class="relative max-w-screen max-h-screen overflow-hidden h-screen game --babylon">
-        <FightUi @update="onFightUpdate" v-if="currentFight" :fight="currentFight" />
+        <FightUi @reset-position="onResetPosition" @update="onFightUpdate" v-if="currentFight" :fight="currentFight" />
 
         <div class="minimap relative-north absolute top-10 right-10 z-10 bg-slate-700 p-[2px] rounded-full" :style="{
             '--cam-rotation': `${cameraDirection}deg`,
