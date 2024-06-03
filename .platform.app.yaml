@@ -1,0 +1,11 @@
+name: ffxiv-fightsim
+type: "nodejs:20"
+build:
+  flavor: none
+  hooks:
+    build: |
+      bun install
+      bun run build
+web:
+  commands:
+    start: bun run .output/server/index.mjs
