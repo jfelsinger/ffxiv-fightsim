@@ -1,5 +1,5 @@
 import { createRingMesh } from '../ring';
-import createAoeMat from '../../materials/squareAoe';
+import createAoeMat from '../../materials/roundAoe';
 import { degToRads, isWithinRadius, getVectorThetaLength } from '../vector-helpers';
 import { yalmsToM } from '../conversions';
 import * as Bab from '@babylonjs/core';
@@ -50,7 +50,7 @@ export class AoeRingEffect extends Effect {
             this.thetaStart = options.thetaStart || 0;
         }
 
-        this.segments = options.segments || (Math.floor(this.thetaLength / (Math.PI / 6.5)) + 1);
+        this.segments = options.segments || (Math.floor(this.thetaLength / (Math.PI / 12)) + 1);
         this.segments = Math.max(Math.floor(this.thetaLength / Math.PI + 1), this.segments);
     }
 
@@ -100,6 +100,7 @@ export class AoeRingEffect extends Effect {
     makeAoe() {
         const ringMat = createAoeMat(this.scene, Bab.Color3.FromInts(255, 150, 20), 'ringMat');
         ringMat.alpha = 0.7;
+        ringMat.setFloat('arenaRadius', yalmsToM(33.35 * 0.86868 * 1.01))
         this.clock.on('tick', (time) => {
             ringMat.setFloat('time', time);
             ringMat.setFloat('elapsed', this.getDurationPercent());

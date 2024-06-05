@@ -127,16 +127,99 @@ function createFight(collection: FightCollection) {
         collection,
         effects: [
             {
+                // IFRIT 1
                 repeat: 5,
                 endDelay: 500,
                 // TODO: use a real effect
                 item: new effectsCollection['aoe-ring']({
-                    outerRadius: 6,
-                    innerRadius: 2,
+                    outerRadius: 33.35 * 0.8687,
+                    innerRadius: 0.01,
+                    thetaLength: Math.PI / 2,
+                    angle: 152,
+                    direction: -90,
+                    position: new Bab.Vector3(0, 0, 0),
+                    // segments: 6,
+                    duration: 2000,
+                    collection,
+                }),
+            },
+            {
+                // IFRIT 2
+                repeat: 5,
+                endDelay: 500,
+                // TODO: use a real effect
+                item: new effectsCollection['aoe-ring']({
+                    outerRadius: 33.35 * 0.8687,
+                    innerRadius: 0.01,
+                    thetaLength: Math.PI / 2,
+                    angle: 152,
+                    direction: 90,
+                    position: new Bab.Vector3(0, 0, 0),
+                    // segments: 6,
+                    duration: 2000,
+                    collection,
+                }),
+            },
+            {
+                // GARUDA 1 (of 4)
+                repeat: 5,
+                endDelay: 500,
+                // TODO: use a real effect
+                item: new effectsCollection['aoe-ring']({
+                    outerRadius: 33.35 * 0.8687,
+                    innerRadius: 0.01,
                     thetaLength: Math.PI / 2,
                     angle: 45,
-                    direction: 90,
-                    position: new Bab.Vector3(0, 0, -10),
+                    direction: -90,
+                    position: new Bab.Vector3(0, 0, 0),
+                    // segments: 6,
+                    duration: 2000,
+                    collection,
+                }),
+            },
+            {
+                // RAMUH
+                repeat: 5,
+                endDelay: 500,
+                // TODO: use a real effect
+                item: new effectsCollection['aoe-disc']({
+                    yalms: 14.325,
+                    position: new Bab.Vector3(0, 0, 0),
+                    // segments: 6,
+                    duration: 2000,
+                    collection,
+                }),
+            },
+            {
+                // leviathan 1 (of 2)
+                repeat: 5,
+                endDelay: 500,
+                // TODO: use a real effect
+                item: new effectsCollection['aoe-ring']({
+                    outerRadius: 33.35 * 0.8687,
+                    innerRadius: 0.01,
+                    thetaLength: Math.PI / 2,
+                    angle: 180,
+                    direction: 0,
+                    position: new Bab.Vector3(6.25, 0, 0),
+                    // segments: 6,
+                    duration: 2000,
+                    collection,
+                }),
+            },
+            {
+                // leviathan 2 (of 2)
+                repeat: 5,
+                endDelay: 500,
+                // TODO: use a real effect
+                item: new effectsCollection['aoe-ring']({
+                    outerRadius: 33.35 * 0.8687,
+                    innerRadius: 0.01,
+                    thetaLength: Math.PI / 2,
+                    angle: 180,
+                    direction: 180,
+                    position: new Bab.Vector3(-6.25, 0, 0),
+                    // segments: 6,
                     duration: 2000,
                     collection,
                 }),

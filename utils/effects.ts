@@ -243,7 +243,7 @@ export class Effect extends EventEmitter {
             ...results,
             name: this.name,
             duration: this.options.duration || this.duration,
-            position: this.options.position || positionValue,
+            position: positionValue,
             positionType: this.options.positionType || this.positionType,
         }
     }

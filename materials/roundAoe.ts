@@ -27,6 +27,7 @@ export default function createShader(scene: Scene, color?: Color3, shaderName = 
                 'world', 'worldView', 'worldViewProjection',
                 'view', 'projection', 'viewProjection',
                 'direction',
+                'arenaRadius',
 
                 'time',
                 'elapsed',
@@ -35,6 +36,7 @@ export default function createShader(scene: Scene, color?: Color3, shaderName = 
         }
     )
 
+    material.setFloat('arenaRadius', 1000000);
     material.setFloat('time', 0);
     material.setFloat('elapsed', 0);
     material.setColor3('color', color || new Color3(0.2, 0.6, 1.0));
