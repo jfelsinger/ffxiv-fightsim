@@ -1,5 +1,6 @@
 import createAoeMat from '../../materials/roundAoe';
 import { yalmsToM } from '../conversions';
+import { isWithinRadius } from '../vector-helpers';
 import * as Bab from '@babylonjs/core';
 
 import {
@@ -31,13 +32,12 @@ export class AoeDiscEffect extends Effect {
             return false;
         }
 
-        const radius = yalmsToM(this.yalms);
-        const aoePosition = new Bab.Vector2(mesh.absolutePosition.x, mesh.absolutePosition.z);
-        const targetPosition = new Bab.Vector2(target.absolutePosition.x, target.absolutePosition.z);
-        const adjustedPos = targetPosition.subtract(aoePosition);
-        const distFromAoe = adjustedPos.length();
-
-        return distFromAoe <= radius;
+        // subtract aoe pos from mesh pos to get local coords of target
+        return isWithinRadius(
+            target.absolutePosition.x - mesh.absolutePosition.x,
+            target.absolutePosition.z - mesh.absolutePosition.z,
+            yalmsToM(this.yalms) // radius
+        );
     }
 
     async cleanup() {
@@ -54,21 +54,15 @@ export class AoeDiscEffect extends Effect {
         });
 
         const disc = Bab.MeshBuilder.CreateDisc('area', { radius: yalmsToM(this.yalms) }, this.scene);
-        disc.position = this.getPosition() || Bab.Vector3.Zero();
-        disc.position.y = 0.01;
-        disc.material = discMat;
         disc.rotation.x = Math.PI / 2;
+        disc.position.y = 0.01;
+        disc.bakeCurrentTransformIntoVertices();
+        disc.position = this.getPosition() || Bab.Vector3.Zero();
+        disc.material = discMat;
         disc.checkCollisions = true;
 
         return {
             disc
-        };
-    }
-
-    toJSON() {
-        return {
-            ...super.toJSON(),
-            yalms: this.yalms,
         };
     }
 }

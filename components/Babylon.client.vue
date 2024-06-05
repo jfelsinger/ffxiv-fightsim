@@ -3,15 +3,17 @@ import '@babylonjs/core/Debug/debugLayer';
 import '@babylonjs/inspector';
 import { Engine, Scene, Vector3 } from '@babylonjs/core';
 import * as Bab from '@babylonjs/core';
+import * as Tex from '@babylonjs/procedural-textures';
 import { GridMaterial } from '@babylonjs/materials';
 import createMarkerMat from '../materials/marker';
 import { Steering } from '../utils/steering';
-import { yalmsToM } from '../utils/conversions';
+import { yalmsToM, mToYalms } from '../utils/conversions';
 import { Arena } from '../utils/arena';
 import { Character } from '../utils/character';
 import { Clock } from '../utils/clock';
 import { FightCollection } from '../utils/fight-collection';
 import { effectsCollection } from '../utils/fight-effects/index';
+import { createRingMesh } from '#imports';
 import {
     Fight,
     FightSection,
@@ -124,58 +126,73 @@ function createFight(collection: FightCollection) {
         name: 'test-mechanic',
         collection,
         effects: [
-            ...checkboard1,
-            // ...checkboard2,
-            // {
-            //     repeat: 1,
-            //     startDelay: 2500,
-            //     endDelay: 500,
-            //     // TODO: use a real effect
-            //     item: testEffect,
-            // },
+            {
+                repeat: 5,
+                endDelay: 500,
+                // TODO: use a real effect
+                item: new effectsCollection['aoe-ring']({
+                    outerRadius: 6,
+                    innerRadius: 2,
+                    thetaLength: Math.PI / 2,
+                    angle: 45,
+                    direction: 90,
+                    position: new Bab.Vector3(0, 0, -10),
+                    duration: 2000,
+                    collection,
+                }),
+            },
+            // ...checkboard1,
+            // // ...checkboard2,
+            // // {
+            // //     repeat: 1,
+            // //     startDelay: 2500,
+            // //     endDelay: 500,
+            // //     // TODO: use a real effect
+            // //     item: testEffect,
+            // // },
 
-            {
-                repeat,
-                preStartDelay: repOffset * (1 + startAfter),
-                startDelay: repDelay,
-                endDelay: 0,
-                // TODO: use a real effect
-                item: new effectsCollection['aoe-disc']({
-                    yalms,
-                    position: 'player',
-                    positionType: 'character',
-                    duration: repDuration,
-                    collection,
-                }),
-            },
-            {
-                repeat,
-                preStartDelay: repOffset * (2 + startAfter),
-                startDelay: repDelay,
-                endDelay: 0,
-                // TODO: use a real effect
-                item: new effectsCollection['aoe-disc']({
-                    yalms,
-                    position: 'player',
-                    positionType: 'character',
-                    duration: repDuration,
-                    collection,
-                }),
-            },
-            {
-                repeat,
-                preStartDelay: repOffset * (3 + startAfter),
-                startDelay: repDelay,
-                endDelay: 0,
-                // TODO: use a real effect
-                item: new effectsCollection['aoe-disc']({
-                    yalms,
-                    position: 'player',
-                    positionType: 'character',
-                    duration: repDuration,
-                    collection,
-                }),
-            },
+            // {
+            //     repeat,
+            //     preStartDelay: repOffset * (1 + startAfter),
+            //     startDelay: repDelay,
+            //     endDelay: 0,
+            //     // TODO: use a real effect
+            //     item: new effectsCollection['aoe-disc']({
+            //         yalms,
+            //         position: 'player',
+            //         positionType: 'character',
+            //         duration: repDuration,
+            //         collection,
+            //     }),
+            // },
+            // {
+            //     repeat,
+            //     preStartDelay: repOffset * (2 + startAfter),
+            //     startDelay: repDelay,
+            //     endDelay: 0,
+            //     // TODO: use a real effect
+            //     item: new effectsCollection['aoe-disc']({
+            //         yalms,
+            //         position: 'player',
+            //         positionType: 'character',
+            //         duration: repDuration,
+            //         collection,
+            //     }),
+            // },
+            // {
+            //     repeat,
+            //     preStartDelay: repOffset * (3 + startAfter),
+            //     startDelay: repDelay,
+            //     endDelay: 0,
+            //     // TODO: use a real effect
+            //     item: new effectsCollection['aoe-disc']({
+            //         yalms,
+            //         position: 'player',
+            //         positionType: 'character',
+            //         duration: repDuration,
+            //         collection,
+            //     }),
+            // },
         ],
     });
     testMechanic.on('start-execute', () => { debug('mechanic:start'); });
@@ -403,8 +420,177 @@ function makeScene(game: Engine) {
     // char2.position.z = yalmsToM(0);
     // char2.position.y = (torsoHeight * 1.20) / 2;
 
-    const arenaResult = makeArena(scene, character);
+    // const e12sArenaRadius = 30;
+    const e12sArenaRadius = 33.35 * 0.86868;
+    const arenaResult = makeArena(scene, character, e12sArenaRadius * 2);
     arena = arenaResult?.arena;
+
+    const testArenaDisc = Bab.MeshBuilder.CreateDisc('test-floor', { radius: yalmsToM(e12sArenaRadius) }, scene);
+    // const testArenaDisc = Bab.MeshBuilder.CreateDisc('test-floor', { radius: 33 }, scene);
+    testArenaDisc.position = Bab.Vector3.Zero();
+    testArenaDisc.position.y = 0.002;
+    testArenaDisc.rotation.x = Math.PI / 2;
+    const e12sMat = new Bab.StandardMaterial('e12sarena', scene);
+    e12sMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/arena.png', scene, undefined, false);
+    e12sMat.diffuseTexture.hasAlpha = true;
+    e12sMat.specularColor = new Bab.Color3(0, 0, 0.05);
+    testArenaDisc.material = e12sMat;
+
+    const bossSize = yalmsToM(5);
+    const boss = Bab.MeshBuilder.CreatePlane('test-boss', { size: bossSize * 2 }, scene, true, Bab.Mesh.DOUBLESIDE);
+    // boss.position.z = yalmsToM(15);
+    boss.position.y = bossSize;
+    const bossMat = new Bab.StandardMaterial('e12s-boss', scene);
+    bossMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/boss.png');
+    bossMat.diffuseTexture.hasAlpha = true;
+    bossMat.specularColor = new Bab.Color3(0, 0, 0);
+    bossMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
+    boss.material = bossMat;
+    boss.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
+
+    const crystalSize = yalmsToM(12);
+
+    const ifritSize = crystalSize
+    const ifrit = Bab.MeshBuilder.CreatePlane('test-ifrit', { height: ifritSize * 2, width: ifritSize * 1.2 }, scene);
+    ifrit.position.z = yalmsToM(26);
+    ifrit.position.x = ifritSize * 1.2 * 1.8;
+    ifrit.position.y = ifritSize * 0.8;
+    const ifritMat = new Bab.StandardMaterial('e12s-ifrit', scene);
+    ifritMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/ifrit.png');
+    ifritMat.diffuseTexture.hasAlpha = true;
+    ifritMat.specularColor = new Bab.Color3(0, 0, 0);
+    ifritMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
+    ifrit.material = ifritMat;
+    ifrit.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
+
+    // const path: Vector3[] = [ifrit.position.clone()];
+    // const beamSegments = 10;
+    // const dist = Bab.Vector3.Distance(boss.position, ifrit.position) / beamSegments;
+    // for (var i = 1; i < beamSegments - 1; i++) {
+    //     // const lastPosition = i && path[i - 1] ? path[i - 1] : ifrit.position.clone();
+    //     // const newPos = lastPosition.subtract(boss.position.clone());
+    //     const mult = (beamSegments - i) / beamSegments;
+    //     const newPos = boss.position.add(ifrit.position).multiply(new Bab.Vector3(mult, mult, mult));
+    //     newPos.x += (Math.random() - 0.5) * 5;
+    //     newPos.z += (Math.random() - 0.5) * 5;
+    //     path.push(newPos);
+    // }
+    // path.push(boss.position.clone());
+    // const ifritBeam = Bab.MeshBuilder.CreateTube('beam-ifrit', {
+    //     path: [
+    //         ...path,
+    //     ],
+    //     tessellation: 3,
+    //     radius: 0.10,
+    // }, scene);
+    // const ifritBeamMat = new Bab.StandardMaterial('ifrit-beam', scene);
+    // ifritBeamMat.emissiveColor = new Bab.Color3(189 / 255, 25 / 255, 28 / 255);
+    // ifritBeam.material = ifritBeamMat;
+    // (window as any).ifritBeam = ifritBeam;
+    // const gl = new Bab.GlowLayer('beam', scene);
+    // gl.addIncludedOnlyMesh(ifritBeam);
+
+    const ifritEmitter = new Bab.CustomParticleEmitter();
+    let id = 0;
+    ifritEmitter.particlePositionGenerator = (_index, _particle, out) => {
+        // const idx = Math.round((_particle?.id ?? id + 1)) % (path.length - 1);
+        // const idx = Math.floor(Math.random() * path.length);
+        // const pos = path[idx] // .subtract(ifrit.position);
+        const pos = ifrit.position // .subtract(ifrit.position);
+        // console.log(id, idx);
+        out.x = pos.x + Math.sin(Math.random() * 10) * 2;
+        out.y = pos.y + Math.cos(Math.random() * 10) * 1.5;
+        out.z = pos.z + Math.sin(Math.random() * 10) * 2.5;
+
+        id += 1;
+    };
+
+    ifritEmitter.particleDestinationGenerator = (_index, _particle, out) => {
+        // const idx = Math.round((_particle?.id ?? id + 1)) % (path.length - 1);
+        // const pos = path[idx + 1] // .subtract(ifrit.position);
+        // out.x = pos.x;
+        // out.y = pos.y;
+        // out.z = pos.z;
+        out.x = boss.position.x;
+        out.y = boss.position.y;
+        out.z = boss.position.z;
+    };
+
+    // const ifritParticles = Bab.ParticleHelper.CreateDefault(ifritBeam);
+    const ifritParticles = Bab.ParticleHelper.CreateDefault(ifrit);
+    ifritParticles.emitter = Bab.Vector3.Zero();
+    ifritParticles.particleEmitterType = ifritEmitter;
+    // ifritParticles.particleEmitterType = new Bab.MeshParticleEmitter(ifritBeam);
+    ifritParticles.maxSize = 2.5;
+    ifritParticles.minSize = 0.25;
+    ifritParticles.maxEmitPower = 0.95;
+    ifritParticles.minEmitPower = 0.70;
+    ifritParticles.updateSpeed = 0.25;
+    ifritParticles.maxLifeTime = 15.45;
+    ifritParticles.minLifeTime = 15.20;
+    ifritParticles.color1 = new Bab.Color4(211 / 255, 108 / 255, 79 / 255, 1.0);
+    ifritParticles.color2 = new Bab.Color4(189 / 255, 25 / 255, 28 / 255, 1.0);
+    ifritParticles.colorDead = new Bab.Color4(189 / 255, 25 / 255, 28 / 255, 0.5);
+    // ifritParticles.gravity = boss.position.subtract(ifrit.position).normalize().multiply(new Bab.Vector3(.1, .1, .1));
+    ifritParticles.billboardMode = Bab.ParticleSystem.BILLBOARDMODE_STRETCHED;
+    ifritParticles.start();
+
+    const noiseTex = new Bab.NoiseProceduralTexture('perlin', 256, scene);
+    noiseTex.animationSpeedFactor = 8;
+    noiseTex.persistence = 2;
+    noiseTex.brightness = 0.5;
+    noiseTex.octaves = 2;
+
+    ifritParticles.noiseTexture = noiseTex;
+    ifritParticles.noiseStrength = new Bab.Vector3(.03, .03, .03);
+
+    const ramuhSize = crystalSize
+    const ramuh = Bab.MeshBuilder.CreatePlane('test-ramuh', { height: ramuhSize * 2, width: ramuhSize * 1.2 }, scene);
+    ramuh.position.z = yalmsToM(35);
+    ramuh.position.x = ramuhSize * 1.2 * 0.625;
+    ramuh.position.y = ramuhSize * 0.8;
+    const ramuhMat = new Bab.StandardMaterial('e12s-ramuh', scene);
+    ramuhMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/ramuh.png');
+    ramuhMat.diffuseTexture.hasAlpha = true;
+    ramuhMat.specularColor = new Bab.Color3(0, 0, 0);
+    ramuhMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
+    ramuh.material = ramuhMat;
+    ramuh.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
+
+    const garudaSize = crystalSize
+    const garuda = Bab.MeshBuilder.CreatePlane('test-garuda', { height: garudaSize * 2, width: garudaSize * 1.2 }, scene);
+    garuda.position.z = yalmsToM(35);
+    garuda.position.x = garudaSize * 1.2 * -0.625;
+    garuda.position.y = garudaSize * 0.8;
+    const garudaMat = new Bab.StandardMaterial('e12s-garuda', scene);
+    garudaMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/garuda.png');
+    garudaMat.diffuseTexture.hasAlpha = true;
+    garudaMat.specularColor = new Bab.Color3(0, 0, 0);
+    garudaMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
+    garuda.material = garudaMat;
+    garuda.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
+
+    const leviathanSize = crystalSize
+    const leviathan = Bab.MeshBuilder.CreatePlane('test-leviathan', { height: leviathanSize * 2, width: leviathanSize * 1.2 }, scene);
+    leviathan.position.z = yalmsToM(26);
+    leviathan.position.x = leviathanSize * 1.2 * -1.8;
+    leviathan.position.y = leviathanSize * 0.8;
+    const leviathanMat = new Bab.StandardMaterial('e12s-leviathan', scene);
+    leviathanMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/leviathan.png');
+    leviathanMat.diffuseTexture.hasAlpha = true;
+    leviathanMat.specularColor = new Bab.Color3(0, 0, 0);
+    leviathanMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
+    leviathan.material = leviathanMat;
+    leviathan.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
+
+
+    // const particles = Bab.ParticleHelper.CreateDefault(boss.position.clone())
+    const particles = Bab.ParticleHelper.CreateDefault(boss.position.clone())
+    // const particles = new Bab.ParticleSystem('boss-particles', 100, scene);
+    // particles.particleTexture = new Tex.FireProceduralTexture('fiah', 128, scene);
+    // particles.emitter = boss.position.clone();
+    particles.emitter = character.position;
+    particles.start();
 
     const collection = new FightCollection({
         scene,
@@ -412,6 +598,15 @@ function makeScene(game: Engine) {
         playerClock,
         arena,
     });
+
+    const ring = createRingMesh('rang', {
+        innerRadius: 0.5,
+        outerRadius: 5,
+        thetaSegments: 1,
+        thetaLength: Math.PI / 1,
+    }, scene);
+    ring.position.z -= 5;
+    ring.position.y += 5;
 
     collection.addCharacter(character);
 
@@ -469,7 +664,7 @@ async function onFightUpdate(updatedFight: Fight) {
 function onResetPosition() {
     const player = currentFight.value?.collection?.player;
     if (player) {
-        player.position = new Bab.Vector3(0, 0, yalmsToM(-20));
+        player.position = new Bab.Vector3(0, 0, yalmsToM(-27));
     }
 }
 

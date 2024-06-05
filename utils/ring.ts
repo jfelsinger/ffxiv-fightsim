@@ -14,7 +14,7 @@ export type RingOptions = {
 
 export default createRingMesh;
 export function createRingMesh(name: string, options: Partial<RingOptions>, scene?: Scene): Mesh {
-    const {
+    let {
         innerRadius = 0.5,
         outerRadius = 1,
         thetaSegments = 8,
@@ -23,10 +23,12 @@ export function createRingMesh(name: string, options: Partial<RingOptions>, scen
         thetaLength = Math.PI * 2
     } = options
     const mesh = new Mesh(name, scene)
+    thetaLength = Math.min(thetaLength, Math.PI * 2);
+    thetaLength = Math.min(thetaLength, Math.PI * 2);
 
-    if (thetaSegments < 3) {
-        throw new Error('Invalid theta segements, min 3 are required.')
-    }
+    // if (thetaSegments < 3) {
+    //     throw new Error('Invalid theta segements, min 3 are required.')
+    // }
 
     if (phiSegments < 1) {
         throw new Error('Invalid phi segements, min 1 are required.')

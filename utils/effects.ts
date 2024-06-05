@@ -230,14 +230,21 @@ export class Effect extends EventEmitter {
             ].join(',');
         }
 
+        const results: Record<string, any> = {};
+
+        for (const property in this.options) {
+            const val = (this.options as any)[property];
+            if (val && (typeof (val) === 'number' || typeof (val) === 'string')) {
+                results[property] = val;
+            }
+        }
+
         return {
+            ...results,
             name: this.name,
-            duration: this.duration,
-
-            position: positionValue,
-            positionType: this.positionType,
-
-            repeatTarget: this.repeatTarget,
+            duration: this.options.duration || this.duration,
+            position: this.options.position || positionValue,
+            positionType: this.options.positionType || this.positionType,
         }
     }
 }
