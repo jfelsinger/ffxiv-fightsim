@@ -5,12 +5,9 @@ import {
     type Scheduled,
     getScheduledDuration,
 } from '../utils/scheduled';
-import {
-    Fight,
-    FightSection,
-    Mechanic,
-    Effect,
-} from '../utils/effects';
+import { Fight, } from '../utils/fight';
+import { FightSection, } from '../utils/sections';
+import { Mechanic } from '../utils/mechanics';
 
 const props = defineProps<{
     fight: Fight,

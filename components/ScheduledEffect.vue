@@ -5,13 +5,10 @@ import {
     type Scheduled,
     getScheduledDuration,
 } from '../utils/scheduled';
-import {
-    Fight,
-    FightSection,
-    Mechanic,
-    Effect,
-} from '../utils/effects';
-import { getJSDocOverrideTagNoCache } from 'typescript';
+import { Fight, } from '../utils/fight';
+import { FightSection, } from '../utils/sections';
+import { Mechanic } from '../utils/mechanics';
+import { Effect, } from '../utils/effects';
 
 const props = defineProps<{
     fight: Fight,

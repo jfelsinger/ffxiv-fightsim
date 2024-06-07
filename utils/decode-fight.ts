@@ -8,19 +8,49 @@ import {
     isScheduled,
 } from './scheduled';
 
+import { Fight } from './fight';
+
+import {
+    FightSection,
+    sectionsCollection,
+} from './sections';
+
+import {
+    Mechanic,
+    mechanicsCollection,
+} from './mechanics';
+
 import {
     Effect,
-    Mechanic,
-    FightSection,
-    Fight,
+    effectsCollection,
 } from './effects';
 
-import { effectsCollection } from './fight-effects';
-import { mechanicsCollection } from './fight-mechanics';
 
 export type FightDecodeOptions = {
     collection: FightCollection
     clock?: Clock
+}
+
+export function getBasicValues(obj: any) {
+    const results: Record<string, any> = {};
+    if (obj) {
+        for (const property in obj) {
+            const val = obj[property];
+            if (
+                (val || val === 0) &&
+                (
+                    typeof (val) === 'number' ||
+                    typeof (val) === 'bigint' ||
+                    typeof (val) === 'string' ||
+                    typeof (val) === 'boolean'
+                )
+            ) {
+                results[property] = val;
+            }
+        }
+    }
+
+    return results;
 }
 
 function tryParse(data: any) {
@@ -68,8 +98,8 @@ export function decodeEffect(data: any, options: FightDecodeOptions) {
 
     let effectClass = Effect;
     let effectClassName: string = data.name;
-    if (effectsCollection[effectClassName as any]) {
-        effectClass = effectsCollection[effectClassName] as typeof Effect;
+    if ((effectsCollection as any)[effectClassName]) {
+        effectClass = (effectsCollection as any)[effectClassName] as typeof Effect;
     }
 
     const resultEffect = new effectClass({
@@ -114,9 +144,15 @@ export function decodeScheduledMechanic(data: any, options: FightDecodeOptions) 
 export function decodeFightSection(data: any, options: FightDecodeOptions) {
     data = tryParse(data);
 
+    let sectionClass = FightSection;
+    let sectionClassName: string = data.name;
+    if (sectionClassName && (sectionsCollection as any)[sectionClassName]) {
+        sectionClass = (sectionsCollection as any)[sectionClassName] as typeof FightSection;
+    }
+
     const mechanics = data?.mechanics?.map((mechanic: any) => decodeScheduledMechanic(mechanic, options)) || [];
 
-    return new FightSection({
+    return new sectionClass({
         ...options,
         ...data,
         mechanics,

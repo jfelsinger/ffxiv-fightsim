@@ -3,6 +3,7 @@ import { GridMaterial } from '@babylonjs/materials';
 import getArenaBoundsMat from '../../materials/arenaBounds';
 import { FightCollection } from '../fight-collection';
 import { arenaMats } from './mats';
+import { getBasicValues } from '../decode-fight';
 
 import { yalmsToM } from '../conversions';
 
@@ -30,6 +31,10 @@ export class Arena {
     globalFloor?: Bab.Mesh;
     boundary?: Bab.Mesh;
     camCollider?: Bab.Mesh;
+
+    get size() {
+        return yalmsToM(this.yalms);
+    }
 
     dispose() {
         this.floor?.dispose();
@@ -62,17 +67,10 @@ export class Arena {
     }
 
     toJSON() {
-        const results: Record<string, any> = {};
-
-        for (const property in this.options) {
-            const val = (this.options as any)[property];
-            if (val && (typeof (val) === 'number' || typeof (val) === 'string' || typeof (val) === 'boolean')) {
-                results[property] = val;
-            }
-        }
+        const results = getBasicValues(this.options);
         return {
-            ...results,
             name: this.name,
+            ...results,
         }
     }
 
@@ -111,7 +109,7 @@ export class Arena {
 
     isPositionWithinBoundary(position: Bab.Vector3) {
         if (this.shape === 'round') {
-            const size = yalmsToM(this.yalms);
+            const size = this.size;
             const radius = size / 2;
             if (position.length() < radius) {
                 return true;
@@ -122,7 +120,7 @@ export class Arena {
     }
 
     makeSquareFloor(mat: Bab.Material): { floor: Bab.Mesh, boundary?: Bab.Mesh } {
-        const size = yalmsToM(this.yalms);
+        const size = this.size;
         const floor = Bab.MeshBuilder.CreateGround(`${this.name}Floor`, { width: size, height: size }, this.scene);
         floor.checkCollisions = false;
         floor.position.y += 0.001
@@ -156,7 +154,7 @@ export class Arena {
 
     makeRoundFloor(mat: Bab.Material): { floor: Bab.Mesh, boundary?: Bab.Mesh } {
         const tessellation = this.tessellation;
-        const size = yalmsToM(this.yalms);
+        const size = this.size;
         const floor = Bab.MeshBuilder.CreateDisc(`${this.name}Floor`, { radius: size / 2, tessellation }, this.scene);
         floor.rotation.x = Math.PI / 2;
         floor.bakeCurrentTransformIntoVertices();
@@ -189,7 +187,7 @@ export class Arena {
     }
 
     makeRingFloor(mat: Bab.Material): { floor: Bab.Mesh, boundary?: Bab.Mesh } {
-        const size = yalmsToM(this.yalms);
+        const size = this.size;
         const floor = Bab.MeshBuilder.CreateDisc(`${this.name}Floor`, { radius: size / 2 }, this.scene);
         floor.rotation.x = Math.PI / 2;
         floor.bakeCurrentTransformIntoVertices();

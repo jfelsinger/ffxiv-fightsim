@@ -1,0 +1,83 @@
+name: e12s
+scheduling: sequential
+arena:
+  name: e12s-arena
+  yalms: 58
+  floorType: e12s
+sections:
+  - item:
+      name: test-section
+      scheduling: sequential
+      mechanics:
+        - item:
+            name: test-mechanic
+            scheduling: parallel
+            effects:
+              - repeat: 5
+                endDelay: 500
+                item:
+                  outerRadius: 28.971145000000003
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  angle: 152
+                  direction: -90
+                  duration: 2000
+                  name: aoe-ring
+                  positionType: arena
+              - repeat: 5
+                endDelay: 500
+                item:
+                  outerRadius: 28.971145000000003
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  angle: 152
+                  direction: 90
+                  duration: 2000
+                  name: aoe-ring
+                  positionType: arena
+              - repeat: 5
+                endDelay: 500
+                item:
+                  outerRadius: 28.971145000000003
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  angle: 45
+                  direction: -90
+                  duration: 2000
+                  name: aoe-ring
+                  positionType: arena
+              - repeat: 5
+                endDelay: 500
+                item:
+                  yalms: 14.325
+                  duration: 2000
+                  name: aoe-disc
+                  positionType: arena
+              - repeat: 5
+                endDelay: 500
+                item:
+                  outerRadius: 28.971145000000003
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  angle: 180
+                  direction: 0
+                  duration: 2000
+                  name: aoe-ring
+                  position:
+                    - 6.25
+                    - 0
+                  positionType: arena
+              - repeat: 5
+                endDelay: 500
+                item:
+                  outerRadius: 28.971145000000003
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  angle: 180
+                  direction: 180
+                  duration: 2000
+                  name: aoe-ring
+                  position:
+                    - -6.25
+                    - 0
+                  positionType: arena

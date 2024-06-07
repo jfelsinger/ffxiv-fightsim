@@ -3,31 +3,23 @@ import '@babylonjs/core/Debug/debugLayer';
 import '@babylonjs/inspector';
 import { Engine, Scene, Vector3 } from '@babylonjs/core';
 import * as Bab from '@babylonjs/core';
-import * as Tex from '@babylonjs/procedural-textures';
-import { GridMaterial } from '@babylonjs/materials';
-import createMarkerMat from '../materials/marker';
-import { Steering } from '../utils/steering';
-import { yalmsToM, mToYalms } from '../utils/conversions';
-import { Arena } from '../utils/arenas/arena';
+import { yalmsToM } from '../utils/conversions';
 import { Character } from '../utils/character';
 import { Clock } from '../utils/clock';
 import { FightCollection } from '../utils/fight-collection';
-import { effectsCollection } from '../utils/fight-effects/index';
+import { effectsCollection } from '../utils/effects';
 import { createRingMesh } from '#imports';
-import {
-    Fight,
-    FightSection,
-    Mechanic,
-} from '../utils/effects';
+import { Fight, } from '../utils/fight';
+import { FightSection, } from '../utils/sections';
+import { Mechanic, } from '../utils/mechanics';
+import { decodeFight } from '../utils/decode-fight';
+import { vectorAngle } from '../utils/vector-helpers';
 
 (window as any).Bab = Bab;
 
-function vectorAngle(v: Bab.Vector3) {
-    let angle = Math.atan2(v.x, v.z);
-    angle = 180 * angle / Math.PI;
-    angle = (360 + (Math.round(angle * 10) / 10)) % 360;
-    return angle;
-}
+const props = defineProps<{
+    fightData?: any,
+}>();
 
 import Debug from 'debug';
 const debug = Debug('game');
@@ -38,7 +30,7 @@ const playerTime = useState<number>('playerTime', () => playerClock.time || 0);
 playerClock.on('tick', (time) => { playerTime.value = time });
 watch(playerTimeScaling, (scaling) => { playerClock.scaling = scaling });
 
-const worldTimeScaling = ref(1.0);
+const worldTimeScaling = useState<number>('worldTimeScaling', () => 1.0);
 const worldClock = new Clock({ name: 'world', paused: true, scaling: worldTimeScaling.value });
 const worldTime = useState<number>('worldTime', () => worldClock.time || 0);
 worldClock.on('tick', (time) => { worldTime.value = time });
@@ -62,6 +54,19 @@ function registerFight(fight: Fight) {
         hits.value++;
     });
 }
+
+function getFight(collection: FightCollection, yalms = 60) {
+    if (props.fightData) {
+        console.log('use fight data!');
+        return decodeFight(props.fightData, {
+            collection,
+            clock: worldClock,
+        });
+    }
+
+    return createFight(collection, yalms);
+}
+
 
 function createFight(collection: FightCollection, yalms = 60) {
 
@@ -387,13 +392,14 @@ function makeScene(game: Engine) {
         debug('collider collided with: ', otherMesh.name, arguments);
     });
 
-    const e12sArenaRadius = 33.35 * 0.86868;
+    const e12sArenaRadius = 29;
     const collection = new FightCollection({
         scene,
         worldClock,
         playerClock,
     });
-    const fight = createFight(collection, e12sArenaRadius * 2);
+
+    const fight = getFight(collection, e12sArenaRadius * 2);
     const arena = fight.arena;
 
 
@@ -509,7 +515,7 @@ function makeScene(game: Engine) {
     const ifritSize = crystalSize
     const ifrit = Bab.MeshBuilder.CreatePlane('test-ifrit', { height: ifritSize * 2, width: ifritSize * 1.2 }, scene);
     ifrit.position.z = yalmsToM(26);
-    ifrit.position.x = ifritSize * 1.2 * 1.8;
+    ifrit.position.x = ifritSize * 1.2 * 1.65;
     ifrit.position.y = ifritSize * 0.8;
     const ifritMat = new Bab.StandardMaterial('e12s-ifrit', scene);
     ifritMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/ifrit.png');
@@ -629,7 +635,7 @@ function makeScene(game: Engine) {
     const leviathanSize = crystalSize
     const leviathan = Bab.MeshBuilder.CreatePlane('test-leviathan', { height: leviathanSize * 2, width: leviathanSize * 1.2 }, scene);
     leviathan.position.z = yalmsToM(26);
-    leviathan.position.x = leviathanSize * 1.2 * -1.8;
+    leviathan.position.x = leviathanSize * 1.2 * -1.65;
     leviathan.position.y = leviathanSize * 0.8;
     const leviathanMat = new Bab.StandardMaterial('e12s-leviathan', scene);
     leviathanMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/leviathan.png');
@@ -716,11 +722,16 @@ function onResetPosition() {
     }
 }
 
+function onScaleTime(value: number) {
+    worldTimeScaling.value = value;
+}
+
 </script>
 
 <template>
     <div id="game" class="relative max-w-screen max-h-screen overflow-hidden h-screen game --babylon">
-        <FightUi @reset-position="onResetPosition" @update="onFightUpdate" v-if="currentFight" :fight="currentFight" />
+        <FightUi @scale-time="onScaleTime" @reset-position="onResetPosition" @update="onFightUpdate" v-if="currentFight"
+            :fight="currentFight" />
 
         <div class="minimap relative-north absolute top-10 right-10 z-10 bg-slate-700 p-[2px] rounded-full" :style="{
             '--cam-rotation': `${cameraDirection}deg`,

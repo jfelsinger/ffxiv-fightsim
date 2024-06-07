@@ -6,7 +6,7 @@ import { parseNumber } from '../parse-number';
 import {
     Effect,
     type EffectOptions,
-} from '../effects';
+} from './';
 
 export type AoeSquareEffectOptions = EffectOptions & {
     yalms?: number | string,

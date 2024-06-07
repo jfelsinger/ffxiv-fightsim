@@ -3,10 +3,8 @@ import * as YAML from 'yaml';
 import {
     type Scheduled,
 } from '../utils/scheduled';
-import {
-    Fight,
-    FightSection,
-} from '../utils/effects';
+import { Fight, } from '../utils/fight';
+import { FightSection } from '../utils/sections';
 import { decodeFight } from '../utils/decode-fight';
 
 const emit = defineEmits<{
@@ -14,6 +12,7 @@ const emit = defineEmits<{
     (e: 'reset-position'): void,
     (e: 'start'): void,
     (e: 'pause'): void,
+    (e: 'scale-time', val: number): void,
 }>();
 
 const props = defineProps({
@@ -30,6 +29,8 @@ const currentTime = useState<number>('worldTime', () => 0);
 // const currentTime = ref(props.fight?.clock?.time || 0);
 const elapsed = computed(() => Math.min(duration.value, currentTime.value));
 const elapsedPercent = computed(() => (elapsed.value || 0) / (duration.value || 1) * 100);
+
+const worldTimeScaling = useState<number>('worldTimeScaling', () => 1.0);
 
 // props.fight?.clock.on('tick', () => {
 //     currentTime.value = props.fight?.clock.time || 0;
@@ -185,26 +186,44 @@ onMounted(() => {
 onBeforeUnmount(() => {
     document.removeEventListener('keydown', handleKeyPress);
 });
+
+function updateTime(val: number) {
+    emit('scale-time', val);
+}
 </script>
 
 <template>
     <div>
-        <div class="fight-bot-center flex flex-col absolute bottom-12 z-20">
+        <div class="fight-bot-center flex flex-col absolute bottom-12 z-50">
 
             <div class="flex p-2 bg-slate-100/45 rounded-box min-w-96 gap-2 items-center">
-                <label @click="togglePause()" class="swap swap-rotate px-2" :class="{ 'swap-active': isPaused }">
+                <label @click="togglePause()"
+                    class="swap swap-rotate btn btn-sm bg-transparent border-transparent shadow-none px-2 "
+                    :class="{ 'swap-active': isPaused }">
                     <Icon class="swap-on" name="solar:play-circle-linear" />
                     <Icon class="swap-off" name="solar:pause-circle-linear" />
                 </label>
                 <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
-                <button @click="reset()" class="tooltip tooltip-top px-2" data-tip="Restart Fight">
+                <div class="dropdown dropdown-hover dropdown-top">
+                    <div tabindex="0" role="button" class="btn btn-sm bg-transparent border-transparent shadow-none px-2">
+                        <Icon name="solar:stopwatch-linear" />
+                    </div>
+                    <ul tabindex="0" class="dropdown-content z-[51] menu p-2 shadow bg-base-100 rounded-box">
+                        <li v-for="val in ['1.0', 0.75, 0.50]" :class="{ 'opacity-50': worldTimeScaling == val }">
+                            <a @click.stop.prevent="updateTime(+val)">{{ val }}</a>
+                        </li>
+                    </ul>
+                </div>
+                <button @click="reset()"
+                    class="tooltip tooltip-top px-2 btn btn-sm bg-transparent border-transparent shadow-none"
+                    data-tip="Restart Fight">
                     <Icon name="solar:refresh-bold" />
                 </button>
             </div>
 
         </div>
 
-        <div class="fight__sidebar z-20">
+        <div class="fight__sidebar z-50">
             <div class="fight__sidebar-content p-2">
                 <ul class="menu bg-slate-100/45  rounded-box">
                     <li>
@@ -246,7 +265,7 @@ onBeforeUnmount(() => {
                         }" role="progressbar"></div>
                         -->
                         <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
-                        <CodeButton @open="() => resetEncoded(true)" class=" dropdown-right float-right relative z-30">
+                        <CodeButton @open="() => resetEncoded(true)" class=" dropdown-right float-right relative z-60">
                             <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language"
                                 v-model="encoded" />
                         </CodeButton>
@@ -278,7 +297,7 @@ onBeforeUnmount(() => {
 <style lang="scss">
 .fight-ui {
     position: relative;
-    z-index: 20;
+    z-index: 50;
     // top: 0rem;
     // left: 1rem;
     backdrop-filter: blur(5px) brightness(1.15);
@@ -296,7 +315,7 @@ onBeforeUnmount(() => {
 
 .fight__sidebar-content {
     position: absolute;
-    z-index: 30;
+    // z-index: 30;
     top: 0;
     left: 0;
     display: flex;

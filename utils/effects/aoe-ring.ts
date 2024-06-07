@@ -8,7 +8,7 @@ import { parseNumber } from '../parse-number';
 import {
     Effect,
     type EffectOptions,
-} from '../effects';
+} from './';
 
 export type AoeRingEffectOptions = EffectOptions & {
     innerRadius?: number | string

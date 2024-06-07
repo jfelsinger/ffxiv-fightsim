@@ -2,7 +2,6 @@ import * as Bab from '@babylonjs/core';
 import { Clock } from './clock';
 import { Character } from './character';
 import { Arena } from '../utils/arenas/arena';
-// import type { Fight } from './effects';
 
 export type CharacterName =
     | 'player'

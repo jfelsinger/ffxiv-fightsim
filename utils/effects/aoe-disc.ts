@@ -7,7 +7,7 @@ import { parseNumber } from '../parse-number';
 import {
     Effect,
     type EffectOptions,
-} from '../effects';
+} from './';
 
 export type AoeDiscEffectOptions = EffectOptions & {
     yalms?: number | string,

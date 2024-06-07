@@ -1,0 +1,89 @@
+name: e12s-primal-combinations
+scheduling: sequential
+arena:
+  name: e12s-arena
+  yalms: 58
+  floorType: e12s
+sections:
+  - item:
+      name: test-section
+      scheduling: sequential
+      mechanics:
+        - item:
+            name: test-mechanic
+            scheduling: parallel
+            effects:
+              # Ifrit
+              - label: Ifrit
+                repeat: 5
+                endDelay: 500
+                item:
+                  name: aoe-group
+                  outerRadius: 28.971145000000003
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  angle: 152
+                  duration: 2000
+                  positionType: arena
+                  aoes:
+                    - name: aoe-ring
+                      direction: -90
+                    - name: aoe-ring
+                      direction: 90
+
+              # Garuda
+              - label: Garuda
+                repeat: 5
+                endDelay: 500
+                item:
+                  name: aoe-group
+                  outerRadius: 28.971145000000003
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  angle: 45.5
+                  direction: -90
+                  duration: 2000
+                  positionType: arena
+                  aoes:
+                    - name: aoe-ring
+                      direction: -90
+                    - name: aoe-ring
+                      direction: 0
+                    - name: aoe-ring
+                      direction: 90
+                    - name: aoe-ring
+                      direction: 180
+
+              # Ramuh
+              - label: Ramuh
+                repeat: 5
+                endDelay: 500
+                item:
+                  name: aoe-disc
+                  yalms: 14.325
+                  duration: 2000
+                  positionType: arena
+
+              # Leviathan
+              - label: Leviathan
+                repeat: 5
+                endDelay: 500
+                item:
+                  name: aoe-group
+                  outerRadius: 28.971145000000003
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  angle: 180
+                  duration: 2000
+                  positionType: arena
+                  aoes:
+                    - name: aoe-ring
+                      direction: 0
+                      position:
+                        - 6.25
+                        - 0
+                    - name: aoe-ring
+                      direction: 180
+                      position:
+                        - -6.25
+                        - 0
