@@ -1,12 +1,12 @@
 import createAoeMat from '../../materials/squareAoe';
 import { yalmsToM } from '../conversions';
 import * as Bab from '@babylonjs/core';
+import { parseNumber } from '../parse-number';
 
 import {
     AoeSquareEffect,
     type AoeSquareEffectOptions,
 } from './aoe-square';
-import { Babylon } from '#build/components';
 
 export type GridOrientation =
     | 'bottom-left'
@@ -27,11 +27,11 @@ export type GridPattern =
 export type AoeSquareGridEffectOptions = AoeSquareEffectOptions & {
     orientation?: GridOrientation
     pattern?: GridPattern
-    gap?: number
+    gap?: number | string
 
-    size?: number;
-    rows?: number;
-    cols?: number;
+    size?: number | string
+    rows?: number | string
+    cols?: number | string
 };
 
 export class AoeSquareGridEffect extends AoeSquareEffect {
@@ -49,9 +49,9 @@ export class AoeSquareGridEffect extends AoeSquareEffect {
         this.orientation = options.orientation || 'center';
         this.pattern = options.pattern || 'none';
 
-        this.gap = options.gap || 0;
-        this.rows = options.rows || options.size || 4;
-        this.cols = options.cols || options.size || 4;
+        this.gap = parseNumber(options.gap || 0);
+        this.rows = parseNumber(options.rows || options.size || 4);
+        this.cols = parseNumber(options.cols || options.size || 4);
     }
 
     async startup() {

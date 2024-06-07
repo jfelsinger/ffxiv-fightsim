@@ -1,6 +1,7 @@
 import createAoeMat from '../../materials/squareAoe';
 import { yalmsToM } from '../conversions';
 import * as Bab from '@babylonjs/core';
+import { parseNumber } from '../parse-number';
 
 import {
     Effect,
@@ -8,7 +9,7 @@ import {
 } from '../effects';
 
 export type AoeSquareEffectOptions = EffectOptions & {
-    yalms?: number,
+    yalms?: number | string,
 };
 
 export class AoeSquareEffect extends Effect {
@@ -17,7 +18,7 @@ export class AoeSquareEffect extends Effect {
 
     constructor(options: AoeSquareEffectOptions) {
         super(options);
-        this.yalms = options.yalms || 15;
+        this.yalms = parseNumber(options.yalms || 15);
     }
 
     async startup() {

@@ -8,7 +8,7 @@ import { GridMaterial } from '@babylonjs/materials';
 import createMarkerMat from '../materials/marker';
 import { Steering } from '../utils/steering';
 import { yalmsToM, mToYalms } from '../utils/conversions';
-import { Arena } from '../utils/arena';
+import { Arena } from '../utils/arenas/arena';
 import { Character } from '../utils/character';
 import { Clock } from '../utils/clock';
 import { FightCollection } from '../utils/fight-collection';
@@ -63,7 +63,7 @@ function registerFight(fight: Fight) {
     });
 }
 
-function createFight(collection: FightCollection) {
+function createFight(collection: FightCollection, yalms = 60) {
 
     // TODO: use a real effect
     const testEffect = new effectsCollection['aoe-disc']({
@@ -120,7 +120,7 @@ function createFight(collection: FightCollection) {
     repOffset = (repDelay + repDuration) / 3;
     startAfter = 4;
     repeat = 10;
-    const yalms = 4;
+    const eYalms = 4;
 
     const testMechanic = new Mechanic({
         name: 'test-mechanic',
@@ -133,12 +133,11 @@ function createFight(collection: FightCollection) {
                 // TODO: use a real effect
                 item: new effectsCollection['aoe-ring']({
                     outerRadius: 33.35 * 0.8687,
-                    innerRadius: 0.01,
-                    thetaLength: Math.PI / 2,
+                    innerRadius: 0,
+                    // thetaLength: Math.PI / 2,
+                    thetaLength: 'pi / 2',
                     angle: 152,
                     direction: -90,
-                    position: new Bab.Vector3(0, 0, 0),
-                    // segments: 6,
                     duration: 2000,
                     collection,
                 }),
@@ -150,12 +149,10 @@ function createFight(collection: FightCollection) {
                 // TODO: use a real effect
                 item: new effectsCollection['aoe-ring']({
                     outerRadius: 33.35 * 0.8687,
-                    innerRadius: 0.01,
-                    thetaLength: Math.PI / 2,
+                    innerRadius: 0,
+                    thetaLength: 'pi / 2',
                     angle: 152,
                     direction: 90,
-                    position: new Bab.Vector3(0, 0, 0),
-                    // segments: 6,
                     duration: 2000,
                     collection,
                 }),
@@ -167,12 +164,10 @@ function createFight(collection: FightCollection) {
                 // TODO: use a real effect
                 item: new effectsCollection['aoe-ring']({
                     outerRadius: 33.35 * 0.8687,
-                    innerRadius: 0.01,
-                    thetaLength: Math.PI / 2,
+                    innerRadius: 0,
+                    thetaLength: 'pi / 2',
                     angle: 45,
                     direction: -90,
-                    position: new Bab.Vector3(0, 0, 0),
-                    // segments: 6,
                     duration: 2000,
                     collection,
                 }),
@@ -184,8 +179,6 @@ function createFight(collection: FightCollection) {
                 // TODO: use a real effect
                 item: new effectsCollection['aoe-disc']({
                     yalms: 14.325,
-                    position: new Bab.Vector3(0, 0, 0),
-                    // segments: 6,
                     duration: 2000,
                     collection,
                 }),
@@ -197,12 +190,11 @@ function createFight(collection: FightCollection) {
                 // TODO: use a real effect
                 item: new effectsCollection['aoe-ring']({
                     outerRadius: 33.35 * 0.8687,
-                    innerRadius: 0.01,
-                    thetaLength: Math.PI / 2,
+                    innerRadius: 0,
+                    thetaLength: 'pi / 2',
                     angle: 180,
                     direction: 0,
-                    position: new Bab.Vector3(6.25, 0, 0),
-                    // segments: 6,
+                    position: [6.25, 0],
                     duration: 2000,
                     collection,
                 }),
@@ -214,12 +206,11 @@ function createFight(collection: FightCollection) {
                 // TODO: use a real effect
                 item: new effectsCollection['aoe-ring']({
                     outerRadius: 33.35 * 0.8687,
-                    innerRadius: 0.01,
-                    thetaLength: Math.PI / 2,
+                    innerRadius: 0,
+                    thetaLength: 'pi / 2',
                     angle: 180,
                     direction: 180,
-                    position: new Bab.Vector3(-6.25, 0, 0),
-                    // segments: 6,
+                    position: [-6.25, 0],
                     duration: 2000,
                     collection,
                 }),
@@ -299,6 +290,11 @@ function createFight(collection: FightCollection) {
         sections: [{
             item: testSection,
         }],
+        arena: {
+            yalms,
+            collection,
+            floorType: 'e12s',
+        },
     });
     fight.on('start-execute', () => { debug('fight:start'); });
     fight.on('end-execute', () => { debug('fight:end'); });
@@ -309,29 +305,17 @@ function createFight(collection: FightCollection) {
 }
 
 // function makeArena(scene: Scene, character: Character, yalms = 90) {
-function makeArena(scene: Scene, character: Character, yalms = 60) {
-
-    const arena = new Arena('arena', { yalms, character }, scene);
-
-    const gridMat = new GridMaterial('arenaMat', scene);
-    let c = 0.83;
-    gridMat.mainColor = new Bab.Color3(c, c, c + 0.075)
-    c = 0.8;
-    gridMat.lineColor = new Bab.Color3(c, c, c)
-    gridMat.gridRatio = yalmsToM(1); // Make the grid display in yalms
-    gridMat.majorUnitFrequency = 5; // 5 yalms
-    const gridSize = yalmsToM(15 * 50);
-    const gridFloor = Bab.MeshBuilder.CreateDisc('ground', { radius: gridSize }, scene);
-    gridFloor.checkCollisions = false;
-    gridFloor.rotation.x = Math.PI / 2;
-    gridFloor.material = gridMat;
-    gridFloor.bakeCurrentTransformIntoVertices();
-
-    return {
-        arena,
-        globalFloor: gridFloor,
-    }
-}
+// function makeArena(scene: Scene, collection: FightCollection, yalms = 60) {
+//     return new Arena(
+//         'arena',
+//         {
+//             yalms,
+//             collection,
+//             globalFloor: true,
+//             floorType: 'e12s',
+//         },
+//         scene);
+// }
 
 const currentFight = ref<Fight | undefined>();
 
@@ -403,9 +387,15 @@ function makeScene(game: Engine) {
         debug('collider collided with: ', otherMesh.name, arguments);
     });
 
-    let isColliding = false;
-    let collisionTime = Date.now();
-    let arena: Arena | undefined;
+    const e12sArenaRadius = 33.35 * 0.86868;
+    const collection = new FightCollection({
+        scene,
+        worldClock,
+        playerClock,
+    });
+    const fight = createFight(collection, e12sArenaRadius * 2);
+    const arena = fight.arena;
+
 
     scene.onBeforeRenderObservable.add(() => {
         let keydown = false;
@@ -491,33 +481,16 @@ function makeScene(game: Engine) {
         cameraDirection.value = vectorAngle(camera.getDirection(Bab.Vector3.Forward()));
     });
 
-    // const height = 1.67;
-    // const heads = 6;
-    // const torsoHeight = height * ((heads - 1) / heads);
-    // const char2 = Bab.MeshBuilder.CreateCylinder('char2', {
-    //     tessellation: 3,
-    //     height: (torsoHeight * 0.945) * 0.75,
-    //     diameterTop: height / (heads / 1.35),
-    //     diameterBottom: height / (heads / 3),
-    // }, scene);
-    // char2.position.z = yalmsToM(0);
-    // char2.position.y = (torsoHeight * 1.20) / 2;
-
-    // const e12sArenaRadius = 30;
-    const e12sArenaRadius = 33.35 * 0.86868;
-    const arenaResult = makeArena(scene, character, e12sArenaRadius * 2);
-    arena = arenaResult?.arena;
-
-    const testArenaDisc = Bab.MeshBuilder.CreateDisc('test-floor', { radius: yalmsToM(e12sArenaRadius) }, scene);
-    // const testArenaDisc = Bab.MeshBuilder.CreateDisc('test-floor', { radius: 33 }, scene);
-    testArenaDisc.position = Bab.Vector3.Zero();
-    testArenaDisc.position.y = 0.002;
-    testArenaDisc.rotation.x = Math.PI / 2;
-    const e12sMat = new Bab.StandardMaterial('e12sarena', scene);
-    e12sMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/arena.png', scene, undefined, false);
-    e12sMat.diffuseTexture.hasAlpha = true;
-    e12sMat.specularColor = new Bab.Color3(0, 0, 0.05);
-    testArenaDisc.material = e12sMat;
+    // const testArenaDisc = Bab.MeshBuilder.CreateDisc('test-floor', { radius: yalmsToM(e12sArenaRadius) }, scene);
+    // // const testArenaDisc = Bab.MeshBuilder.CreateDisc('test-floor', { radius: 33 }, scene);
+    // testArenaDisc.position = Bab.Vector3.Zero();
+    // testArenaDisc.position.y = 0.002;
+    // testArenaDisc.rotation.x = Math.PI / 2;
+    // const e12sMat = new Bab.StandardMaterial('e12sarena', scene);
+    // e12sMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/arena.png', scene, undefined, false);
+    // e12sMat.diffuseTexture.hasAlpha = true;
+    // e12sMat.specularColor = new Bab.Color3(0, 0, 0.05);
+    // testArenaDisc.material = e12sMat;
 
     const bossSize = yalmsToM(5);
     const boss = Bab.MeshBuilder.CreatePlane('test-boss', { size: bossSize * 2 }, scene, true, Bab.Mesh.DOUBLESIDE);
@@ -675,13 +648,6 @@ function makeScene(game: Engine) {
     particles.emitter = character.position;
     particles.start();
 
-    const collection = new FightCollection({
-        scene,
-        worldClock,
-        playerClock,
-        arena,
-    });
-
     const ring = createRingMesh('rang', {
         innerRadius: 0.5,
         outerRadius: 5,
@@ -693,7 +659,6 @@ function makeScene(game: Engine) {
 
     collection.addCharacter(character);
 
-    const fight = createFight(collection);
     registerFight(fight);
     fight.execute();
     currentFight.value = fight;
@@ -702,11 +667,11 @@ function makeScene(game: Engine) {
         collection,
         scene,
         character,
-        arenaResult,
+        arena,
     };
 
     return {
-        scene, camera, light, character, arena: arenaResult,
+        scene, camera, light, character, arena,
     }
 }
 

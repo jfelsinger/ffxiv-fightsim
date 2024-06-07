@@ -1,9 +1,12 @@
 import * as Bab from '@babylonjs/core';
+import { Arena, type ArenaOptions } from './arenas/arena';
+import { arenasCollection } from './arenas';
 import { EventEmitter } from 'eventemitter3';
 import { Clock } from './clock';
 import { FightCollection } from './fight-collection';
 import { decodeFight } from './decode-fight';
 import { Character } from './character';
+import { parseNumber } from './parse-number';
 
 import {
     type ScheduleMode,
@@ -19,7 +22,6 @@ const DefaultFightSchedulingMode = 'sequential';
 const DefaultFightSectionSchedulingMode = 'sequential';
 const DefaultMechanicSchedulingMode = 'parallel';
 
-
 export type EffectTargetType =
     | 'boss' | 'adds'
     | 'all' // All players
@@ -32,12 +34,12 @@ export type EffectTarget =
 export type EffectPositionType = 'arena' | 'global' | 'mesh' | 'character';
 
 export type EffectOptions = {
-    duration: number
+    duration: number | string
     collection: FightCollection
     clock?: Clock
 
     target?: EffectTarget | (EffectTarget[])
-    position?: Bab.Vector3 | string | (() => Bab.Vector3 | string)
+    position?: Bab.Vector3 | (string[]) | (number[]) | string | (() => Bab.Vector3 | (string[]) | (number[]) | string)
     positionType?: EffectPositionType
 
     // Whether or not the same random target can be selected more than once,
@@ -53,8 +55,8 @@ export class Effect extends EventEmitter {
 
     duration: number;
     target: EffectTarget[] = [];
-    position: Bab.Vector3 | string | (() => Bab.Vector3 | string)
-    positionType: EffectPositionType;
+    position: EffectOptions['position'];
+    positionType: EffectOptions['positionType'];
     repeatTarget: boolean;
 
     // The mesh for the effect itself
@@ -75,7 +77,7 @@ export class Effect extends EventEmitter {
     constructor(options: EffectOptions) {
         super();
         this.options = options;
-        this.duration = options.duration ?? 0;
+        this.duration = parseNumber(options.duration ?? 0);
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
         this.repeatTarget = options.repeatTarget ?? false;
@@ -95,7 +97,7 @@ export class Effect extends EventEmitter {
     }
 
     getPosition(): Bab.Vector3 {
-        const positionValue = typeof (this.position) === 'function' ? this.position() : this.position;
+        let positionValue = typeof (this.position) === 'function' ? this.position() : this.position;
 
         if (typeof positionValue === 'string') {
             if (this.positionType === 'mesh') {
@@ -113,7 +115,11 @@ export class Effect extends EventEmitter {
             }
 
             // Convert to number value
-            const split = positionValue.split(',').map((value) => +value);
+            positionValue = positionValue.split(',').map((value) => +value);
+        }
+
+        if (Array.isArray(positionValue)) {
+            const split = positionValue.map(v => parseNumber(v));
             if (
                 split.length >= 2 &&
                 split.length <= 3 &&
@@ -131,7 +137,7 @@ export class Effect extends EventEmitter {
             return Bab.Vector3.Zero();
         }
 
-        return positionValue.clone();
+        return positionValue?.clone() || Bab.Vector3.Zero();
     }
 
     startTime: number = 0;
@@ -221,12 +227,12 @@ export class Effect extends EventEmitter {
     }
 
     toJSON() {
-        let positionValue = typeof (this.position) === 'function' ? this.position() : this.position;
-        if (typeof (positionValue) !== 'string') {
+        let positionValue = typeof (this.options.position) === 'function' ? this.options.position() : this.options.position;
+        if (positionValue && typeof (positionValue) !== 'string' && !Array.isArray(positionValue)) {
             positionValue = [
-                positionValue.x,
-                positionValue.y,
-                positionValue.z,
+                positionValue!.x,
+                positionValue!.y,
+                positionValue!.z,
             ].join(',');
         }
 
@@ -234,7 +240,7 @@ export class Effect extends EventEmitter {
 
         for (const property in this.options) {
             const val = (this.options as any)[property];
-            if (val && (typeof (val) === 'number' || typeof (val) === 'string')) {
+            if ((val || val === 0) && (typeof (val) === 'number' || typeof (val) === 'string' || typeof (val) === 'boolean')) {
                 results[property] = val;
             }
         }
@@ -459,10 +465,12 @@ export class FightSection extends EventEmitter {
 
 export type FightOptions = {
     name?: string
-    scheduling?: ScheduleMode;
+    scheduling?: ScheduleMode
     sections: Scheduled<FightSection>[]
     collection: FightCollection
     clock?: Clock
+    arenaType?: string
+    arena: ArenaOptions & any
 }
 
 export class Fight extends EventEmitter {
@@ -473,6 +481,7 @@ export class Fight extends EventEmitter {
     clock: Clock;
     isActive: boolean = false;
     options: FightOptions;
+    arena: Arena;
 
     getDuration() {
         let duration = 0;
@@ -491,14 +500,6 @@ export class Fight extends EventEmitter {
         }
 
         return duration;
-    }
-
-    toJSON() {
-        return {
-            name: this.name,
-            scheduling: this.scheduling,
-            sections: this.sections,
-        };
     }
 
     constructor(options: FightOptions) {
@@ -520,8 +521,25 @@ export class Fight extends EventEmitter {
         }
 
         if (options.name) {
-            this.name = options.name;
+            this.name = options.name || 'fight';
         }
+
+        const ArenaClass = (options.arenaType && (arenasCollection as any)[options.arenaType]) || arenasCollection.default;
+        this.arena = new ArenaClass(
+            options.arena.name || `${this.name || 'fight'}Arena`,
+            { ...options.arena },
+            this.collection.scene
+        );
+        this.collection.setArena(this.arena);
+    }
+
+    toJSON() {
+        return {
+            name: this.name,
+            scheduling: this.scheduling,
+            arena: this.arena?.toJSON(),
+            sections: this.sections,
+        };
     }
 
     async execute() {
@@ -557,6 +575,7 @@ export class Fight extends EventEmitter {
             promises.push(this.sections[i]?.item?.dispose());
         }
         await Promise.all(promises);
+        this.arena?.dispose();
     }
 
     clone() {

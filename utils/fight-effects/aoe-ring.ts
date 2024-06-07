@@ -3,6 +3,7 @@ import createAoeMat from '../../materials/roundAoe';
 import { degToRads, isWithinRadius, getVectorThetaLength } from '../vector-helpers';
 import { yalmsToM } from '../conversions';
 import * as Bab from '@babylonjs/core';
+import { parseNumber } from '../parse-number';
 
 import {
     Effect,
@@ -10,15 +11,15 @@ import {
 } from '../effects';
 
 export type AoeRingEffectOptions = EffectOptions & {
-    innerRadius?: number
-    outerRadius?: number
+    innerRadius?: number | string
+    outerRadius?: number | string
 
-    segments?: number,
-    thetaStart?: number,
-    thetaLength?: number,
+    segments?: number | string
+    thetaStart?: number | string
+    thetaLength?: number | string
 
-    angle?: number,
-    direction?: number,
+    angle?: number | string
+    direction?: number | string
 };
 
 export class AoeRingEffect extends Effect {
@@ -34,23 +35,23 @@ export class AoeRingEffect extends Effect {
     constructor(options: AoeRingEffectOptions) {
         super(options);
         this.options = options;
-        this.innerRadius = options.innerRadius || 1;
-        this.outerRadius = options.outerRadius || 5;
+        this.innerRadius = parseNumber(options.innerRadius ?? 1);
+        this.outerRadius = parseNumber(options.outerRadius || 5);
 
 
         if (options.angle) {
-            this.thetaLength = degToRads(options.angle);
+            this.thetaLength = degToRads(parseNumber(options.angle));
         } else {
-            this.thetaLength = options.thetaLength || Math.PI * 2;
+            this.thetaLength = parseNumber(options.thetaLength || Math.PI * 2);
         }
 
         if (options.direction || options.direction === 0) {
-            this.thetaStart = degToRads(options.direction) - (this.thetaLength / 2);
+            this.thetaStart = degToRads(parseNumber(options.direction)) - (this.thetaLength / 2);
         } else {
-            this.thetaStart = options.thetaStart || 0;
+            this.thetaStart = parseNumber(options.thetaStart ?? 0);
         }
 
-        this.segments = options.segments || (Math.floor(this.thetaLength / (Math.PI / 12)) + 1);
+        this.segments = parseNumber(options.segments || (Math.floor(this.thetaLength / (Math.PI / 12)) + 1));
         this.segments = Math.max(Math.floor(this.thetaLength / Math.PI + 1), this.segments);
     }
 

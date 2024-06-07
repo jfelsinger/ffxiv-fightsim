@@ -1,16 +1,19 @@
 import * as Bab from '@babylonjs/core';
 import { GridMaterial } from '@babylonjs/materials';
-import getArenaBoundsMat from '../materials/arenaBounds';
-import { Character } from './character';
+import getArenaBoundsMat from '../../materials/arenaBounds';
+import { FightCollection } from '../fight-collection';
+import { arenaMats } from './mats';
 
-import { yalmsToM } from './conversions';
+import { yalmsToM } from '../conversions';
 
 export type ArenaShape = 'round' | 'ring' | 'square';
 export type ArenaOptions = {
     yalms: number
     shape?: ArenaShape
     tessellation?: number
-    character?: Character
+    globalFloor?: boolean
+    floorType?: string
+    collection: FightCollection
 }
 
 export class Arena {
@@ -18,27 +21,80 @@ export class Arena {
     yalms: number;
     scene: Bab.Scene;
     shape: ArenaShape;
+    collection: FightCollection;
+    floorType: string;
+    tessellation: number;
+    options: ArenaOptions;
 
     floor: Bab.Mesh;
+    globalFloor?: Bab.Mesh;
     boundary?: Bab.Mesh;
     camCollider?: Bab.Mesh;
-    tessellation: number;
-    character?: Character;
+
+    dispose() {
+        this.floor?.dispose();
+        this.globalFloor?.dispose();
+        this.boundary?.dispose();
+        this.camCollider?.dispose();
+    }
 
     constructor(name: string, options: ArenaOptions, scene: Bab.Scene) {
+        this.options = options;
         this.name = name;
         this.scene = scene;
         this.yalms = options.yalms;
         this.shape = options.shape || 'round';
         this.tessellation = options.tessellation || 32;
-        this.character = options.character;
+        this.collection = options.collection;
+        this.floorType = options.floorType || 'default';
 
         const arenaMat = this.makeArenaMat();
         const { floor, boundary } = this.makeFloor(arenaMat);
         this.floor = floor;
         this.boundary = boundary;
 
+        if (options.globalFloor) {
+            const globalFloorResult = this.makeGlobalFloor();
+            this.globalFloor = globalFloorResult?.globalFloor;
+
+        }
         this.makeCamCollider();
+    }
+
+    toJSON() {
+        const results: Record<string, any> = {};
+
+        for (const property in this.options) {
+            const val = (this.options as any)[property];
+            if (val && (typeof (val) === 'number' || typeof (val) === 'string' || typeof (val) === 'boolean')) {
+                results[property] = val;
+            }
+        }
+        return {
+            ...results,
+            name: this.name,
+        }
+    }
+
+    makeGlobalFloor() {
+        const gridMat = new GridMaterial('global-ground-mat', this.scene);
+        let c = 0.83;
+        gridMat.mainColor = new Bab.Color3(c, c, c + 0.075)
+        c = 0.8;
+        gridMat.lineColor = new Bab.Color3(c, c, c)
+        gridMat.gridRatio = yalmsToM(1); // Make the grid display in yalms
+        gridMat.majorUnitFrequency = 5; // 5 yalms
+        const gridSize = yalmsToM(15 * 50);
+
+        const gridFloor = Bab.MeshBuilder.CreateDisc('global-ground', { radius: gridSize }, this.scene);
+        gridFloor.checkCollisions = false;
+        gridFloor.rotation.x = Math.PI / 2;
+        gridFloor.material = gridMat;
+        gridFloor.bakeCurrentTransformIntoVertices();
+
+        return {
+            globalFloor: gridFloor,
+        }
     }
 
     makeFloor(mat: Bab.Material, shape?: ArenaShape): { floor: Bab.Mesh, boundary?: Bab.Mesh } {
@@ -147,7 +203,7 @@ export class Arena {
         const boundaryMat = getArenaBoundsMat(this.scene);
         let time = 0;
         this.scene.registerAfterRender(() => {
-            const charPos = this.character?.position ?? Bab.Vector3.Zero();
+            const charPos = this.collection?.player?.position ?? Bab.Vector3.Zero();
             boundaryMat.setFloat('time', time)
             boundaryMat.setArray3('characterPosition', [charPos.x, charPos.y, charPos.z])
             time += 0.1;
@@ -156,13 +212,9 @@ export class Arena {
     }
 
     makeArenaMat() {
-        const arenaMat = new GridMaterial('arenaMat', this.scene);
-        let c = 0.85;
-        arenaMat.mainColor = new Bab.Color3(c, c, c + 0.075)
-        c = 0.735;
-        arenaMat.lineColor = new Bab.Color3(c, c, c)
-        arenaMat.gridRatio = yalmsToM(1); // Make the grid display in yalms
-        arenaMat.majorUnitFrequency = 5; // 5 yalms
+        const matFunction: ((scene: Bab.Scene) => Bab.Material) = (arenaMats as any)[this.floorType] || arenaMats.default;
+
+        const arenaMat = matFunction(this.scene);
         return arenaMat;
     }
 

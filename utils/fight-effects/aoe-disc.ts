@@ -2,6 +2,7 @@ import createAoeMat from '../../materials/roundAoe';
 import { yalmsToM } from '../conversions';
 import { isWithinRadius } from '../vector-helpers';
 import * as Bab from '@babylonjs/core';
+import { parseNumber } from '../parse-number';
 
 import {
     Effect,
@@ -9,7 +10,7 @@ import {
 } from '../effects';
 
 export type AoeDiscEffectOptions = EffectOptions & {
-    yalms?: number,
+    yalms?: number | string,
 };
 
 export class AoeDiscEffect extends Effect {
@@ -18,7 +19,7 @@ export class AoeDiscEffect extends Effect {
 
     constructor(options: AoeDiscEffectOptions) {
         super(options);
-        this.yalms = options.yalms || 15;
+        this.yalms = parseNumber(options.yalms || 15);
     }
 
     async startup() {

@@ -43,8 +43,8 @@ void main(void) {
     float r = clamp((color.r) + (adj * 0.35), 0.0, 1.0);
     float g = clamp((color.g) - (adj * 0.25), 0.0, 1.0);
     float b = clamp((color.b) - (adj * 0.25), 0.0, 1.0);
-    alpha *= step(arenaDistance, 1.0);
     alpha = max(0.20, alpha);
+    alpha *= step(arenaDistance, 1.0);
 
     gl_FragColor = vec4(r, g, b, alpha);
 }

@@ -1,7 +1,7 @@
 import * as Bab from '@babylonjs/core';
 import { Clock } from './clock';
 import { Character } from './character';
-import { Arena } from './arena';
+import { Arena } from '../utils/arenas/arena';
 // import type { Fight } from './effects';
 
 export type CharacterName =
@@ -13,7 +13,7 @@ export type FightCollectionOptions = {
     scene: Bab.Scene;
     worldClock: Clock;
     playerClock: Clock;
-    arena: Arena;
+    arena?: Arena;
 }
 
 export class FightCollection {
@@ -21,7 +21,7 @@ export class FightCollection {
     scene: Bab.Scene;
     worldClock: Clock;
     playerClock: Clock;
-    arena: Arena;
+    arena?: Arena;
 
     get player(): Character | undefined { return this.characters.player }
     set player(value: Character) { this.characters.player = value; }
@@ -54,6 +54,10 @@ export class FightCollection {
     getCharactersWithTags(tags: string[] | string) {
         const tagsArray = Array.isArray(tags) ? tags : [tags];
         return this.filterCharacters((_, char) => tagsArray.every((tag) => char.tags.has(tag)));
+    }
+
+    setArena(arena: Arena) {
+        this.arena = arena;
     }
 
     constructor(options: FightCollectionOptions) {

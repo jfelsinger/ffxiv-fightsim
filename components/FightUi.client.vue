@@ -165,7 +165,12 @@ function togglePause() {
 }
 
 function handleKeyPress(event: KeyboardEvent) {
+    if (event.target && (event.target as HTMLElement).matches('input,textarea,[role=textbox],[role=input]')) {
+        return;
+    }
+
     if (event.code === 'Space') {
+        console.log('event: ', event, event.target);
         event.preventDefault();
         event.stopPropagation();
         togglePause();

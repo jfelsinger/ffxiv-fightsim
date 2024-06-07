@@ -22,7 +22,7 @@ void main(void) {
 
     vPos = (viewProjection * finalWorld * vec4(position, 1.0)).xyz;
     gl_Position = viewProjection * finalWorld * vec4(position, 1.0);
-    arenaDistance = length(position) / arenaRadius;
+    arenaDistance = length(finalWorld * vec4(position, 1.0)) / arenaRadius;
 
     vuv = uv;
 }
