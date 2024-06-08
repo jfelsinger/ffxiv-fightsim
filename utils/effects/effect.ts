@@ -5,6 +5,7 @@ import { FightCollection } from '../fight-collection';
 import { Character } from '../character';
 import { parseNumber } from '../parse-number';
 import { getBasicValues } from '../decode-fight';
+import type { PositionType, PositionOption } from '../positioning';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:effect');
@@ -18,7 +19,7 @@ export type EffectTargetType =
 export type EffectTarget =
     | EffectTargetType | Bab.Mesh;
 
-export type EffectPositionType = 'arena' | 'global' | 'mesh' | 'character';
+export type EffectPositionType = PositionType;
 
 export type EffectOptions = {
     label?: string
@@ -28,7 +29,7 @@ export type EffectOptions = {
     telegraph?: number
 
     target?: EffectTarget | (EffectTarget[])
-    position?: Bab.Vector3 | (string[]) | (number[]) | string | (() => Bab.Vector3 | (string[]) | (number[]) | string)
+    position?: PositionOption
     positionType?: EffectPositionType
 
     // Whether or not the same random target can be selected more than once,

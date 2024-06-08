@@ -10,6 +10,8 @@ export function useFightContent(fightParams?: Array<string>) {
         'arenaType',
         'scheduling',
         'sections',
+        'startPosition',
+        'startPositionType',
     ];
 
 

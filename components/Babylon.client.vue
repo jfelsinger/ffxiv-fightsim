@@ -39,11 +39,11 @@ watch(worldTimeScaling, (scaling) => { worldClock.scaling = scaling });
 
 const canvas = ref<HTMLCanvasElement>();
 let game: Engine | undefined;
-const cameraDirection = ref(0);
-const characterDirection = ref(0);
+const cameraDirection = useState<number>('cameraDirection', () => 0);
+const characterDirection = useState<number>('characterDirection', () => 0);
 
-const isHit = ref(false);
-const hits = ref(0);
+const isHit = useState<boolean>('isHit', () => false);
+const hits = useState<number>('hits', () => 0);
 let hitTimeoutKey: ReturnType<typeof setTimeout> | undefined;
 watch(hits, (value: number, oldValue: number) => {
     if (value > oldValue) {
@@ -54,290 +54,30 @@ watch(hits, (value: number, oldValue: number) => {
 });
 
 function onResize() {
-    if (game) {
-        game.resize();
-    }
+    game?.resize();
 }
 
 function registerFight(fight: Fight) {
+    currentFight.value = fight;
     fight.on('effect-hit', ({ effect }) => {
-        console.log('hit by: ', effect.name, effect);
+        debug('hit by: ', effect.name, effect);
         hits.value++;
     });
 }
 
-function getFight(collection: FightCollection, yalms = 60) {
+function getFight(collection: FightCollection) {
     if (props.fightData) {
-        console.log('use fight data!');
         return decodeFight(props.fightData, {
             collection,
             clock: worldClock,
         });
     }
-
-    return createFight(collection, yalms);
 }
-
-
-function createFight(collection: FightCollection, yalms = 60) {
-
-    // TODO: use a real effect
-    const testEffect = new effectsCollection['aoe-disc']({
-        position: new Bab.Vector3(0, 0, -1.5),
-        duration: 2500,
-        collection,
-    });
-    testEffect.on('start', () => { debug('effect:start'); });
-    testEffect.on('end', () => { debug('effect:end'); });
-
-
-    let startDelay = 0;
-    let endDelay = 1500;
-    let duration = 1500;
-    const checkboard1: any[] = [];
-
-    // TODO: Create a checkerboard effect class using instances
-    let repDuration = 1325;
-    let repDelay = repDuration * 0.85;
-    let repOffset = (repDelay + repDuration) / 2;
-    let startAfter = 0;
-    let repeat = 11;
-
-    checkboard1.push({
-        repeat,
-        preStartDelay: repOffset * (0 + startAfter),
-        startDelay: repDelay,
-        endDelay: 0,
-        item: new effectsCollection['aoe-square-grid']({
-            duration: repDuration,
-            yalms: 5,
-            size: 12,
-            pattern: 'checkered',
-            collection,
-        } as any),
-    });
-
-    checkboard1.push({
-        repeat,
-        preStartDelay: repOffset * (1 + startAfter),
-        startDelay: repDelay,
-        endDelay: 0,
-        item: new effectsCollection['aoe-square-grid']({
-            duration: repDuration,
-            yalms: 5,
-            size: 12,
-            pattern: 'checkered-alt',
-            collection,
-        } as any),
-    });
-
-    repDuration = 1250;
-    repDelay = repDuration * 0.5;
-    repOffset = (repDelay + repDuration) / 3;
-    startAfter = 4;
-    repeat = 10;
-    const eYalms = 4;
-
-    const testMechanic = new Mechanic({
-        name: 'test-mechanic',
-        collection,
-        effects: [
-            {
-                // IFRIT 1
-                repeat: 5,
-                endDelay: 500,
-                // TODO: use a real effect
-                item: new effectsCollection['aoe-ring']({
-                    outerRadius: 33.35 * 0.8687,
-                    innerRadius: 0,
-                    // thetaLength: Math.PI / 2,
-                    thetaLength: 'pi / 2',
-                    angle: 152,
-                    direction: -90,
-                    duration: 2000,
-                    collection,
-                }),
-            },
-            {
-                // IFRIT 2
-                repeat: 5,
-                endDelay: 500,
-                // TODO: use a real effect
-                item: new effectsCollection['aoe-ring']({
-                    outerRadius: 33.35 * 0.8687,
-                    innerRadius: 0,
-                    thetaLength: 'pi / 2',
-                    angle: 152,
-                    direction: 90,
-                    duration: 2000,
-                    collection,
-                }),
-            },
-            {
-                // GARUDA 1 (of 4)
-                repeat: 5,
-                endDelay: 500,
-                // TODO: use a real effect
-                item: new effectsCollection['aoe-ring']({
-                    outerRadius: 33.35 * 0.8687,
-                    innerRadius: 0,
-                    thetaLength: 'pi / 2',
-                    angle: 45,
-                    direction: -90,
-                    duration: 2000,
-                    collection,
-                }),
-            },
-            {
-                // RAMUH
-                repeat: 5,
-                endDelay: 500,
-                // TODO: use a real effect
-                item: new effectsCollection['aoe-disc']({
-                    yalms: 14.325,
-                    duration: 2000,
-                    collection,
-                }),
-            },
-            {
-                // leviathan 1 (of 2)
-                repeat: 5,
-                endDelay: 500,
-                // TODO: use a real effect
-                item: new effectsCollection['aoe-ring']({
-                    outerRadius: 33.35 * 0.8687,
-                    innerRadius: 0,
-                    thetaLength: 'pi / 2',
-                    angle: 180,
-                    direction: 0,
-                    position: [6.25, 0],
-                    duration: 2000,
-                    collection,
-                }),
-            },
-            {
-                // leviathan 2 (of 2)
-                repeat: 5,
-                endDelay: 500,
-                // TODO: use a real effect
-                item: new effectsCollection['aoe-ring']({
-                    outerRadius: 33.35 * 0.8687,
-                    innerRadius: 0,
-                    thetaLength: 'pi / 2',
-                    angle: 180,
-                    direction: 180,
-                    position: [-6.25, 0],
-                    duration: 2000,
-                    collection,
-                }),
-            },
-            // ...checkboard1,
-            // // ...checkboard2,
-            // // {
-            // //     repeat: 1,
-            // //     startDelay: 2500,
-            // //     endDelay: 500,
-            // //     // TODO: use a real effect
-            // //     item: testEffect,
-            // // },
-
-            // {
-            //     repeat,
-            //     preStartDelay: repOffset * (1 + startAfter),
-            //     startDelay: repDelay,
-            //     endDelay: 0,
-            //     // TODO: use a real effect
-            //     item: new effectsCollection['aoe-disc']({
-            //         yalms,
-            //         position: 'player',
-            //         positionType: 'character',
-            //         duration: repDuration,
-            //         collection,
-            //     }),
-            // },
-            // {
-            //     repeat,
-            //     preStartDelay: repOffset * (2 + startAfter),
-            //     startDelay: repDelay,
-            //     endDelay: 0,
-            //     // TODO: use a real effect
-            //     item: new effectsCollection['aoe-disc']({
-            //         yalms,
-            //         position: 'player',
-            //         positionType: 'character',
-            //         duration: repDuration,
-            //         collection,
-            //     }),
-            // },
-            // {
-            //     repeat,
-            //     preStartDelay: repOffset * (3 + startAfter),
-            //     startDelay: repDelay,
-            //     endDelay: 0,
-            //     // TODO: use a real effect
-            //     item: new effectsCollection['aoe-disc']({
-            //         yalms,
-            //         position: 'player',
-            //         positionType: 'character',
-            //         duration: repDuration,
-            //         collection,
-            //     }),
-            // },
-        ],
-    });
-    testMechanic.on('start-execute', () => { debug('mechanic:start'); });
-    testMechanic.on('end-execute', () => { debug('mechanic:end'); });
-    testMechanic.on('start-effect', ({ effect }) => { debug('mechanic:start-effect', effect); });
-    testMechanic.on('end-effect', ({ effect }) => { debug('mechanic:end-effect', effect); });
-
-    const testSection = new FightSection({
-        name: 'test-section',
-        collection,
-        mechanics: [{
-            item: testMechanic,
-        }],
-    });
-    testSection.on('start-execute', () => { debug('section:start'); });
-    testSection.on('end-execute', () => { debug('section:end'); });
-
-    const fight = new Fight({
-        name: 'test-fight',
-        collection,
-        sections: [{
-            item: testSection,
-        }],
-        arena: {
-            yalms,
-            collection,
-            floorType: 'e12s',
-        },
-    });
-    fight.on('start-execute', () => { debug('fight:start'); });
-    fight.on('end-execute', () => { debug('fight:end'); });
-
-    debug('get fight!', fight);
-    debug('FIGHT TIME: ', fight.getDuration());
-    return fight;
-}
-
-// function makeArena(scene: Scene, character: Character, yalms = 90) {
-// function makeArena(scene: Scene, collection: FightCollection, yalms = 60) {
-//     return new Arena(
-//         'arena',
-//         {
-//             yalms,
-//             collection,
-//             globalFloor: true,
-//             floorType: 'e12s',
-//         },
-//         scene);
-// }
 
 const currentFight = ref<Fight | undefined>();
 
 const inputMap = ref<Record<string, boolean>>({});
 const leftStickVector = ref<Bab.Vector3>(Bab.Vector3.Zero());
-const rightStickVector = ref<Bab.Vector3>(Bab.Vector3.Zero());
 
 function makeScene(game: Engine) {
     const scene = new Scene(game);
@@ -362,7 +102,6 @@ function makeScene(game: Engine) {
     sky.reflectionTexture!.coordinatesMode = Bab.Texture.SKYBOX_MODE;
     sky.enableGroundProjection = true
     sky.projectedGroundRadius = 1000;
-    // sky.projectedGroundHeight = 150;
     sky.projectedGroundHeight = 10;
     skydome.material = sky;
 
@@ -375,16 +114,7 @@ function makeScene(game: Engine) {
     camera.upperRadiusLimit = 24;
     camera.checkCollisions = false;
     camera.collisionRadius = new Vector3(0.5, .5, .5);
-    camera.onCollide = (e) => {
-        (window as any).onCollide = e;
-        console.log(e);
-    }
     (camera as any).attachControl(null, true, true, 1);
-
-    // const gamepadInput = new Bab.ArcRotateCameraGamepadInput();
-    // gamepadInput.gamepadRotationSensibility = 250;
-    // gamepadInput.gamepadMoveSensibility = 250;
-    // camera.inputs.add(gamepadInput);
 
     const gamepadManager = new Bab.GamepadManager();
     gamepadManager.onGamepadConnectedObservable.add((gamepad, _state) => {
@@ -404,17 +134,6 @@ function makeScene(game: Engine) {
             }
         });
 
-        // gamepad.onrightstickchanged((values) => {
-        //     const vec = new Bab.Vector3(values.x, 0, values.y);
-        //     if (vec.length() >= 0.05) {
-        //         rightStickVector.value = vec;
-        //         inputMap.value['right-stick'] = true;
-        //     } else {
-        //         rightStickVector.value = Bab.Vector3.Zero();
-        //         inputMap.value['right-stick'] = false;
-        //     }
-        // });
-
     });
 
     const inputManager = camera.inputs;
@@ -427,33 +146,24 @@ function makeScene(game: Engine) {
     light.intensity = 0.7;
 
 
-
-    scene.collisionsEnabled = true;
-    const character = new Character('player', {}, scene, playerClock);
-    camera.setTarget(character.camMarker.position.clone());
-    camera.lockedTarget = character.camMarker;
-
-    character.setCamera(camera);
-
-    character.marker.onCollideObservable.add(function (otherMesh) {
-        debug('marker collided with: ', otherMesh.name, arguments);
-    });
-
-    character.collider.onCollideObservable.add(function (otherMesh) {
-        debug('collider collided with: ', otherMesh.name, arguments);
-    });
-
-    const e12sArenaRadius = 29;
     const collection = new FightCollection({
         scene,
         worldClock,
         playerClock,
     });
 
-    const fight = getFight(collection, e12sArenaRadius * 2);
-    const arena = fight.arena;
+    const fight = getFight(collection);
+    const arena = fight?.arena;
 
 
+    const character = new Character('player', {
+        startPosition: fight?.getStartPosition(),
+    }, scene, playerClock);
+    camera.setTarget(character.camMarker.position.clone());
+    camera.lockedTarget = character.camMarker;
+    character.setCamera(camera);
+
+    scene.collisionsEnabled = true;
     scene.onBeforeRenderObservable.add(() => {
         let keydown = false;
         let movement = new Bab.Vector3(0, 0, 0);
@@ -462,63 +172,35 @@ function makeScene(game: Engine) {
         playerClock.tick(delta);
         character.setMarkerHeight();
 
-        // if (inputMap.value['left-stick']) {
-        //     console.log('uh: ', leftStickVector.value.x, leftStickVector.value.y, leftStickVector.value.z);
-        //     if (leftStickVector.value.z > 0.1) {
-        //         console.log('forward');
-        //         camera.cameraDirection.addInPlace(
-        //             camera.getDirection(Bab.Vector3.Forward()).scale(
-        //                 1.0
-        //                 // Math.abs(leftStickVector.value.z / 10)
-        //             )
-        //         );
-        //     } else if (leftStickVector.value.z < -0.1) {
-        //         console.log('back');
-        //         camera.cameraDirection.addInPlace(
-        //             camera.getDirection(Bab.Vector3.Backward()).scale(
-        //                 1.0
-        //                 // Math.abs(leftStickVector.value.z / 10)
-        //             )
-        //         );
-        //     }
-        //     let currentRotation = Bab.Quaternion.RotationYawPitchRoll(
-        //         camera.rotation.y,
-        //         camera.rotation.x,
-        //         camera.rotation.z
-        //     );
-
-        //     let rotationChange = Bab.Quaternion.RotationAxis(Bab.Axis.X, ((leftStickVector.value.z / 100) * -1));
-        //     currentRotation.multiplyInPlace(rotationChange);
-        //     currentRotation.toEulerAnglesToRef(camera.rotation);
-        // }
-
         if (inputMap.value['left-stick']) {
             const direction = camera.getDirection(leftStickVector.value)
             direction.y = 0;
             movement.addInPlace(direction.scaleInPlace(character.speed));
             keydown = true;
-        } else if (inputMap.value['w']) {
-            const direction = camera.getDirection(new Bab.Vector3(0, 0, 1))
-            direction.y = 0;
-            movement.addInPlace(direction.scaleInPlace(character.speed));
-            keydown = true;
-        } else if (inputMap.value['s']) {
-            const direction = camera.getDirection(new Bab.Vector3(0, 0, -1))
-            direction.y = 0;
-            movement.addInPlace(direction.scaleInPlace(character.speed));
-            keydown = true;
-        }
+        } else {
+            if (inputMap.value['w']) {
+                const direction = camera.getDirection(new Bab.Vector3(0, 0, 1))
+                direction.y = 0;
+                movement.addInPlace(direction.scaleInPlace(character.speed));
+                keydown = true;
+            } else if (inputMap.value['s']) {
+                const direction = camera.getDirection(new Bab.Vector3(0, 0, -1))
+                direction.y = 0;
+                movement.addInPlace(direction.scaleInPlace(character.speed));
+                keydown = true;
+            }
 
-        if (inputMap.value['a']) {
-            const direction = camera.getDirection(new Bab.Vector3(-1, 0, 0))
-            direction.y = 0;
-            movement.addInPlace(direction.scaleInPlace(character.speed));
-            keydown = true;
-        } else if (inputMap.value['d']) {
-            const direction = camera.getDirection(new Bab.Vector3(1, 0, 0))
-            direction.y = 0;
-            movement.addInPlace(direction.scaleInPlace(character.speed));
-            keydown = true;
+            if (inputMap.value['a']) {
+                const direction = camera.getDirection(new Bab.Vector3(-1, 0, 0))
+                direction.y = 0;
+                movement.addInPlace(direction.scaleInPlace(character.speed));
+                keydown = true;
+            } else if (inputMap.value['d']) {
+                const direction = camera.getDirection(new Bab.Vector3(1, 0, 0))
+                direction.y = 0;
+                movement.addInPlace(direction.scaleInPlace(character.speed));
+                keydown = true;
+            }
         }
 
         if (keydown) {
@@ -547,21 +229,6 @@ function makeScene(game: Engine) {
                 currentDirection.normalize();
                 character.position.addInPlace(currentDirection.scale(character.speed * playerClock.lastDelta * (1.0 - turnAdjustment)));
             }
-
-            // TODO: Replace AOE collider with that from the fight aoe.
-            // if (character.collider.intersectsMesh(aoe.disc, false)) {
-            //     if (!isColliding) {
-            //         isColliding = true;
-            //         collisionTime = Date.now();
-            //         debug('colission started!', collisionTime);
-            //     }
-            // } else {
-            //     if (isColliding) {
-            //         isColliding = false;
-            //         const now = Date.now();
-            //         debug('colission ended!', collisionTime, now, now - collisionTime);
-            //     }
-            // }
         } else {
             const currentDirection = character.getDirection(Bab.Vector3.Forward());
             currentDirection.y = 0;
@@ -575,9 +242,10 @@ function makeScene(game: Engine) {
 
     collection.addCharacter(character);
 
-    registerFight(fight);
-    fight.execute();
-    currentFight.value = fight;
+    if (fight) {
+        registerFight(fight);
+        fight.execute();
+    }
 
     (window as any).__scenery = {
         collection,
@@ -587,7 +255,7 @@ function makeScene(game: Engine) {
     };
 
     return {
-        scene, camera, light, character, arena,
+        scene, camera, light, character, arena, fight
     }
 }
 
@@ -641,9 +309,7 @@ async function onFightUpdate(updatedFight: Fight) {
 
 function onResetPosition() {
     const player = currentFight.value?.collection?.player;
-    if (player) {
-        player.position = new Bab.Vector3(0, 0, yalmsToM(-27));
-    }
+    player?.resetPosition();
 }
 
 function onScaleTime(value: number) {
@@ -655,19 +321,13 @@ function onScaleTime(value: number) {
 <template>
     <div id="game" class="relative max-w-screen max-h-screen overflow-hidden h-screen game --babylon"
         :class="{ '--is-hit': isHit }">
-        <FightUi @scale-time="onScaleTime" @reset-position="onResetPosition" @update="onFightUpdate" v-if="currentFight"
-            :fight="currentFight" />
+        <FightUi @scale-time="onScaleTime" @reset-position="onResetPosition" @update="onFightUpdate"
+            v-if="showUi && currentFight" :fight="currentFight" />
 
-        <div class="minimap relative-north absolute top-10 right-10 z-10 bg-slate-100/45 bg-blur p-[2px] rounded-full"
-            :style="{
-                '--cam-rotation': `${cameraDirection}deg`,
-                '--char-rotation': `${characterDirection}deg`,
-            }">
-            <div class="minimap__floor w-24 h-24 bg-slate-100/75 overflow-hidden rounded-full relative">
-            </div>
-        </div>
+        <Minimap v-if="showUi" />
 
-        <div class="ui-extras absolute top-6 flex justify-center items-center p-2 px-4 bg-blur rounded bg-slate-100/50">
+        <div v-if="showUi"
+            class="ui-extras absolute top-6 flex justify-center items-center p-2 px-4 bg-blur rounded bg-slate-100/50">
             <p>
                 Hits:
                 <span class="countdown font-mono">
@@ -700,82 +360,6 @@ function onScaleTime(value: number) {
         transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
         transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         transition-duration: 150ms
-    }
-}
-
-.minimap {
-    z-index: 11;
-
-    &::before {
-        content: "N";
-        display: block;
-        position: absolute;
-        left: 50%;
-        top: -22%;
-        z-index: 10;
-        transform: translateX(-50%);
-        text-shadow:
-            0 0 1px #ffffffea,
-            0 0 4px #ffffffaa,
-            0 0 2px #ffffff5a;
-    }
-
-    &.relative-north {
-        transform: rotate(calc(var(--cam-rotation) * -1));
-
-        &::before {
-            transform: translateX(-50%) rotate(calc(var(--cam-rotation) * 1));
-        }
-    }
-}
-
-.minimap__floor {
-    background-size: 15px 15px;
-    background-image:
-        linear-gradient(to right, rgba(0, 0, 0, 0.12) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.12) 1px, transparent 1px);
-
-    // transform: rotate(var(--cam-rotation));
-
-    &::before {
-        content: "";
-        display: block;
-        width: 0;
-        height: 0;
-        border: 5.5em solid transparent;
-        border-top-width: 6em;
-        border-bottom-width: 6em;
-        border-top-color: rgb(159 235 235 / 52%);
-
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%) rotate(var(--cam-rotation));
-        filter: blur(3px);
-        filter: drop-shadow(0 0 5px #ffffff6a) blur(3px);
-
-        .relative-north & {
-            transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%) rotate(calc(var(--cam-rotation) * 1));
-        }
-    }
-
-    &::after {
-        content: "";
-        display: block;
-        width: 0;
-        height: 0;
-        border: 0.35em solid transparent;
-        border-top-width: 0;
-        border-bottom-width: 1em;
-        border-bottom-color: rgba(23, 37, 84, 1);
-
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -65%);
-        transform: translate(-50%, -65%) rotate(var(--char-rotation));
     }
 }
 </style>

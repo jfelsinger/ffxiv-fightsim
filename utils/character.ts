@@ -17,8 +17,9 @@ export type CharacterOptions = {
 
     speed: number
     speedRotation: number
-    role?: 'dps' | 'tank' | 'healer';
-    tags?: string[];
+    role?: 'dps' | 'tank' | 'healer'
+    tags?: string[]
+    startPosition?: Bab.Vector3
 }
 
 export const MinPlayerHeight = 0.525;
@@ -32,6 +33,7 @@ export const DefaultCharacterOptions: CharacterOptions = {
 
     speed: 1.0,
     speedRotation: 0.88,
+    startPosition: new Bab.Vector3(0, 0, -25),
 } as const
 
 export class Character {
@@ -57,6 +59,7 @@ export class Character {
     collider: Bab.Mesh;
     marker: Bab.Mesh;
     steering: Steering;
+    startPosition: Bab.Vector3;
 
     addStacks(name: string, count = 1) {
         this.stacks[name] = (this.stacks[name] || 0) + count;
@@ -92,6 +95,8 @@ export class Character {
         }
     }
 
+
+
     constructor(name: string, options: Partial<CharacterOptions>, scene: Bab.Scene, clock: Clock) {
         this.name = name;
         this.clock = clock;
@@ -106,6 +111,7 @@ export class Character {
         const yalmsPerMs = opts.speed / (5034 / 31);
         this.speed = yalmsToM(yalmsPerMs);
         this.speedRotation = clamp(opts.speedRotation);
+        this.startPosition = opts.startPosition || Bab.Vector3.Zero();
 
         this.heads = opts.heads;
         this.diffuseColor = opts.diffuseColor;
@@ -137,7 +143,11 @@ export class Character {
 
         this.marker = this.makeMarker(charMat);
         this.steering = new Steering(this.marker, this.clock);
-        this.position.z -= yalmsToM(20);
+        this.position = this.startPosition.clone();
+    }
+
+    resetPosition() {
+        this.position = this.startPosition.clone();
     }
 
     setCamera(camera: Bab.ArcRotateCamera) {

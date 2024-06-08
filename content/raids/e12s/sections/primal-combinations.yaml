@@ -1,5 +1,7 @@
 name: e12s
 scheduling: sequential
+startPosition: 0,-0.35
+startPositionType: arena
 arena:
   name: e12s-arena
   yalms: 58

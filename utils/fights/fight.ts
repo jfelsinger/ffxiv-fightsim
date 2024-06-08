@@ -1,3 +1,4 @@
+import * as Bab from '@babylonjs/core';
 import { Arena, type ArenaOptions } from '../arenas';
 import { arenasCollection } from '../arenas';
 import { EventEmitter } from 'eventemitter3';
@@ -5,6 +6,7 @@ import { Clock } from '../clock';
 import { FightCollection } from '../fight-collection';
 import { decodeFight, getBasicValues } from '../decode-fight';
 import { FightSection } from '../sections';
+import type { PositionType, PositionOption } from '../positioning';
 
 import {
     type ScheduleMode,
@@ -29,6 +31,9 @@ export type FightOptions = {
     clock?: Clock
     arenaType?: string
     arena: ArenaOptions & any
+
+    startPosition?: PositionOption
+    startPositionType?: PositionType
 }
 
 export class Fight extends EventEmitter {
@@ -42,6 +47,9 @@ export class Fight extends EventEmitter {
     isActive: boolean = false;
     options: FightOptions;
     arena: Arena;
+
+    startPosition?: PositionOption
+    startPositionType?: PositionType
 
     getDuration() {
         let duration = 0;
@@ -62,6 +70,72 @@ export class Fight extends EventEmitter {
         return duration;
     }
 
+    getStartPositionVector(): Bab.Vector3 {
+        let positionValue = typeof (this.startPosition) === 'function' ? this.startPosition() : this.startPosition;
+
+        if (typeof positionValue === 'string') {
+            if (this.startPositionType === 'mesh') {
+                const mesh = this.collection.scene.getMeshByName(positionValue);
+                if (mesh) { return mesh.position.clone(); }
+
+                const character = this.collection.characters[positionValue as any];
+                if (character?.position) { return character.position.clone(); }
+            } else if (this.startPositionType === 'character') {
+                const character = this.collection.characters[positionValue as any];
+                if (character?.position) { return character.position.clone(); }
+
+                const mesh = this.collection.scene.getMeshByName(positionValue);
+                if (mesh) { return mesh.position.clone(); }
+            }
+
+            // Convert to number value
+            positionValue = positionValue.split(',').map((value) => +value);
+        }
+
+        if (Array.isArray(positionValue)) {
+            const split = positionValue.map(v => parseNumber(v));
+            if (
+                split.length >= 2 &&
+                split.length <= 3 &&
+                split.every(val => !isNaN(val))
+            ) {
+                if (split.length === 2) {
+                    // Assume that we want the x,y on the arena plane: z is what we would think as the y plane kinda...
+                    return new Bab.Vector3(split[0], 0, split[1]);
+                } else {
+                    // A regular Vector3
+                    return new Bab.Vector3(split[0], split[1], split[2]);
+                }
+            }
+
+            return Bab.Vector3.Zero();
+        }
+
+        return positionValue?.clone() || Bab.Vector3.Zero();
+    }
+
+    getStartPosition(): Bab.Vector3 {
+        console.log('GET START POSITION: ', this.startPositionType, this.startPosition);
+        let vec = this.getStartPositionVector();
+
+        if (!this.startPositionType || this.startPositionType === 'global') {
+            return vec;
+
+        } else if (this.startPositionType === 'arena') {
+            if (this.collection.arena) {
+                vec = this.collection.arena.getPosition(vec);
+            }
+
+        } else if (this.startPositionType === 'character') {
+            return vec;
+
+        } else if (this.startPositionType === 'mesh') {
+            return vec;
+        }
+
+        return vec;
+    }
+
     constructor(options: FightOptions) {
         super();
         this.options = options;
@@ -69,6 +143,9 @@ export class Fight extends EventEmitter {
         this.scheduling = options.scheduling || DefaultFightSchedulingMode;
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
+
+        this.startPosition = options.startPosition;
+        this.startPositionType = options.startPositionType;
 
         const len = this.sections.length;
         for (let i = 0; i < len; i++) {
