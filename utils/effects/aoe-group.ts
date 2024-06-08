@@ -69,6 +69,7 @@ export class AoeGroupEffect extends Effect {
         const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
             promises.push((async () => {
+                this.aoes[i].startTime = this.clock.time;
                 await this.aoes[i].startup();
                 const mesh = this.aoes[i].mesh;
                 if (mesh && this.mesh) {
@@ -83,7 +84,10 @@ export class AoeGroupEffect extends Effect {
         const len = this.aoes.length;
         const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
-            promises.push(this.aoes[i].cleanup());
+            promises.push((async () => {
+                await this.aoes[i].cleanup();
+                this.aoes[i].endTime = this.clock.time;
+            })());
         }
         await Promise.all(promises);
 

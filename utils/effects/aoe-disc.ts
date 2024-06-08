@@ -52,9 +52,12 @@ export class AoeDiscEffect extends Effect {
         if (this.collection.arena) {
             discMat.setFloat('arenaRadius', this.collection.arena.size / 2);
         }
+
         discMat.setFloat('telegraph', this.telegraph);
+        discMat.setFloat('elapsed', this.getDurationPercent());
         this.clock.on('tick', (time) => {
             discMat.setFloat('time', time);
+            discMat.setFloat('telegraph', this.telegraph);
             discMat.setFloat('elapsed', this.getDurationPercent());
         });
 

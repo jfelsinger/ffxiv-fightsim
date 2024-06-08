@@ -24,7 +24,7 @@ sections:
                   innerRadius: 0
                   thetaLength: pi / 2
                   angle: 152
-                  duration: 4200
+                  duration: 8000
                   positionType: arena
                   telegraph: 0.5
                   aoes:
@@ -46,7 +46,7 @@ sections:
                   thetaLength: pi / 2
                   angle: 45.5
                   direction: -90
-                  duration: 4200
+                  duration: 8000
                   positionType: arena
                   telegraph: 0.5
                   aoes:
@@ -67,7 +67,7 @@ sections:
               - label: Ramuh
                 item:
                   name: aoe-group
-                  duration: 4200
+                  duration: 8000
                   positionType: arena
                   telegraph: 0.5
                   aoes:
@@ -86,7 +86,7 @@ sections:
                   innerRadius: 0
                   thetaLength: pi / 2
                   angle: 180
-                  duration: 4200
+                  duration: 8000
                   positionType: arena
                   telegraph: 0.5
                   aoes:

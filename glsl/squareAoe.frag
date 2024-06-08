@@ -4,6 +4,8 @@ uniform sampler2D textureSampler;
 uniform float elapsed;
 uniform vec3 color;
 
+uniform float elapsed;
+uniform float telegraph;
 varying vec2 vuv;
 varying vec3 vPos;
 varying float iid;
@@ -59,6 +61,7 @@ void main(void) {
     float r = clamp((color.r) + (adj * 0.35), 0.0, 1.0);
     float g = clamp((color.g) - (adj * 0.25), 0.0, 1.0);
     float b = clamp((color.b) - (adj * 0.25), 0.0, 1.0);
+    alpha *= step(1.0 - elapsed, telegraph);
     alpha *= step(1.0 - elapsed, telegraph);
     gl_FragColor = vec4(r, g, b, alpha);
 

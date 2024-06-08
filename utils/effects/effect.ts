@@ -175,6 +175,7 @@ export class Effect extends EventEmitter {
 
     async start() {
         this.startTime = this.clock.time;
+        console.log('EFFECT START: ', this.name, this.startTime, this);
         this.emit('start');
         await this.startup();
 
@@ -237,6 +238,7 @@ export class Effect extends EventEmitter {
 
     async dispose() {
         this.isActive = false;
+        this.emit('dispose');
         await this.cleanup();
     }
 

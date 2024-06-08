@@ -3,6 +3,8 @@ varying vec2 vuv;
 varying vec3 vPos;
 uniform sampler2D textureSampler;
 uniform vec3 color;
+uniform float elapsed;
+uniform float telegraph;
 
 // SQUARE AOE
 void main(void) {
@@ -45,6 +47,7 @@ void main(void) {
     // float a2 = step(0.4, 0.8 - distCenter);
 
     // gl_FragColor = vec4(0.2, 0.6, 1.0, alpha);
+    alpha *= step(1.0 - elapsed, telegraph);
     alpha *= step(1.0 - elapsed, telegraph);
     gl_FragColor = vec4(color, alpha);
 }

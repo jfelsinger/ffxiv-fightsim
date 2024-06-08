@@ -37,6 +37,7 @@ export class AoeSquareEffect extends Effect {
         squareMat.setFloat('telegraph', this.telegraph);
         this.clock.on('tick', (time) => {
             squareMat.setFloat('time', time);
+            squareMat.setFloat('telegraph', this.telegraph);
             squareMat.setFloat('elapsed', this.getDurationPercent());
         });
 
