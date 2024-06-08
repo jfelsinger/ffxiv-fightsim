@@ -1,3 +1,4 @@
+import { useState } from '#imports';
 import createAoeMat from '../../materials/roundAoe';
 import { yalmsToM } from '../conversions';
 import { isWithinRadius } from '../vector-helpers';
@@ -53,11 +54,12 @@ export class AoeDiscEffect extends Effect {
             discMat.setFloat('arenaRadius', this.collection.arena.size / 2);
         }
 
-        discMat.setFloat('telegraph', this.telegraph);
+        const globalTelegraph = useState<number>('telegraph', () => 1.0);
+        discMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
         discMat.setFloat('elapsed', this.getDurationPercent());
         this.clock.on('tick', (time) => {
             discMat.setFloat('time', time);
-            discMat.setFloat('telegraph', this.telegraph);
+            discMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
             discMat.setFloat('elapsed', this.getDurationPercent());
         });
 

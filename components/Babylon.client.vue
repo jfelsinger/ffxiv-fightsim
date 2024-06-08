@@ -334,17 +334,21 @@ function createFight(collection: FightCollection, yalms = 60) {
 
 const currentFight = ref<Fight | undefined>();
 
+const inputMap = ref<Record<string, boolean>>({});
+const leftStickVector = ref<Bab.Vector3>(Bab.Vector3.Zero());
+const rightStickVector = ref<Bab.Vector3>(Bab.Vector3.Zero());
+
 function makeScene(game: Engine) {
     const scene = new Scene(game);
     scene.environmentTexture = Bab.CubeTexture.CreateFromPrefilteredData('/tex/basic-sky.env', scene);
 
-    const inputMap: Partial<Record<string, boolean>> = {};
+    inputMap.value = {};
     scene.actionManager = new Bab.ActionManager(scene);
     scene.actionManager.registerAction(new Bab.ExecuteCodeAction(Bab.ActionManager.OnKeyDownTrigger, (evt) => {
-        inputMap[evt.sourceEvent.key] = evt.sourceEvent.type === 'keydown';
+        inputMap.value[evt.sourceEvent.key] = evt.sourceEvent.type === 'keydown';
     }));
     scene.actionManager.registerAction(new Bab.ExecuteCodeAction(Bab.ActionManager.OnKeyUpTrigger, (evt) => {
-        inputMap[evt.sourceEvent.key] = evt.sourceEvent.type === 'keydown';
+        inputMap.value[evt.sourceEvent.key] = evt.sourceEvent.type === 'keydown';
     }));
 
     const skydome = Bab.MeshBuilder.CreateBox('sky', { size: 5000, sideOrientation: Bab.Mesh.BACKSIDE }, scene);
@@ -375,6 +379,42 @@ function makeScene(game: Engine) {
         console.log(e);
     }
     (camera as any).attachControl(null, true, true, 1);
+
+    // const gamepadInput = new Bab.ArcRotateCameraGamepadInput();
+    // gamepadInput.gamepadRotationSensibility = 250;
+    // gamepadInput.gamepadMoveSensibility = 250;
+    // camera.inputs.add(gamepadInput);
+
+    const gamepadManager = new Bab.GamepadManager();
+    gamepadManager.onGamepadConnectedObservable.add((gamepad, _state) => {
+        camera.inputs.addGamepad();
+        if ((camera as any).inputs?.attached?.gamepad?.gamepadRotationSensibility) {
+            (camera as any).inputs.attached.gamepad.gamepadRotationSensibility = 150;
+        }
+
+        gamepad.onleftstickchanged((values) => {
+            const vec = new Bab.Vector3(values.x, 0, -values.y);
+            if (vec.length() >= 0.05) {
+                inputMap.value['left-stick'] = true;
+                leftStickVector.value = vec;
+            } else {
+                inputMap.value['left-stick'] = false;
+                leftStickVector.value = Bab.Vector3.Zero();
+            }
+        });
+
+        // gamepad.onrightstickchanged((values) => {
+        //     const vec = new Bab.Vector3(values.x, 0, values.y);
+        //     if (vec.length() >= 0.05) {
+        //         rightStickVector.value = vec;
+        //         inputMap.value['right-stick'] = true;
+        //     } else {
+        //         rightStickVector.value = Bab.Vector3.Zero();
+        //         inputMap.value['right-stick'] = false;
+        //     }
+        // });
+
+    });
 
     const inputManager = camera.inputs;
     (inputManager.attached as any).mousewheel.wheelPrecision = 25;
@@ -421,24 +461,59 @@ function makeScene(game: Engine) {
         playerClock.tick(delta);
         character.setMarkerHeight();
 
-        if (inputMap['w']) {
+        // if (inputMap.value['left-stick']) {
+        //     console.log('uh: ', leftStickVector.value.x, leftStickVector.value.y, leftStickVector.value.z);
+        //     if (leftStickVector.value.z > 0.1) {
+        //         console.log('forward');
+        //         camera.cameraDirection.addInPlace(
+        //             camera.getDirection(Bab.Vector3.Forward()).scale(
+        //                 1.0
+        //                 // Math.abs(leftStickVector.value.z / 10)
+        //             )
+        //         );
+        //     } else if (leftStickVector.value.z < -0.1) {
+        //         console.log('back');
+        //         camera.cameraDirection.addInPlace(
+        //             camera.getDirection(Bab.Vector3.Backward()).scale(
+        //                 1.0
+        //                 // Math.abs(leftStickVector.value.z / 10)
+        //             )
+        //         );
+        //     }
+        //     let currentRotation = Bab.Quaternion.RotationYawPitchRoll(
+        //         camera.rotation.y,
+        //         camera.rotation.x,
+        //         camera.rotation.z
+        //     );
+
+        //     let rotationChange = Bab.Quaternion.RotationAxis(Bab.Axis.X, ((leftStickVector.value.z / 100) * -1));
+        //     currentRotation.multiplyInPlace(rotationChange);
+        //     currentRotation.toEulerAnglesToRef(camera.rotation);
+        // }
+
+        if (inputMap.value['left-stick']) {
+            const direction = camera.getDirection(leftStickVector.value)
+            direction.y = 0;
+            movement.addInPlace(direction.scaleInPlace(character.speed));
+            keydown = true;
+        } else if (inputMap.value['w']) {
             const direction = camera.getDirection(new Bab.Vector3(0, 0, 1))
             direction.y = 0;
             movement.addInPlace(direction.scaleInPlace(character.speed));
             keydown = true;
-        } else if (inputMap['s']) {
+        } else if (inputMap.value['s']) {
             const direction = camera.getDirection(new Bab.Vector3(0, 0, -1))
             direction.y = 0;
             movement.addInPlace(direction.scaleInPlace(character.speed));
             keydown = true;
         }
 
-        if (inputMap['a']) {
+        if (inputMap.value['a']) {
             const direction = camera.getDirection(new Bab.Vector3(-1, 0, 0))
             direction.y = 0;
             movement.addInPlace(direction.scaleInPlace(character.speed));
             keydown = true;
-        } else if (inputMap['d']) {
+        } else if (inputMap.value['d']) {
             const direction = camera.getDirection(new Bab.Vector3(1, 0, 0))
             direction.y = 0;
             movement.addInPlace(direction.scaleInPlace(character.speed));
@@ -497,97 +572,6 @@ function makeScene(game: Engine) {
         cameraDirection.value = vectorAngle(camera.getDirection(Bab.Vector3.Forward()));
     });
 
-    // const testArenaDisc = Bab.MeshBuilder.CreateDisc('test-floor', { radius: yalmsToM(e12sArenaRadius) }, scene);
-    // // const testArenaDisc = Bab.MeshBuilder.CreateDisc('test-floor', { radius: 33 }, scene);
-    // testArenaDisc.position = Bab.Vector3.Zero();
-    // testArenaDisc.position.y = 0.002;
-    // testArenaDisc.rotation.x = Math.PI / 2;
-    // const e12sMat = new Bab.StandardMaterial('e12sarena', scene);
-    // e12sMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/arena.png', scene, undefined, false);
-    // e12sMat.diffuseTexture.hasAlpha = true;
-    // e12sMat.specularColor = new Bab.Color3(0, 0, 0.05);
-    // testArenaDisc.material = e12sMat;
-
-    // const bossSize = yalmsToM(5);
-    // const boss = Bab.MeshBuilder.CreatePlane('boss', { size: bossSize * 2 }, scene);
-    // // boss.position.z = yalmsToM(15);
-    // boss.position.y = bossSize;
-    // const bossMat = new Bab.StandardMaterial('e12s-boss-mat', scene);
-    // bossMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/boss.png');
-    // bossMat.diffuseTexture.hasAlpha = true;
-    // bossMat.specularColor = new Bab.Color3(0, 0, 0);
-    // bossMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
-    // boss.material = bossMat;
-    // boss.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
-
-    const crystalSize = yalmsToM(12);
-
-    const ifrit = collection.getMeshByName('ifrit');
-
-    // const path: Vector3[] = [ifrit.position.clone()];
-    // const beamSegments = 10;
-    // const dist = Bab.Vector3.Distance(boss.position, ifrit.position) / beamSegments;
-    // for (var i = 1; i < beamSegments - 1; i++) {
-    //     // const lastPosition = i && path[i - 1] ? path[i - 1] : ifrit.position.clone();
-    //     // const newPos = lastPosition.subtract(boss.position.clone());
-    //     const mult = (beamSegments - i) / beamSegments;
-    //     const newPos = boss.position.add(ifrit.position).multiply(new Bab.Vector3(mult, mult, mult));
-    //     newPos.x += (Math.random() - 0.5) * 5;
-    //     newPos.z += (Math.random() - 0.5) * 5;
-    //     path.push(newPos);
-    // }
-    // path.push(boss.position.clone());
-    // const ifritBeam = Bab.MeshBuilder.CreateTube('beam-ifrit', {
-    //     path: [
-    //         ...path,
-    //     ],
-    //     tessellation: 3,
-    //     radius: 0.10,
-    // }, scene);
-    // const ifritBeamMat = new Bab.StandardMaterial('ifrit-beam', scene);
-    // ifritBeamMat.emissiveColor = new Bab.Color3(189 / 255, 25 / 255, 28 / 255);
-    // ifritBeam.material = ifritBeamMat;
-    // (window as any).ifritBeam = ifritBeam;
-    // const gl = new Bab.GlowLayer('beam', scene);
-    // gl.addIncludedOnlyMesh(ifritBeam);
-
-    const ifritEmitter = new Bab.CustomParticleEmitter();
-    let id = 0;
-    ifritEmitter.particlePositionGenerator = (_index, _particle, out) => {
-        // const idx = Math.round((_particle?.id ?? id + 1)) % (path.length - 1);
-        // const idx = Math.floor(Math.random() * path.length);
-        // const pos = path[idx] // .subtract(ifrit.position);
-        const pos = ifrit?.position // .subtract(ifrit.position);
-        // console.log(id, idx);
-        out.x = (pos?.x || 0) + Math.sin(Math.random() * 10) * 2;
-        out.y = (pos?.y || 0) + Math.cos(Math.random() * 10) * 1.5;
-        out.z = (pos?.z || 0) + Math.sin(Math.random() * 10) * 2.5;
-
-        id += 1;
-    };
-
-    const boss = collection.bossMesh;
-    ifritEmitter.particleDestinationGenerator = (_index, _particle, out) => {
-        // const idx = Math.round((_particle?.id ?? id + 1)) % (path.length - 1);
-        // const pos = path[idx + 1] // .subtract(ifrit.position);
-        // out.x = pos.x;
-        // out.y = pos.y;
-        // out.z = pos.z;
-
-        out.x = boss?.position.x || 0;
-        out.y = boss?.position.y || 0;
-        out.z = boss?.position.z || 0;
-    };
-
-    const ring = createRingMesh('rang', {
-        innerRadius: 0.5,
-        outerRadius: 5,
-        thetaSegments: 1,
-        thetaLength: Math.PI / 1,
-    }, scene);
-    ring.position.z -= 5;
-    ring.position.y += 5;
-
     collection.addCharacter(character);
 
     registerFight(fight);
@@ -606,8 +590,20 @@ function makeScene(game: Engine) {
     }
 }
 
+function onVisibilityChange() {
+    if (document.hidden || document.visibilityState === 'hidden') {
+        inputMap.value = {};
+    }
+}
+
+function onBlur() {
+    inputMap.value = {};
+}
+
 onMounted(async () => {
     window.addEventListener('resize', onResize);
+    window.addEventListener('blur', onBlur);
+    document.addEventListener('visibilitychange', onVisibilityChange);
     nextTick(() => {
         debug('mount: ', canvas.value);
         if (canvas.value) {
@@ -625,6 +621,8 @@ onMounted(async () => {
 
 onBeforeUnmount(async () => {
     window.removeEventListener('resize', onResize);
+    window.removeEventListener('blur', onBlur);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
 });
 
 async function onFightUpdate(updatedFight: Fight) {

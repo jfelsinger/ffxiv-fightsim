@@ -1,3 +1,4 @@
+import { useState } from '#imports';
 import { createRingMesh } from '../ring';
 import createAoeMat from '../../materials/roundAoe';
 import { degToRads, isWithinRadius, getVectorThetaLength } from '../vector-helpers';
@@ -105,11 +106,12 @@ export class AoeRingEffect extends Effect {
             ringMat.setFloat('arenaRadius', this.collection.arena.size / 2);
         }
 
-        ringMat.setFloat('telegraph', this.telegraph);
+        const globalTelegraph = useState<number>('telegraph', () => 1.0);
+        ringMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
         ringMat.setFloat('elapsed', this.getDurationPercent());
         const onTick = (time: number) => {
             ringMat.setFloat('time', time);
-            ringMat.setFloat('telegraph', this.telegraph);
+            ringMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
             ringMat.setFloat('elapsed', this.getDurationPercent());
         }
         this.clock.on('tick', onTick);

@@ -1,3 +1,4 @@
+import { useState } from '#imports';
 import createAoeMat from '../../materials/squareAoe';
 import { yalmsToM } from '../conversions';
 import * as Bab from '@babylonjs/core';
@@ -177,10 +178,13 @@ export class AoeSquareGridEffect extends AoeSquareEffect {
     makeAoe() {
         const squareMat = createAoeMat(this.scene, Bab.Color3.FromInts(255, 150, 20), 'squareMat');
         squareMat.alpha = 0.7;
-        squareMat.setFloat('telegraph', this.telegraph);
+
+        const globalTelegraph = useState<number>('telegraph', () => 1.0);
+        squareMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
+        squareMat.setFloat('elapsed', this.getDurationPercent());
         this.clock.on('tick', (time) => {
             squareMat.setFloat('time', time);
-            squareMat.setFloat('telegraph', this.telegraph);
+            squareMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
             squareMat.setFloat('elapsed', this.getDurationPercent());
         });
 

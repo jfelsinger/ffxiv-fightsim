@@ -25,6 +25,17 @@ const name = computed(() => props.fight?.name || 'Unnamed');
 const sections = computed(() => props.fight?.sections || []);
 
 const duration = computed(() => props.fight?.getDuration() || 0);
+const globalTelegraph = useState<number>('telegraph', () => 1.0);
+const telegraph = computed({
+    get() {
+        return globalTelegraph.value * 100;
+    },
+    set(value: number) {
+        value = Math.max(5, Math.min(100, value));
+        globalTelegraph.value = value / 100;
+    }
+});
+
 const currentTime = useState<number>('worldTime', () => 0);
 const currentMinutes = computed(() => ('00' + (Math.floor(currentTime.value / 1000 / 60) % 99)).slice(-2));
 const currentSeconds = computed(() => ('00' + (Math.floor(currentTime.value / 1000) % 60)).slice(-2));
@@ -221,6 +232,15 @@ function updateTime(val: number) {
                             <a @click.stop.prevent="updateTime(+val)">{{ val }}</a>
                         </li>
                     </ul>
+                </div>
+                <div class="dropdown dropdown-hover dropdown-top tooltip tooltip-bottom" data-tip="Attack Telegraphing">
+                    <div tabindex="0" role="button" class="btn btn-sm bg-transparent border-transparent shadow-none px-2">
+                        <Icon name="solar:eye-closed-bold-duotone" />
+                    </div>
+                    <div tabindex="0" class="dropdown-content z-[51] menu p-2 shadow bg-base-100 rounded-box text-xs
+                        min-w-24">
+                        <input type="range" min="0" max="100" v-model="telegraph" class="range range-xs" />
+                    </div>
                 </div>
                 <button @click="reset()"
                     class="tooltip tooltip-bottom px-2 btn btn-sm bg-transparent border-transparent shadow-none"
