@@ -22,6 +22,18 @@ import {
 export type E12SPrimalCombinationOptions = MechanicOptions & {
 };
 
+type PrimalName =
+    | 'ifrit'
+    | 'ramuh'
+    | 'garuda'
+    | 'leviathan';
+const primalPairs: Record<PrimalName, PrimalName[]> = {
+    ifrit: ['ramuh', 'leviathan'],
+    ramuh: ['leviathan', 'garuda', 'ifrit'],
+    garuda: ['leviathan', 'ramuh'],
+    leviathan: ['ifrit', 'ramuh', 'garuda'],
+} as const;
+
 export class E12SPrimalCombination extends Mechanic {
     name = 'primal-combination';
     options: E12SPrimalCombinationOptions;
@@ -34,52 +46,29 @@ export class E12SPrimalCombination extends Mechanic {
 
     getEffects(): Scheduled<Effect>[] {
         const allEffects = this.effects;
-        const ifrit = allEffects.find(e => e.label?.toLowerCase() === 'ifrit');
-        const ramuh = allEffects.find(e => e.label?.toLowerCase() === 'ramuh');
-        const garuda = allEffects.find(e => e.label?.toLowerCase() === 'garuda');
-        const leviathan = allEffects.find(e => e.label?.toLowerCase() === 'leviathan');
+        const primalEffects: Record<PrimalName, Scheduled<Effect> | undefined> = {
+            ifrit: allEffects.find(e => e.label?.toLowerCase() === 'ifrit'),
+            ramuh: allEffects.find(e => e.label?.toLowerCase() === 'ramuh'),
+            garuda: allEffects.find(e => e.label?.toLowerCase() === 'garuda'),
+            leviathan: allEffects.find(e => e.label?.toLowerCase() === 'leviathan'),
+        };
 
-        if (!ifrit && !ramuh && !garuda && !leviathan) {
+        if (!primalEffects.ifrit && !primalEffects.ramuh && !primalEffects.garuda && !primalEffects.leviathan) {
             return allEffects;
         }
 
-        const availableEntries: Scheduled<Effect>[] = [
-            ifrit, ramuh, garuda, leviathan,
-        ].filter(_ => _) as any;
+        const availableEntries = Object.entries(primalEffects).filter(([_, value]) => value);
 
-        const first = availableEntries[Math.floor(Math.random() * availableEntries.length)];
+        const [firstLabel, first] = availableEntries[Math.floor(Math.random() * availableEntries.length)] || [];
 
         if (first) {
-            const firstLabel = first.label?.toLowerCase();
-            if (firstLabel === 'ifrit') {
-                const availableEntries: Scheduled<Effect>[] = [
-                    ramuh, leviathan,
-                ].filter(_ => _) as any;
-                const second = availableEntries[Math.floor(Math.random() * availableEntries.length)];
-                return [first, second];
-            } else if (firstLabel === 'ramuh') {
-                const availableEntries: Scheduled<Effect>[] = [
-                    leviathan, garuda, ifrit
-                ].filter(_ => _) as any;
-                const second = availableEntries[Math.floor(Math.random() * availableEntries.length)];
-                return [first, second];
-            } else if (firstLabel === 'garuda') {
-                const availableEntries: Scheduled<Effect>[] = [
-                    leviathan, ramuh,
-                ].filter(_ => _) as any;
-                const second = availableEntries[Math.floor(Math.random() * availableEntries.length)];
-                return [first, second];
-            } else if (firstLabel === 'leviathan') {
-                const availableEntries: Scheduled<Effect>[] = [
-                    ifrit, ramuh, garuda,
-                ].filter(_ => _) as any;
-                const second = availableEntries[Math.floor(Math.random() * availableEntries.length)];
-                return [first, second];
-            }
+            const availableEntries = primalPairs[firstLabel as PrimalName]
+                .map((primalName) => primalEffects[primalName])
+                .filter(_ => _) as Scheduled<Effect>[];
+            const second = availableEntries[Math.floor(Math.random() * availableEntries.length)];
+            return [first, second];
         }
 
-        return shuffleArray([
-            ifrit, ramuh, garuda, leviathan,
-        ].filter(_ => _)).slice(0, 2) as any;
+        return [];
     }
 }

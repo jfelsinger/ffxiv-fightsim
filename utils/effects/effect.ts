@@ -85,8 +85,16 @@ export class Effect extends EventEmitter {
         this.positionType = options.positionType || 'arena';
     }
 
+    setDuration(duration: number | string) {
+        this.duration = parseNumber(duration);
+    }
+
     getDuration() {
         return this.duration || 0;
+    }
+
+    setTelegraph(telegraph: number | string) {
+        this.telegraph = parseNumber(telegraph);
     }
 
     getPositionVector(): Bab.Vector3 {

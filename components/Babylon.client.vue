@@ -40,7 +40,17 @@ const canvas = ref<HTMLCanvasElement>();
 let game: Engine | undefined;
 const cameraDirection = ref(0);
 const characterDirection = ref(0);
+
+const isHit = ref(false);
 const hits = ref(0);
+let hitTimeoutKey: ReturnType<typeof setTimeout> | undefined;
+watch(hits, (value: number, oldValue: number) => {
+    if (value > oldValue) {
+        isHit.value = true;
+        clearTimeout(hitTimeoutKey);
+        hitTimeoutKey = setTimeout(() => isHit.value = false, 725);
+    }
+});
 
 function onResize() {
     if (game) {
@@ -644,7 +654,8 @@ function onScaleTime(value: number) {
 </script>
 
 <template>
-    <div id="game" class="relative max-w-screen max-h-screen overflow-hidden h-screen game --babylon">
+    <div id="game" class="relative max-w-screen max-h-screen overflow-hidden h-screen game --babylon"
+        :class="{ '--is-hit': isHit }">
         <FightUi @scale-time="onScaleTime" @reset-position="onResetPosition" @update="onFightUpdate" v-if="currentFight"
             :fight="currentFight" />
 
@@ -657,7 +668,12 @@ function onScaleTime(value: number) {
         </div>
 
         <div class="ui-extras absolute top-6 flex justify-center items-center p-2 px-4 rounded bg-slate-100/50">
-            <p>Hits: {{ hits }}</p>
+            <p>
+                Hits:
+                <span class="countdown font-mono">
+                    <span :style="{ '--value': hits }"></span>
+                </span>
+            </p>
         </div>
 
         <div class="absolute top-0 left-0 z-10">
@@ -678,6 +694,13 @@ function onScaleTime(value: number) {
     left: 50%;
     transform: translateX(-50%);
     z-index: 30;
+
+    .--is-hit & {
+        background-color: #e7493bcf;
+        transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms
+    }
 }
 
 .minimap {

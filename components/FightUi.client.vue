@@ -26,6 +26,8 @@ const sections = computed(() => props.fight?.sections || []);
 
 const duration = computed(() => props.fight?.getDuration() || 0);
 const currentTime = useState<number>('worldTime', () => 0);
+const currentMinutes = computed(() => ('00' + (Math.floor(currentTime.value / 1000 / 60) % 99)).slice(-2));
+const currentSeconds = computed(() => ('00' + (Math.floor(currentTime.value / 1000) % 60)).slice(-2));
 // const currentTime = ref(props.fight?.clock?.time || 0);
 const elapsed = computed(() => Math.min(duration.value, currentTime.value));
 const elapsedPercent = computed(() => (elapsed.value || 0) / (duration.value || 1) * 100);
@@ -204,18 +206,24 @@ function updateTime(val: number) {
                     <Icon class="swap-off" name="solar:pause-circle-linear" />
                 </label>
                 <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
-                <div class="dropdown dropdown-hover dropdown-top">
+                <div class="pr-1 text-xs flex items-center">
+                    <span class="countdown font-mono">
+                        <span :style="{ '--value': currentMinutes }"></span>:
+                        <span :style="{ '--value': currentSeconds }"></span>
+                    </span>
+                </div>
+                <div class="dropdown dropdown-hover dropdown-top tooltip tooltip-bottom" data-tip="Game Speed">
                     <div tabindex="0" role="button" class="btn btn-sm bg-transparent border-transparent shadow-none px-2">
                         <Icon name="solar:stopwatch-linear" />
                     </div>
-                    <ul tabindex="0" class="dropdown-content z-[51] menu p-2 shadow bg-base-100 rounded-box">
+                    <ul tabindex="0" class="dropdown-content z-[51] menu p-2 shadow bg-base-100 rounded-box text-xs">
                         <li v-for="val in ['1.0', 0.75, 0.50]" :class="{ 'opacity-50': worldTimeScaling == val }">
                             <a @click.stop.prevent="updateTime(+val)">{{ val }}</a>
                         </li>
                     </ul>
                 </div>
                 <button @click="reset()"
-                    class="tooltip tooltip-top px-2 btn btn-sm bg-transparent border-transparent shadow-none"
+                    class="tooltip tooltip-bottom px-2 btn btn-sm bg-transparent border-transparent shadow-none"
                     data-tip="Restart Fight">
                     <Icon name="solar:refresh-bold" />
                 </button>

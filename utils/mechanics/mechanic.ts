@@ -20,6 +20,8 @@ export type MechanicOptions = {
     effects: Scheduled<Effect>[]
     collection: FightCollection
     clock?: Clock
+    duration?: number | string
+    telegraph?: number | string
 }
 
 export class Mechanic extends EventEmitter {
@@ -39,8 +41,8 @@ export class Mechanic extends EventEmitter {
             label: this.options.label,
             name: this.name,
             scheduling: this.scheduling,
-            effects: this.effects,
             ...results,
+            effects: this.effects,
         };
     }
 
@@ -75,6 +77,15 @@ export class Mechanic extends EventEmitter {
         const len = this.effects.length;
         for (let i = 0; i < len; i++) {
             const effect = this.effects[i];
+            if (effect?.item?.options) {
+                if (options.duration && !effect.item.options.duration) {
+                    effect.item.setDuration(options.duration);
+                }
+                if (options.telegraph && !effect.item.options.duration) {
+                    effect.item.setTelegraph(options.telegraph);
+                }
+            }
+
             effect.item.on('effect-hit', (data) => {
                 this.emit('effect-hit', {
                     ...data,

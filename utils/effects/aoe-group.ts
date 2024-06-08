@@ -80,6 +80,23 @@ export class AoeGroupEffect extends Effect {
         await Promise.all(promises);
     }
 
+    setDuration(duration: number | string) {
+        super.setDuration(duration);
+        this.duration = parseNumber(duration);
+        const len = this.aoes.length;
+        for (let i = 0; i < len; i++) {
+            this.aoes[i].setDuration(this.duration);
+        }
+    }
+
+    setTelegraph(telegraph: number | string) {
+        super.setTelegraph(telegraph);
+        const len = this.aoes.length;
+        for (let i = 0; i < len; i++) {
+            this.aoes[i].setTelegraph(this.telegraph);
+        }
+    }
+
     async cleanup() {
         const len = this.aoes.length;
         const promises: Promise<void>[] = [];
