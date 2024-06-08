@@ -20,6 +20,7 @@ import { vectorAngle } from '../utils/vector-helpers';
 const props = defineProps<{
     fightData?: any,
     showUi?: boolean,
+    skipCharacter?: boolean,
 }>();
 
 import Debug from 'debug';
@@ -155,10 +156,17 @@ function makeScene(game: Engine) {
     const fight = getFight(collection);
     const arena = fight?.arena;
 
+    if (props.skipCharacter) {
+        return {
+            scene, camera, light, arena, fight
+        }
+    } // else:
 
     const character = new Character('player', {
         startPosition: fight?.getStartPosition(),
     }, scene, playerClock);
+    collection.addCharacter(character);
+
     camera.setTarget(character.camMarker.position.clone());
     camera.lockedTarget = character.camMarker;
     character.setCamera(camera);
@@ -240,7 +248,6 @@ function makeScene(game: Engine) {
         cameraDirection.value = vectorAngle(camera.getDirection(Bab.Vector3.Forward()));
     });
 
-    collection.addCharacter(character);
 
     if (fight) {
         registerFight(fight);
