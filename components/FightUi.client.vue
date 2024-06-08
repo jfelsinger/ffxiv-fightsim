@@ -36,6 +36,14 @@ const telegraph = computed({
     }
 });
 
+function toggleTelegraph() {
+    if (telegraph.value > 50) {
+        telegraph.value = 5;
+    } else {
+        telegraph.value = 100;
+    }
+}
+
 const currentTime = useState<number>('worldTime', () => 0);
 const currentMinutes = computed(() => ('00' + (Math.floor(currentTime.value / 1000 / 60) % 99)).slice(-2));
 const currentSeconds = computed(() => ('00' + (Math.floor(currentTime.value / 1000) % 60)).slice(-2));
@@ -235,7 +243,10 @@ function updateTime(val: number) {
                 </div>
                 <div class="dropdown dropdown-hover dropdown-top tooltip tooltip-bottom" data-tip="Attack Telegraphing">
                     <div tabindex="0" role="button" class="btn btn-sm bg-transparent border-transparent shadow-none px-2">
-                        <Icon name="solar:eye-closed-bold-duotone" />
+                        <label @click="toggleTelegraph" class="swap" :class="{ 'swap-active': telegraph > 50 }">
+                            <Icon class="swap-on" name="solar:eye-broken" />
+                            <Icon class="swap-off" name="solar:eye-closed-bold-duotone" />
+                        </label>
                     </div>
                     <div tabindex="0" class="dropdown-content z-[51] menu p-2 shadow bg-base-100 rounded-box text-xs
                         min-w-24">
