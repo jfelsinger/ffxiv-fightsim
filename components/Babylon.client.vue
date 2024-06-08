@@ -19,6 +19,7 @@ import { vectorAngle } from '../utils/vector-helpers';
 
 const props = defineProps<{
     fightData?: any,
+    showUi?: boolean,
 }>();
 
 import Debug from 'debug';
@@ -657,15 +658,16 @@ function onScaleTime(value: number) {
         <FightUi @scale-time="onScaleTime" @reset-position="onResetPosition" @update="onFightUpdate" v-if="currentFight"
             :fight="currentFight" />
 
-        <div class="minimap relative-north absolute top-10 right-10 z-10 bg-slate-700 p-[2px] rounded-full" :style="{
-            '--cam-rotation': `${cameraDirection}deg`,
-            '--char-rotation': `${characterDirection}deg`,
-        }">
-            <div class="minimap__floor w-24 h-24 bg-slate-100 overflow-hidden rounded-full relative">
+        <div class="minimap relative-north absolute top-10 right-10 z-10 bg-slate-100/45 bg-blur p-[2px] rounded-full"
+            :style="{
+                '--cam-rotation': `${cameraDirection}deg`,
+                '--char-rotation': `${characterDirection}deg`,
+            }">
+            <div class="minimap__floor w-24 h-24 bg-slate-100/75 overflow-hidden rounded-full relative">
             </div>
         </div>
 
-        <div class="ui-extras absolute top-6 flex justify-center items-center p-2 px-4 rounded bg-slate-100/50">
+        <div class="ui-extras absolute top-6 flex justify-center items-center p-2 px-4 bg-blur rounded bg-slate-100/50">
             <p>
                 Hits:
                 <span class="countdown font-mono">
