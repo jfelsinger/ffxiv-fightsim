@@ -45,5 +45,6 @@ void main(void) {
     // float a2 = step(0.4, 0.8 - distCenter);
 
     // gl_FragColor = vec4(0.2, 0.6, 1.0, alpha);
+    alpha *= step(1.0 - elapsed, telegraph);
     gl_FragColor = vec4(color, alpha);
 }

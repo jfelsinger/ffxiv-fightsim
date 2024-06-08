@@ -5,7 +5,7 @@ import {
     type Scheduled,
     getScheduledDuration,
 } from '../utils/scheduled';
-import { Fight, } from '../utils/fight';
+import { Fight, } from '../utils/fights';
 import { FightSection, } from '../utils/sections';
 import { Mechanic } from '../utils/mechanics';
 

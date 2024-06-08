@@ -9,7 +9,7 @@ import { Clock } from '../utils/clock';
 import { FightCollection } from '../utils/fight-collection';
 import { effectsCollection } from '../utils/effects';
 import { createRingMesh } from '#imports';
-import { Fight, } from '../utils/fight';
+import { Fight } from '../utils/fights';
 import { FightSection, } from '../utils/sections';
 import { Mechanic, } from '../utils/mechanics';
 import { decodeFight } from '../utils/decode-fight';
@@ -498,32 +498,21 @@ function makeScene(game: Engine) {
     // e12sMat.specularColor = new Bab.Color3(0, 0, 0.05);
     // testArenaDisc.material = e12sMat;
 
-    const bossSize = yalmsToM(5);
-    const boss = Bab.MeshBuilder.CreatePlane('test-boss', { size: bossSize * 2 }, scene, true, Bab.Mesh.DOUBLESIDE);
-    // boss.position.z = yalmsToM(15);
-    boss.position.y = bossSize;
-    const bossMat = new Bab.StandardMaterial('e12s-boss', scene);
-    bossMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/boss.png');
-    bossMat.diffuseTexture.hasAlpha = true;
-    bossMat.specularColor = new Bab.Color3(0, 0, 0);
-    bossMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
-    boss.material = bossMat;
-    boss.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
+    // const bossSize = yalmsToM(5);
+    // const boss = Bab.MeshBuilder.CreatePlane('boss', { size: bossSize * 2 }, scene);
+    // // boss.position.z = yalmsToM(15);
+    // boss.position.y = bossSize;
+    // const bossMat = new Bab.StandardMaterial('e12s-boss-mat', scene);
+    // bossMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/boss.png');
+    // bossMat.diffuseTexture.hasAlpha = true;
+    // bossMat.specularColor = new Bab.Color3(0, 0, 0);
+    // bossMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
+    // boss.material = bossMat;
+    // boss.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
 
     const crystalSize = yalmsToM(12);
 
-    const ifritSize = crystalSize
-    const ifrit = Bab.MeshBuilder.CreatePlane('test-ifrit', { height: ifritSize * 2, width: ifritSize * 1.2 }, scene);
-    ifrit.position.z = yalmsToM(26);
-    ifrit.position.x = ifritSize * 1.2 * 1.65;
-    ifrit.position.y = ifritSize * 0.8;
-    const ifritMat = new Bab.StandardMaterial('e12s-ifrit', scene);
-    ifritMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/ifrit.png');
-    ifritMat.diffuseTexture.hasAlpha = true;
-    ifritMat.specularColor = new Bab.Color3(0, 0, 0);
-    ifritMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
-    ifrit.material = ifritMat;
-    ifrit.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
+    const ifrit = collection.getMeshByName('ifrit');
 
     // const path: Vector3[] = [ifrit.position.clone()];
     // const beamSegments = 10;
@@ -558,101 +547,27 @@ function makeScene(game: Engine) {
         // const idx = Math.round((_particle?.id ?? id + 1)) % (path.length - 1);
         // const idx = Math.floor(Math.random() * path.length);
         // const pos = path[idx] // .subtract(ifrit.position);
-        const pos = ifrit.position // .subtract(ifrit.position);
+        const pos = ifrit?.position // .subtract(ifrit.position);
         // console.log(id, idx);
-        out.x = pos.x + Math.sin(Math.random() * 10) * 2;
-        out.y = pos.y + Math.cos(Math.random() * 10) * 1.5;
-        out.z = pos.z + Math.sin(Math.random() * 10) * 2.5;
+        out.x = (pos?.x || 0) + Math.sin(Math.random() * 10) * 2;
+        out.y = (pos?.y || 0) + Math.cos(Math.random() * 10) * 1.5;
+        out.z = (pos?.z || 0) + Math.sin(Math.random() * 10) * 2.5;
 
         id += 1;
     };
 
+    const boss = collection.bossMesh;
     ifritEmitter.particleDestinationGenerator = (_index, _particle, out) => {
         // const idx = Math.round((_particle?.id ?? id + 1)) % (path.length - 1);
         // const pos = path[idx + 1] // .subtract(ifrit.position);
         // out.x = pos.x;
         // out.y = pos.y;
         // out.z = pos.z;
-        out.x = boss.position.x;
-        out.y = boss.position.y;
-        out.z = boss.position.z;
+
+        out.x = boss?.position.x || 0;
+        out.y = boss?.position.y || 0;
+        out.z = boss?.position.z || 0;
     };
-
-    // const ifritParticles = Bab.ParticleHelper.CreateDefault(ifritBeam);
-    const ifritParticles = Bab.ParticleHelper.CreateDefault(ifrit);
-    ifritParticles.emitter = Bab.Vector3.Zero();
-    ifritParticles.particleEmitterType = ifritEmitter;
-    // ifritParticles.particleEmitterType = new Bab.MeshParticleEmitter(ifritBeam);
-    ifritParticles.maxSize = 2.5;
-    ifritParticles.minSize = 0.25;
-    ifritParticles.maxEmitPower = 0.95;
-    ifritParticles.minEmitPower = 0.70;
-    ifritParticles.updateSpeed = 0.25;
-    ifritParticles.maxLifeTime = 15.45;
-    ifritParticles.minLifeTime = 15.20;
-    ifritParticles.color1 = new Bab.Color4(211 / 255, 108 / 255, 79 / 255, 1.0);
-    ifritParticles.color2 = new Bab.Color4(189 / 255, 25 / 255, 28 / 255, 1.0);
-    ifritParticles.colorDead = new Bab.Color4(189 / 255, 25 / 255, 28 / 255, 0.5);
-    // ifritParticles.gravity = boss.position.subtract(ifrit.position).normalize().multiply(new Bab.Vector3(.1, .1, .1));
-    ifritParticles.billboardMode = Bab.ParticleSystem.BILLBOARDMODE_STRETCHED;
-    ifritParticles.start();
-
-    const noiseTex = new Bab.NoiseProceduralTexture('perlin', 256, scene);
-    noiseTex.animationSpeedFactor = 8;
-    noiseTex.persistence = 2;
-    noiseTex.brightness = 0.5;
-    noiseTex.octaves = 2;
-
-    ifritParticles.noiseTexture = noiseTex;
-    ifritParticles.noiseStrength = new Bab.Vector3(.03, .03, .03);
-
-    const ramuhSize = crystalSize
-    const ramuh = Bab.MeshBuilder.CreatePlane('test-ramuh', { height: ramuhSize * 2, width: ramuhSize * 1.2 }, scene);
-    ramuh.position.z = yalmsToM(35);
-    ramuh.position.x = ramuhSize * 1.2 * 0.625;
-    ramuh.position.y = ramuhSize * 0.8;
-    const ramuhMat = new Bab.StandardMaterial('e12s-ramuh', scene);
-    ramuhMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/ramuh.png');
-    ramuhMat.diffuseTexture.hasAlpha = true;
-    ramuhMat.specularColor = new Bab.Color3(0, 0, 0);
-    ramuhMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
-    ramuh.material = ramuhMat;
-    ramuh.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
-
-    const garudaSize = crystalSize
-    const garuda = Bab.MeshBuilder.CreatePlane('test-garuda', { height: garudaSize * 2, width: garudaSize * 1.2 }, scene);
-    garuda.position.z = yalmsToM(35);
-    garuda.position.x = garudaSize * 1.2 * -0.625;
-    garuda.position.y = garudaSize * 0.8;
-    const garudaMat = new Bab.StandardMaterial('e12s-garuda', scene);
-    garudaMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/garuda.png');
-    garudaMat.diffuseTexture.hasAlpha = true;
-    garudaMat.specularColor = new Bab.Color3(0, 0, 0);
-    garudaMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
-    garuda.material = garudaMat;
-    garuda.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
-
-    const leviathanSize = crystalSize
-    const leviathan = Bab.MeshBuilder.CreatePlane('test-leviathan', { height: leviathanSize * 2, width: leviathanSize * 1.2 }, scene);
-    leviathan.position.z = yalmsToM(26);
-    leviathan.position.x = leviathanSize * 1.2 * -1.65;
-    leviathan.position.y = leviathanSize * 0.8;
-    const leviathanMat = new Bab.StandardMaterial('e12s-leviathan', scene);
-    leviathanMat.diffuseTexture = new Bab.Texture('/images/fights/e12s/leviathan.png');
-    leviathanMat.diffuseTexture.hasAlpha = true;
-    leviathanMat.specularColor = new Bab.Color3(0, 0, 0);
-    leviathanMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
-    leviathan.material = leviathanMat;
-    leviathan.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
-
-
-    // const particles = Bab.ParticleHelper.CreateDefault(boss.position.clone())
-    const particles = Bab.ParticleHelper.CreateDefault(boss.position.clone())
-    // const particles = new Bab.ParticleSystem('boss-particles', 100, scene);
-    // particles.particleTexture = new Tex.FireProceduralTexture('fiah', 128, scene);
-    // particles.emitter = boss.position.clone();
-    particles.emitter = character.position;
-    particles.start();
 
     const ring = createRingMesh('rang', {
         innerRadius: 0.5,
@@ -762,7 +677,7 @@ function onScaleTime(value: number) {
 .ui-extras {
     left: 50%;
     transform: translateX(-50%);
-    z-index: 99;
+    z-index: 30;
 }
 
 .minimap {

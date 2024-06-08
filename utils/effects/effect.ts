@@ -25,6 +25,7 @@ export type EffectOptions = {
     duration: number | string
     collection: FightCollection
     clock?: Clock
+    telegraph?: number
 
     target?: EffectTarget | (EffectTarget[])
     position?: Bab.Vector3 | (string[]) | (number[]) | string | (() => Bab.Vector3 | (string[]) | (number[]) | string)
@@ -47,6 +48,7 @@ export class Effect extends EventEmitter {
     position: EffectOptions['position'];
     positionType: EffectOptions['positionType'];
     repeatTarget: boolean;
+    telegraph: number;
 
     // The mesh for the effect itself
     mesh?: Bab.Mesh;
@@ -66,6 +68,7 @@ export class Effect extends EventEmitter {
     constructor(options: EffectOptions) {
         super();
         this.options = options;
+        this.telegraph = parseNumber(options.telegraph ?? 1.0);
         this.label = options.label;
         this.duration = parseNumber(options.duration ?? 0);
         this.collection = options.collection;
@@ -86,7 +89,7 @@ export class Effect extends EventEmitter {
         return this.duration || 0;
     }
 
-    getPosition(): Bab.Vector3 {
+    getPositionVector(): Bab.Vector3 {
         let positionValue = typeof (this.position) === 'function' ? this.position() : this.position;
 
         if (typeof positionValue === 'string') {
@@ -128,6 +131,27 @@ export class Effect extends EventEmitter {
         }
 
         return positionValue?.clone() || Bab.Vector3.Zero();
+    }
+
+    getPosition(): Bab.Vector3 {
+        let vec = this.getPositionVector();
+
+        if (!this.positionType || this.positionType === 'global') {
+            return vec;
+
+        } else if (this.positionType === 'arena') {
+            if (this.collection.arena) {
+                vec = this.collection.arena.getPosition(vec);
+            }
+
+        } else if (this.positionType === 'character') {
+            return vec;
+
+        } else if (this.positionType === 'mesh') {
+            return vec;
+        }
+
+        return vec;
     }
 
     startTime: number = 0;

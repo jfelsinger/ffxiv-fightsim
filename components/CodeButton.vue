@@ -45,7 +45,7 @@ function handleBlur() {
             <Icon name="solar:code-bold" />
         </div>
 
-        <div tabindex="0" class="dropdown-content w-[30rem] z-40 p-2">
+        <div tabindex="0" class="dropdown-content w-[30rem] z-[70] p-2">
             <slot />
         </div>
     </div>

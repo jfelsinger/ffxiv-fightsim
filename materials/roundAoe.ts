@@ -31,6 +31,7 @@ export default function createShader(scene: Scene, color?: Color3, shaderName = 
 
                 'time',
                 'elapsed',
+                'telegraph',
                 'color',
             ],
         }
@@ -39,6 +40,7 @@ export default function createShader(scene: Scene, color?: Color3, shaderName = 
     material.setFloat('arenaRadius', 1000000);
     material.setFloat('time', 0);
     material.setFloat('elapsed', 0);
+    material.setFloat('telegraph', 0);
     material.setColor3('color', color || new Color3(0.2, 0.6, 1.0));
     return material;
 }

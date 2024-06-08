@@ -49,6 +49,10 @@ export class AoeDiscEffect extends Effect {
     makeAoe() {
         const discMat = createAoeMat(this.scene, Bab.Color3.FromInts(255, 150, 20), 'discMat');
         discMat.alpha = 0.7;
+        if (this.collection.arena) {
+            discMat.setFloat('arenaRadius', this.collection.arena.size / 2);
+        }
+        discMat.setFloat('telegraph', this.telegraph);
         this.clock.on('tick', (time) => {
             discMat.setFloat('time', time);
             discMat.setFloat('elapsed', this.getDurationPercent());

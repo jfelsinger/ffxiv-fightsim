@@ -27,6 +27,7 @@ export class Mechanic extends EventEmitter {
     label?: string
     scheduling: ScheduleMode;
     effects: Scheduled<Effect>[];
+    activeEffects: Scheduled<Effect>[] = [];
     collection: FightCollection;
     clock: Clock;
     isActive: boolean = false;
@@ -87,18 +88,24 @@ export class Mechanic extends EventEmitter {
         }
     }
 
+    getEffects() {
+        return this.effects;
+    }
+
     async execute() {
         this.isActive = true;
         this.emit('start-execute');
 
+        const effects = this.getEffects();
+        this.activeEffects = effects;
         if (this.scheduling === 'sequential') {
-            const len = this.effects.length;
+            const len = effects.length;
             for (let i = 0; i < len; i++) {
                 if (!this.isActive) break;
-                await this.executeEffect(this.effects[i])
+                await this.executeEffect(effects[i])
             }
         } else if (this.isActive) {
-            await Promise.all(this.effects.map(effect => this.executeEffect(effect)));
+            await Promise.all(effects.map(effect => this.executeEffect(effect)));
         }
 
         this.isActive = false;

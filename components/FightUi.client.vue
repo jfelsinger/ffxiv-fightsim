@@ -3,7 +3,7 @@ import * as YAML from 'yaml';
 import {
     type Scheduled,
 } from '../utils/scheduled';
-import { Fight, } from '../utils/fight';
+import { Fight, } from '../utils/fights';
 import { FightSection } from '../utils/sections';
 import { decodeFight } from '../utils/decode-fight';
 
@@ -224,7 +224,7 @@ function updateTime(val: number) {
         </div>
 
         <div class="fight__sidebar z-50">
-            <div class="fight__sidebar-content p-2">
+            <div class="fight__sidebar-content p-2 z-70">
                 <ul class="menu bg-slate-100/45  rounded-box">
                     <li>
                         <button @click="open('ui')" class="tooltip tooltip-right px-2" data-tip="Open UI">
@@ -255,7 +255,7 @@ function updateTime(val: number) {
                     class="fight-ui p-2 bg-slate-100/45 rounded collapse clip-collapse collapse-arrow w-full max-w-md min-w-[20rem]">
                     <input type="checkbox" />
 
-                    <div class="collapse-title relative flex items-center gap-4">
+                    <div class="collapse-title flex items-center gap-4">
                         <h2 class="flex-grow-2 min-w-fit">{{ name }}</h2>
                         <!--
                         <div class="radial-progress" :style="{
@@ -265,7 +265,7 @@ function updateTime(val: number) {
                         }" role="progressbar"></div>
                         -->
                         <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
-                        <CodeButton @open="() => resetEncoded(true)" class=" dropdown-right float-right relative z-60">
+                        <CodeButton @open="() => resetEncoded(true)" class="dropdown-right float-right relative z-[60]">
                             <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language"
                                 v-model="encoded" />
                         </CodeButton>
@@ -315,7 +315,7 @@ function updateTime(val: number) {
 
 .fight__sidebar-content {
     position: absolute;
-    // z-index: 30;
+    z-index: 55;
     top: 0;
     left: 0;
     display: flex;

@@ -1,17 +1,17 @@
-import { Arena, type ArenaOptions } from './arenas';
-import { arenasCollection } from './arenas';
+import { Arena, type ArenaOptions } from '../arenas';
+import { arenasCollection } from '../arenas';
 import { EventEmitter } from 'eventemitter3';
-import { Clock } from './clock';
-import { FightCollection } from './fight-collection';
-import { decodeFight, getBasicValues } from './decode-fight';
-import { FightSection } from './sections';
+import { Clock } from '../clock';
+import { FightCollection } from '../fight-collection';
+import { decodeFight, getBasicValues } from '../decode-fight';
+import { FightSection } from '../sections';
 
 import {
     type ScheduleMode,
     type Scheduled,
     getScheduledDuration,
     executeScheduled,
-} from './scheduled';
+} from '../scheduled';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:fight');

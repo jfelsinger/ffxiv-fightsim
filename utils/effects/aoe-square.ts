@@ -34,6 +34,7 @@ export class AoeSquareEffect extends Effect {
     makeAoe() {
         const squareMat = createAoeMat(this.scene, Bab.Color3.FromInts(255, 150, 20), 'squareMat');
         squareMat.alpha = 0.7;
+        squareMat.setFloat('telegraph', this.telegraph);
         this.clock.on('tick', (time) => {
             squareMat.setFloat('time', time);
             squareMat.setFloat('elapsed', this.getDurationPercent());

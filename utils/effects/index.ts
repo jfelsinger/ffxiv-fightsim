@@ -6,6 +6,7 @@ import { AoeRingEffect } from './aoe-ring';
 import { AoeSquareEffect } from './aoe-square';
 import { AoeGroupEffect } from './aoe-group';
 import { AoeSquareGridEffect } from './aoe-square-grid';
+import { TetherEffect } from './tether';
 
 export const effectsCollection = {
     'default': Effect,
@@ -15,6 +16,7 @@ export const effectsCollection = {
     'aoe-disc': AoeDiscEffect,
     'aoe-group': AoeGroupEffect,
     'test-aoe': AoeDiscEffect,
+    'tether': TetherEffect,
 } as const;
 
 export default effectsCollection;

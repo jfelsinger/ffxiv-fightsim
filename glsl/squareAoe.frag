@@ -59,6 +59,7 @@ void main(void) {
     float r = clamp((color.r) + (adj * 0.35), 0.0, 1.0);
     float g = clamp((color.g) - (adj * 0.25), 0.0, 1.0);
     float b = clamp((color.b) - (adj * 0.25), 0.0, 1.0);
+    alpha *= step(1.0 - elapsed, telegraph);
     gl_FragColor = vec4(r, g, b, alpha);
 
     // gl_FragColor = vec4(color, 1.0);

@@ -43,6 +43,17 @@ export class Arena {
         this.camCollider?.dispose();
     }
 
+    getPosition(vec: Bab.Vector3) {
+        const size = this.size;
+        const result = vec.multiply(new Bab.Vector3(size, 1, size));
+
+        if (this?.floor?.position) {
+            result.addInPlace(this.floor.position);
+        }
+
+        return result;
+    }
+
     constructor(name: string, options: ArenaOptions, scene: Bab.Scene) {
         this.options = options;
         this.name = name;

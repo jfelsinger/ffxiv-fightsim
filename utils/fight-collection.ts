@@ -25,7 +25,12 @@ export class FightCollection {
     get player(): Character | undefined { return this.characters.player }
     set player(value: Character) { this.characters.player = value; }
 
-    get groundMesh() { return this.scene.getMeshByName('ground'); }
+    get groundMesh() { return this.getMeshByName('ground'); }
+    get bossMesh() { return this.getMeshByName('boss'); }
+
+    getMeshByName(name: string) {
+        return this.scene.getMeshByName(name);
+    }
 
     addCharacter(character: Character, name?: CharacterName) {
         name = name || (character.name as CharacterName);

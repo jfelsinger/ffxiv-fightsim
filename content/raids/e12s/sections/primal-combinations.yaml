@@ -1,49 +1,54 @@
-name: e12s-primal-combinations
+name: e12s
 scheduling: sequential
 arena:
   name: e12s-arena
   yalms: 58
   floorType: e12s
 sections:
-  - item:
+  - startDelay: 500
+    item:
       name: test-section
       scheduling: sequential
       mechanics:
-        - item:
-            name: test-mechanic
-            scheduling: parallel
+        - repeat: 5
+          startDelay: 500
+          endDelay: 2500
+          item:
+            name: primal-combinations
             effects:
               # Ifrit
               - label: Ifrit
-                repeat: 5
-                endDelay: 500
                 item:
                   name: aoe-group
-                  outerRadius: 28.971145000000003
+                  outerRadius: 30
                   innerRadius: 0
                   thetaLength: pi / 2
                   angle: 152
-                  duration: 2000
+                  duration: 4200
                   positionType: arena
+                  telegraph: 0.5
                   aoes:
                     - name: aoe-ring
                       direction: -90
                     - name: aoe-ring
                       direction: 90
+                    - name: tether
+                      from: ifrit
+                      to: boss
+                      telegraph: 1
 
               # Garuda
               - label: Garuda
-                repeat: 5
-                endDelay: 500
                 item:
                   name: aoe-group
-                  outerRadius: 28.971145000000003
+                  outerRadius: 30
                   innerRadius: 0
                   thetaLength: pi / 2
                   angle: 45.5
                   direction: -90
-                  duration: 2000
+                  duration: 4200
                   positionType: arena
+                  telegraph: 0.5
                   aoes:
                     - name: aoe-ring
                       direction: -90
@@ -53,37 +58,49 @@ sections:
                       direction: 90
                     - name: aoe-ring
                       direction: 180
+                    - name: tether
+                      from: garuda
+                      to: boss
+                      telegraph: 1
 
               # Ramuh
               - label: Ramuh
-                repeat: 5
-                endDelay: 500
                 item:
-                  name: aoe-disc
-                  yalms: 14.325
-                  duration: 2000
+                  name: aoe-group
+                  duration: 4200
                   positionType: arena
+                  telegraph: 0.5
+                  aoes:
+                    - name: aoe-disc
+                      yalms: 14.325
+                    - name: tether
+                      from: ramuh
+                      to: boss
+                      telegraph: 1
 
               # Leviathan
               - label: Leviathan
-                repeat: 5
-                endDelay: 500
                 item:
                   name: aoe-group
-                  outerRadius: 28.971145000000003
+                  outerRadius: 30
                   innerRadius: 0
                   thetaLength: pi / 2
                   angle: 180
-                  duration: 2000
+                  duration: 4200
                   positionType: arena
+                  telegraph: 0.5
                   aoes:
                     - name: aoe-ring
                       direction: 0
                       position:
-                        - 6.25
+                        - 0.124
                         - 0
                     - name: aoe-ring
                       direction: 180
                       position:
-                        - -6.25
+                        - -0.124
                         - 0
+                    - name: tether
+                      from: leviathan
+                      to: boss
+                      telegraph: 1

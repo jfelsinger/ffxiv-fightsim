@@ -3,6 +3,7 @@ varying vec2 vuv;
 varying vec3 vPos;
 uniform sampler2D textureSampler;
 uniform float elapsed;
+uniform float telegraph;
 uniform vec3 color;
 varying float arenaDistance;
 
@@ -45,6 +46,7 @@ void main(void) {
     float b = clamp((color.b) - (adj * 0.25), 0.0, 1.0);
     alpha = max(0.20, alpha);
     alpha *= step(arenaDistance, 1.0);
+    alpha *= step(1.0 - elapsed, telegraph);
 
     gl_FragColor = vec4(r, g, b, alpha);
 }

@@ -101,7 +101,10 @@ export class AoeRingEffect extends Effect {
     makeAoe() {
         const ringMat = createAoeMat(this.scene, Bab.Color3.FromInts(255, 150, 20), 'ringMat');
         ringMat.alpha = 0.7;
-        ringMat.setFloat('arenaRadius', yalmsToM(33.35 * 0.86868 * 1.01))
+        if (this.collection.arena) {
+            ringMat.setFloat('arenaRadius', this.collection.arena.size / 2);
+        }
+        ringMat.setFloat('telegraph', this.telegraph);
         this.clock.on('tick', (time) => {
             ringMat.setFloat('time', time);
             ringMat.setFloat('elapsed', this.getDurationPercent());

@@ -8,7 +8,10 @@ import {
     isScheduled,
 } from './scheduled';
 
-import { Fight } from './fight';
+import {
+    Fight,
+    fightsCollection
+} from './fights';
 
 import {
     FightSection,
@@ -168,9 +171,15 @@ export function decodeScheduledFightSection(data: any, options: FightDecodeOptio
 export function decodeFight(data: any, options: FightDecodeOptions) {
     data = tryParse(data);
 
+    let fightClass = Fight;
+    let fightClassName: string = data.name;
+    if (fightClassName && (fightsCollection as any)[fightClassName]) {
+        fightClass = (fightsCollection as any)[fightClassName] as typeof Fight;
+    }
+
     const sections = data?.sections?.map((section: any) => decodeScheduledFightSection(section, options)) || [];
 
-    return new Fight({
+    return new fightClass({
         ...options,
         ...data,
         sections,
