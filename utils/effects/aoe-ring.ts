@@ -100,7 +100,8 @@ export class AoeRingEffect extends Effect {
     }
 
     makeAoe() {
-        const ringMat = createAoeMat(this.scene, Bab.Color3.FromInts(255, 150, 20), 'ringMat');
+        // const ringMat = createAoeMat(this.scene, Bab.Color3.FromInts(255, 150, 20), 'ringMat');
+        const ringMat = createAoeMat(this.scene, this.getColor(), 'ringMat');
         ringMat.alpha = 0.7;
         if (this.collection.arena) {
             ringMat.setFloat('arenaRadius', this.collection.arena.size / 2);

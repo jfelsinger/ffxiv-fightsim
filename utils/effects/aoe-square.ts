@@ -33,7 +33,7 @@ export class AoeSquareEffect extends Effect {
     }
 
     makeAoe() {
-        const squareMat = createAoeMat(this.scene, Bab.Color3.FromInts(255, 150, 20), 'squareMat');
+        const squareMat = createAoeMat(this.scene, this.getColor(), 'squareMat');
         squareMat.alpha = 0.7;
 
         const globalTelegraph = useState<number>('telegraph', () => 1.0);

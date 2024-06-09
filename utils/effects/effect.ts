@@ -23,6 +23,7 @@ export type EffectPositionType = PositionType;
 
 export type EffectOptions = {
     label?: string
+    color?: string
     duration: number | string
     collection: FightCollection
     clock?: Clock
@@ -42,6 +43,7 @@ export class Effect extends EventEmitter {
     label?: string;
     clock: Clock
     collection: FightCollection;
+    color?: string;
     isActive: boolean = false;
 
     duration: number;
@@ -56,6 +58,29 @@ export class Effect extends EventEmitter {
     options: EffectOptions;
 
     get scene() { return this.collection.scene; }
+
+    setColor(color: string) {
+        this.color = color;
+    }
+
+    getColor() {
+        if (this.color) {
+            if (this.color.startsWith('#')) {
+                return Bab.Color3.FromHexString(this.color);
+            } else if (this.color.includes(',')) {
+                const entries = this.color.split(',').map(_ => +_);
+                if (entries.length === 3) {
+                    if (entries.every((e) => e <= 1)) {
+                        return new Bab.Color3(entries[0], entries[1], entries[2]);
+                    } else {
+                        return Bab.Color3.FromInts(entries[0], entries[1], entries[2]);
+                    }
+                }
+            }
+        }
+
+        return Bab.Color3.FromInts(255, 150, 20);
+    }
 
     getTargets() {
     }
@@ -74,6 +99,7 @@ export class Effect extends EventEmitter {
         this.duration = parseNumber(options.duration ?? 0);
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
+        this.color = options.color;
         this.repeatTarget = options.repeatTarget ?? false;
 
         if (Array.isArray(options.target)) {
