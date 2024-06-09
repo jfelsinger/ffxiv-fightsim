@@ -6,6 +6,7 @@ import {
 import { Fight, } from '../utils/fights';
 import { FightSection } from '../utils/sections';
 import { decodeFight } from '../utils/decode-fight';
+import type { NuxtLink } from '#build/components';
 
 const emit = defineEmits<{
     (e: 'update', value: Fight): void,
@@ -284,6 +285,11 @@ function updateTime(val: number) {
                         <button @click="reset()" class="tooltip tooltip-right px-2" data-tip="Restart Fight">
                             <Icon name="solar:refresh-bold" />
                         </button>
+                    </li>
+                    <li>
+                        <NuxtLink to="/" class="tooltip tooltip-right px-2" data-tip="Home">
+                            <Icon name="solar:home-2-broken" />
+                        </NuxtLink>
                     </li>
                 </ul>
             </div>

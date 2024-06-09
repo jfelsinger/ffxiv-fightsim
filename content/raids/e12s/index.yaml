@@ -1,83 +1,102 @@
 name: e12s
 scheduling: sequential
+startPosition: 0,-0.35
+startPositionType: arena
 arena:
   name: e12s-arena
   yalms: 58
   floorType: e12s
 sections:
-  - item:
+  - startDelay: 500
+    item:
       name: test-section
       scheduling: sequential
       mechanics:
-        - item:
-            name: test-mechanic
-            scheduling: parallel
+        - repeat: 5
+          startDelay: 500
+          endDelay: 2500
+          item:
+            name: primal-combinations
+            duration: 5600
+            telegraph: 0.5
             effects:
-              - repeat: 5
-                endDelay: 500
+              # Ifrit
+              - label: Ifrit
                 item:
-                  outerRadius: 28.971145000000003
+                  name: aoe-group
+                  outerRadius: 30
                   innerRadius: 0
                   thetaLength: pi / 2
                   angle: 152
-                  direction: -90
-                  duration: 2000
-                  name: aoe-ring
                   positionType: arena
-              - repeat: 5
-                endDelay: 500
+                  aoes:
+                    - name: aoe-ring
+                      direction: -90
+                    - name: aoe-ring
+                      direction: 90
+                    - name: tether
+                      from: ifrit
+                      to: boss
+                      telegraph: 1
+
+              # Garuda
+              - label: Garuda
                 item:
-                  outerRadius: 28.971145000000003
+                  name: aoe-group
+                  outerRadius: 30
                   innerRadius: 0
                   thetaLength: pi / 2
-                  angle: 152
-                  direction: 90
-                  duration: 2000
-                  name: aoe-ring
-                  positionType: arena
-              - repeat: 5
-                endDelay: 500
-                item:
-                  outerRadius: 28.971145000000003
-                  innerRadius: 0
-                  thetaLength: pi / 2
-                  angle: 45
+                  angle: 45.5
                   direction: -90
-                  duration: 2000
-                  name: aoe-ring
                   positionType: arena
-              - repeat: 5
-                endDelay: 500
+                  aoes:
+                    - name: aoe-ring
+                      direction: -90
+                    - name: aoe-ring
+                      direction: 0
+                    - name: aoe-ring
+                      direction: 90
+                    - name: aoe-ring
+                      direction: 180
+                    - name: tether
+                      from: garuda
+                      to: boss
+                      telegraph: 1
+
+              # Ramuh
+              - label: Ramuh
                 item:
-                  yalms: 14.325
-                  duration: 2000
-                  name: aoe-disc
+                  name: aoe-group
                   positionType: arena
-              - repeat: 5
-                endDelay: 500
+                  aoes:
+                    - name: aoe-disc
+                      yalms: 14.325
+                    - name: tether
+                      from: ramuh
+                      to: boss
+                      telegraph: 1
+
+              # Leviathan
+              - label: Leviathan
                 item:
-                  outerRadius: 28.971145000000003
+                  name: aoe-group
+                  outerRadius: 30
                   innerRadius: 0
                   thetaLength: pi / 2
                   angle: 180
-                  direction: 0
-                  duration: 2000
-                  name: aoe-ring
-                  position:
-                    - 6.25
-                    - 0
                   positionType: arena
-              - repeat: 5
-                endDelay: 500
-                item:
-                  outerRadius: 28.971145000000003
-                  innerRadius: 0
-                  thetaLength: pi / 2
-                  angle: 180
-                  direction: 180
-                  duration: 2000
-                  name: aoe-ring
-                  position:
-                    - -6.25
-                    - 0
-                  positionType: arena
+                  aoes:
+                    - name: aoe-ring
+                      direction: 0
+                      position:
+                        - 0.124
+                        - 0
+                    - name: aoe-ring
+                      direction: 180
+                      position:
+                        - -0.124
+                        - 0
+                    - name: tether
+                      from: leviathan
+                      to: boss
+                      telegraph: 1
