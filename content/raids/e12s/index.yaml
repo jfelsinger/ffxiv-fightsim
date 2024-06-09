@@ -24,6 +24,7 @@ sections:
               - label: Ifrit
                 item:
                   name: aoe-group
+                  color: 199,42,45
                   outerRadius: 30
                   innerRadius: 0
                   thetaLength: pi / 2
@@ -43,6 +44,7 @@ sections:
               - label: Garuda
                 item:
                   name: aoe-group
+                  color: 64,229,90
                   outerRadius: 30
                   innerRadius: 0
                   thetaLength: pi / 2
@@ -68,6 +70,7 @@ sections:
                 item:
                   name: aoe-group
                   positionType: arena
+                  color: 43,40,255
                   aoes:
                     - name: aoe-disc
                       yalms: 14.325
@@ -80,6 +83,7 @@ sections:
               - label: Leviathan
                 item:
                   name: aoe-group
+                  color: 9,180,219
                   outerRadius: 30
                   innerRadius: 0
                   thetaLength: pi / 2
