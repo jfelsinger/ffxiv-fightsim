@@ -68,7 +68,14 @@ export default defineNuxtConfig({
                 plugins: ['duration'],
             }
         ],
-        '@nuxt/content',
+        [
+            '@nuxt/content',
+            {
+                markdown: {
+                    anchorLinks: false
+                },
+            },
+        ],
         '@nuxt/image',
     ]
 })

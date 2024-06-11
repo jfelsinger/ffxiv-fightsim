@@ -19,6 +19,7 @@ import { vectorAngle } from '../utils/vector-helpers';
 
 const props = defineProps<{
     fightData?: any,
+    infoData?: any,
     showUi?: boolean,
     skipCharacter?: boolean,
 }>();
@@ -328,7 +329,7 @@ function onScaleTime(value: number) {
 <template>
     <div id="game" class="relative max-w-screen max-h-screen overflow-hidden h-screen game --babylon"
         :class="{ '--is-hit': isHit }">
-        <FightUi @scale-time="onScaleTime" @reset-position="onResetPosition" @update="onFightUpdate"
+        <FightUi @scale-time="onScaleTime" @reset-position="onResetPosition" @update="onFightUpdate" :info="infoData"
             v-if="showUi && currentFight" :fight="currentFight" />
 
         <Minimap v-if="showUi" />

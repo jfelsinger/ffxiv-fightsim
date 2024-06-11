@@ -16,9 +16,10 @@ const emit = defineEmits<{
     (e: 'scale-time', val: number): void,
 }>();
 
-const props = defineProps({
+const props = defineProps<{
     fight: Fight,
-});
+    info?: any,
+}>();
 
 const isPaused = ref(true);
 
@@ -212,6 +213,7 @@ onBeforeUnmount(() => {
 function updateTime(val: number) {
     emit('scale-time', val);
 }
+
 </script>
 
 <template>
@@ -286,6 +288,11 @@ function updateTime(val: number) {
                             <Icon name="solar:refresh-bold" />
                         </button>
                     </li>
+                    <li v-if="info">
+                        <button @click="open('info')" class="tooltip tooltip-right px-2" data-tip="Info">
+                            <Icon name="solar:info-circle-linear" />
+                        </button>
+                    </li>
                     <li>
                         <NuxtLink to="/" class="tooltip tooltip-right px-2" data-tip="Home">
                             <Icon name="solar:home-2-broken" />
@@ -294,6 +301,25 @@ function updateTime(val: number) {
                 </ul>
             </div>
 
+            <div class="fight__drawer-side mt-2 ml-[4.125rem] max-w-md min-w-[20rem]" v-if="info"
+                :class="{ '--open': openSide === 'info' }">
+                <div
+                    class="rounded-box shadow-xl p-3 py-3 pr-0 bg-slate-100 collapse clip-collapse collapse-arrow w-full max-w-md min-w-[20rem] relative">
+                    <button @click="open('')" class="absolute right-0 top-0 p-3 z-[1]">
+                        <Icon name="solar:close-circle-line-duotone" />
+                    </button>
+                    <div class="prose text-sm m-1">
+                        <h2 class="font-normal text-sm text-slate-600 opacity-90 pr-4 mb-1">{{ info.raid }}</h2>
+                        <h1 class="font-normal text-2xl pr-4 mb-1">
+                            <span v-if="info.category">{{ info.category }},</span>
+                            {{ info.title }}
+                        </h1>
+                        <div class="max-h-[80vh] overflow-y-auto pr-3">
+                            <ContentRenderer :value="info" />
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="fight__drawer-side mt-2 ml-[4.125rem] max-w-md min-w-[20rem]"
                 :class="{ '--open': openSide === 'ui' }">
                 <div
