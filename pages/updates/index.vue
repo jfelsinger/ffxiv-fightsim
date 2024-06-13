@@ -1,4 +1,11 @@
 <script setup lang="ts">
+useHead({
+    title: 'Updates | XIV FIGHTSIM',
+    meta: [
+        { name: 'description', content: 'Recent announcements, changelogs, and other updates about XIV FIGHTSIM', },
+    ],
+});
+
 import type { QueryBuilderParams } from '@nuxt/content/types';
 const query: QueryBuilderParams = {
     path: '/updates',
