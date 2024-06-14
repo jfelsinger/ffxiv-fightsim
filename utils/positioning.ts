@@ -7,6 +7,7 @@ import { easingFunctions } from './easing';
 export type PositionType =
     | 'arena'
     | 'global'
+    | 'effect'
     | 'mesh'
     | 'character';
 
@@ -27,6 +28,13 @@ export function getPositionVector(position: PositionOption | undefined, position
 
             const character = collection.characters[positionValue as any];
             if (character?.position) { return character.position.clone(); }
+        } else if (positionType === 'effect') {
+            const effect = collection.activeEffects[positionValue as any];
+            if (effect?.getPosition) { return effect.getPosition(); }
+            if (effect?.mesh?.position) { return effect?.mesh?.position?.clone(); }
+
+            const mesh = collection.scene.getMeshByName(positionValue);
+            if (mesh) { return mesh.position.clone(); }
         } else if (positionType === 'character') {
             const character = collection.characters[positionValue as any];
             if (character?.position) { return character.position.clone(); }

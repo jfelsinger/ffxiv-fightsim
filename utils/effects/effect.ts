@@ -290,6 +290,7 @@ export class Effect extends EventEmitter {
 
     async startup() {
         this.isActive = true;
+        this.collection.addActiveEffect(this);
     }
 
     async cleanup() {

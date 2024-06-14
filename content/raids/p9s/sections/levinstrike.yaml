@@ -17,9 +17,20 @@ sections:
             name: levinstrike
             telegraph: 1.0
             effects:
-              - label: Test
+              - Label: Halfway
+                startDelay: 300
                 item:
                   duration: 1000
+                  name: aoe-disc
+                  color: 180,219,9
+                  yalms: 5
+                  # followPosition: true
+                  positionType: effect
+                  position: moving-aoe
+              - label: Test
+                item:
+                  label: moving-aoe
+                  duration: 2000
                   name: aoe-disc
                   color: 9,180,219
                   yalms: 5
@@ -33,5 +44,5 @@ sections:
                   color: 180,9,219
                   yalms: 5
                   followPosition: true
-                  positionType: character
-                  position: player
+                  positionType: effect
+                  position: moving-aoe

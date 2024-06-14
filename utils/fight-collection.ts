@@ -2,6 +2,7 @@ import * as Bab from '@babylonjs/core';
 import { Clock } from './clock';
 import { Character } from './character';
 import { Arena } from '../utils/arenas/arena';
+import { Effect } from './effects';
 
 export type CharacterName =
     | 'player'
@@ -17,6 +18,7 @@ export type FightCollectionOptions = {
 
 export class FightCollection {
     characters: Partial<Record<CharacterName, Character>> = {};
+    activeEffects: Partial<Record<string, Effect>> = {};
     scene: Bab.Scene;
     worldClock: Clock;
     playerClock: Clock;
@@ -36,6 +38,13 @@ export class FightCollection {
         name = name || (character.name as CharacterName);
         if (name) {
             this.characters[name] = character;
+        }
+    }
+
+    addActiveEffect(effect: Effect, label?: string) {
+        label = label || effect.label || effect.name || effect?.mesh?.name;
+        if (label) {
+            this.activeEffects[label] = effect;
         }
     }
 
