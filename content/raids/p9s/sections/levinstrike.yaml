@@ -2,7 +2,7 @@ name: p9s
 startPosition: 0,-0.35
 startPositionType: arena
 arena:
-  yalms: 58
+  yalms: 60
   floorType: p9s
 sections:
   - startDelay: 500

@@ -2,6 +2,7 @@ import * as Bab from '@babylonjs/core';
 import { GridMaterial } from '@babylonjs/materials';
 import { yalmsToM } from '../conversions';
 import { default as createPolarGrid } from '../../materials/polarGrid';
+import { default as createP9SGrid } from '../../materials/p9s';
 
 export const arenaMats = {
     'default': arenaGridMat,
@@ -9,6 +10,8 @@ export const arenaMats = {
     'image': imageArenaMat,
     'e12s': e12sArenaMat,
     'p9s': p9sArenaMat,
+    'polar': polarArenaMat,
+    'polar-grid': polarArenaMat,
 } as const;
 
 export function arenaGridMat(scene: Bab.Scene) {
@@ -41,8 +44,13 @@ export function e12sArenaMat(scene: Bab.Scene) {
     return mat;
 }
 
-export function p9sArenaMat(scene: Bab.Scene) {
+export function polarArenaMat(scene: Bab.Scene) {
     const mat = createPolarGrid(scene);
+    return mat;
+}
+
+export function p9sArenaMat(scene: Bab.Scene) {
+    const mat = createP9SGrid(scene);
     return mat;
 }
 
