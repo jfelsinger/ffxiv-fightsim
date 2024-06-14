@@ -9,7 +9,13 @@ export type PositionType =
     | 'global'
     | 'effect'
     | 'mesh'
+    | 'target'
     | 'character';
+
+export type PositionTarget = {
+    position?: Bab.Vector3
+    getPosition?: () => Bab.Vector3
+}
 
 export type PositionOption =
     | Bab.Vector3
@@ -18,11 +24,23 @@ export type PositionOption =
     | string
     | (() => Bab.Vector3 | (string[]) | (number[]) | string)
 
-export function getPositionVector(position: PositionOption | undefined, positionType: PositionType | undefined, collection: FightCollection) {
+export function getPositionVector(
+    position: PositionOption | undefined,
+    positionType: PositionType | undefined,
+    collection: FightCollection,
+    target?: PositionTarget
+) {
     let positionValue = typeof (position) === 'function' ? position() : position;
 
     if (typeof positionValue === 'string') {
-        if (positionType === 'mesh') {
+        if (positionType === 'target') {
+            if (target?.position) {
+                return target.position.clone();
+            }
+            if (target?.getPosition) {
+                return target.getPosition();
+            }
+        } else if (positionType === 'mesh') {
             const mesh = collection.scene.getMeshByName(positionValue);
             if (mesh) { return mesh.position.clone(); }
 
@@ -69,8 +87,8 @@ export function getPositionVector(position: PositionOption | undefined, position
     return positionValue?.clone() || Bab.Vector3.Zero();
 }
 
-export function getPosition(position: PositionOption | undefined, positionType: PositionType | undefined, collection: FightCollection) {
-    let vec = getPositionVector(position, positionType, collection);
+export function getPosition(position: PositionOption | undefined, positionType: PositionType | undefined, collection: FightCollection, target?: PositionTarget) {
+    let vec = getPositionVector(position, positionType, collection, target);
 
     if (positionType === 'arena') {
         vec = getArenaPosition(vec, collection);
@@ -86,7 +104,8 @@ export function getInterpolatedPosition(options: {
     steps?: number[],
     easing?: string,
     value: number,
-    collection: FightCollection
+    collection: FightCollection,
+    target?: PositionTarget,
 }) {
     let {
         positions,
@@ -96,6 +115,7 @@ export function getInterpolatedPosition(options: {
         steps,
         value,
         collection,
+        target,
     } = options;
 
     if (easing && easing !== 'linear') {
@@ -110,7 +130,7 @@ export function getInterpolatedPosition(options: {
         return getPosition(
             positions && positions[0],
             (positionTypes ? positionTypes[0] : positionType) || positionType,
-            collection
+            collection, target
         )
     }
 
@@ -134,13 +154,13 @@ export function getInterpolatedPosition(options: {
     const startValue = steps[currentStepIndex - 1] || 0;
     const startPosition = positions[currentStepIndex - 1];
     const startPositionType = (positionTypes ? positionTypes[currentStepIndex - 1] : positionType) || positionType;
-    const start = getPosition(startPosition, startPositionType, collection)
+    const start = getPosition(startPosition, startPositionType, collection, target)
     // console.log('start: ', startPosition, startPositionType);
 
     const endValue = steps[currentStepIndex];
     const endPosition = positions[currentStepIndex];
     const endPositionType = (positionTypes ? positionTypes[currentStepIndex] : positionType) || positionType;
-    const end = getPosition(endPosition, endPositionType, collection)
+    const end = getPosition(endPosition, endPositionType, collection, target)
     // console.log('end: ', endPosition, endPositionType);
 
     // console.log(`interpolate: from ${startValue} to ${endValue}: `, startValue, value);

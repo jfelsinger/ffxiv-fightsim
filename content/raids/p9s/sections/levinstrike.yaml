@@ -25,7 +25,8 @@ sections:
                   usePlayerTick: true
                   label: levin-dice
                   followPosition: true
-                  positionType: character
+                  target: player
+                  positionType: target
                   position: player
 
               - label: Halfway

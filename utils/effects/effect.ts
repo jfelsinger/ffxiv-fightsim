@@ -19,7 +19,8 @@ export type EffectTargetType =
     | 'tank' | 'healer' | 'dps';
 
 export type EffectTarget =
-    | EffectTargetType | Bab.Mesh;
+    // | Bab.Mesh
+    | EffectTargetType;
 
 export type EffectPositionType = PositionType;
 
@@ -29,7 +30,7 @@ export type EffectOptions = {
     duration: number | string
     collection: FightCollection
     clock?: Clock
-    usePlayerTick?: boolean;
+    usePlayerTick?: boolean
     telegraph?: number
 
     target?: EffectTarget | (EffectTarget[])
@@ -169,6 +170,7 @@ export class Effect extends EventEmitter {
     }
 
     getPosition(value?: number): Bab.Vector3 {
+        const target = this.getTarget('player')
         if (this.scheduledParent?.scheduled?.item) {
             if (this.position === 'parent') {
                 return this.scheduledParent.scheduled.item.getPosition();
@@ -191,19 +193,20 @@ export class Effect extends EventEmitter {
                 value: value ?? this.getDurationPercent(),
                 easing: this.easing,
                 collection: this.collection,
+                target
             });
         }
 
         return getPosition(
             this.position,
             this.positionType,
-            this.collection
+            this.collection,
+            target
         )
     }
 
     updatePosition(value?: number) {
         if ((this.positions || this.followPosition) && this.mesh) {
-            console.log('update position...');
             const { x, z } = this.getPosition(value);
             const y = this.mesh.position.y;
             this.mesh.position.set(x, y, z);
