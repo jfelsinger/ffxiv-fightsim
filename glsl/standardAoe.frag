@@ -1,5 +1,5 @@
 precision highp float;
-varying vec2 vuv;
+varying vec2 vUV;
 varying vec3 vPos;
 uniform sampler2D textureSampler;
 uniform vec3 color;
@@ -11,7 +11,7 @@ void main(void) {
     // gl_FragColor = texture2D(textureSampler, vUV);
 
     float distCenter = 0.0;
-    distCenter = distance(vuv.xy, vec2(0.5));
+    distCenter = distance(vUV.xy, vec2(0.5));
 
     // float alpha = distCenter;
     float alpha = 0.0;
@@ -19,15 +19,15 @@ void main(void) {
 
     float borderWidth = 0.015;
     float borderOpacity = 0.45;
-    // alpha = clamp(alpha + smoothstep(borderWidth, borderWidth - 0.001, vuv.x) * borderOpacity, 0.0, 1.0);
-    // alpha = clamp(alpha + smoothstep(1.0 - borderWidth, 1.001 - borderWidth, vuv.x) * borderOpacity, 0.0, 1.0);
-    // alpha = clamp(alpha + smoothstep(borderWidth, borderWidth - 0.001, vuv.y) * borderOpacity, 0.0, 1.0);
-    // alpha = clamp(alpha + smoothstep(1.0 - borderWidth, 1.001 - borderWidth, vuv.y) * borderOpacity, 0.0, 1.0);
+    // alpha = clamp(alpha + smoothstep(borderWidth, borderWidth - 0.001, vUV.x) * borderOpacity, 0.0, 1.0);
+    // alpha = clamp(alpha + smoothstep(1.0 - borderWidth, 1.001 - borderWidth, vUV.x) * borderOpacity, 0.0, 1.0);
+    // alpha = clamp(alpha + smoothstep(borderWidth, borderWidth - 0.001, vUV.y) * borderOpacity, 0.0, 1.0);
+    // alpha = clamp(alpha + smoothstep(1.0 - borderWidth, 1.001 - borderWidth, vUV.y) * borderOpacity, 0.0, 1.0);
 
-    alpha = clamp(alpha + smoothstep(borderWidth, borderWidth - 0.001, vuv.x), 0.0, 1.0);
-    alpha = clamp(alpha + smoothstep(1.0 - borderWidth, 1.001 - borderWidth, vuv.x), 0.0, 1.0);
-    alpha = clamp(alpha + smoothstep(borderWidth, borderWidth - 0.001, vuv.y), 0.0, 1.0);
-    alpha = clamp(alpha + smoothstep(1.0 - borderWidth, 1.001 - borderWidth, vuv.y), 0.0, 1.0);
+    alpha = clamp(alpha + smoothstep(borderWidth, borderWidth - 0.001, vUV.x), 0.0, 1.0);
+    alpha = clamp(alpha + smoothstep(1.0 - borderWidth, 1.001 - borderWidth, vUV.x), 0.0, 1.0);
+    alpha = clamp(alpha + smoothstep(borderWidth, borderWidth - 0.001, vUV.y), 0.0, 1.0);
+    alpha = clamp(alpha + smoothstep(1.0 - borderWidth, 1.001 - borderWidth, vUV.y), 0.0, 1.0);
     alpha *= borderOpacity;
     // alpha = step(0.5, 1.0 - distCenter); // Outer ring
     alpha = clamp(alpha + distCenter, 0.0, 1.0);
@@ -36,14 +36,14 @@ void main(void) {
 
     // Crosshairs
     // alpha = mix(alpha, 1.0,
-    //         smoothstep(0.5 - wdt, 0.5, vuv.y) -
-    //             smoothstep(0.5, 0.5 + wdt, vuv.y));
+    //         smoothstep(0.5 - wdt, 0.5, vUV.y) -
+    //             smoothstep(0.5, 0.5 + wdt, vUV.y));
     // alpha = mix(alpha, 0.8,
-    //         smoothstep(0.5 - wdt, 0.5, vuv.x) -
-    //             smoothstep(0.5, 0.5 + wdt, vuv.x));
+    //         smoothstep(0.5 - wdt, 0.5, vUV.x) -
+    //             smoothstep(0.5, 0.5 + wdt, vUV.x));
 
     // Fade across X-axis
-    // alpha *= smoothstep(0.0, 1.0, vuv.x);
+    // alpha *= smoothstep(0.0, 1.0, vUV.x);
     // float a2 = step(0.4, 0.8 - distCenter);
 
     // gl_FragColor = vec4(0.2, 0.6, 1.0, alpha);

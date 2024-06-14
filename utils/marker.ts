@@ -3,19 +3,9 @@ import type { PositionType, PositionOption } from './positioning';
 import { getPosition } from './positioning';
 import { Fight } from './fights';
 
-export type MarkerTypes =
-    | '1'
-    | '2'
-    | '3'
-    | '4'
-    | 'a'
-    | 'b'
-    | 'c'
-    | 'd'
-
 export type MarkerOptions = {
     name?: string
-    markerType: MarkerTypes
+    label: string
     position: PositionOption
     positionType: PositionType
 }
@@ -37,7 +27,7 @@ export class Marker {
 
     createMesh() {
         const mesh = new Bab.Mesh(
-            `${this.options.name || 'marker'}-${this.options.markerType}`,
+            `${this.options.name || 'marker'}-${this.options.label}`,
             this.fight.collection.scene
         )
 

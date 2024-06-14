@@ -5,7 +5,7 @@ attribute vec2 uv;
 
 uniform mat4 viewProjection;
 
-varying vec2 vuv;
+varying vec2 vUV;
 varying vec3 vPos;
 varying float iid;
 
@@ -21,5 +21,5 @@ void main(void) {
     vPos = (viewProjection * finalWorld * vec4(position, 1.0)).xyz;
     gl_Position = viewProjection * finalWorld * vec4(position, 1.0);
 
-    vuv = uv;
+    vUV = uv;
 }

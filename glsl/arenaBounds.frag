@@ -1,5 +1,5 @@
 precision highp float;
-varying vec2 vuv;
+varying vec2 vUV;
 varying vec3 vPos;
 uniform sampler2D textureSampler;
 uniform vec3 color;
@@ -40,7 +40,7 @@ vec3 waterCaustics(vec2 uv) {
 void main(void) {
     // gl_FragColor = texture2D(textureSampler, vUV);
 
-    vec2 st = vuv.xy;
+    vec2 st = vUV.xy;
     float distCenter = 0.0;
     distCenter = distance(st.xy, vec2(0.5));
 
@@ -60,14 +60,14 @@ void main(void) {
 
     // Crosshairs
     // alpha = mix(alpha, 1.0,
-    //         smoothstep(0.5 - wdt, 0.5, vuv.y) -
-    //             smoothstep(0.5, 0.5 + wdt, vuv.y));
+    //         smoothstep(0.5 - wdt, 0.5, vUV.y) -
+    //             smoothstep(0.5, 0.5 + wdt, vUV.y));
     // alpha = mix(alpha, 0.8,
-    //         smoothstep(0.5 - wdt, 0.5, vuv.x) -
-    //             smoothstep(0.5, 0.5 + wdt, vuv.x));
+    //         smoothstep(0.5 - wdt, 0.5, vUV.x) -
+    //             smoothstep(0.5, 0.5 + wdt, vUV.x));
 
     // Fade across X-axis
-    // alpha *= smoothstep(0.0, 1.0, vuv.x);
+    // alpha *= smoothstep(0.0, 1.0, vUV.x);
     // float a2 = step(0.4, 0.8 - dist);
 
     vec3 caustic = waterCaustics(st);
@@ -81,5 +81,5 @@ void main(void) {
 
     // gl_FragColor = vec4(vec3(dist, 1.0, 1.0), 1.0);
     // gl_FragColor = vec4(vec3(st.x, 1.0, 0.0), dist);
-    // gl_FragColor = vec4(vec3(vuv.y, vuv.x, 0.0), alpha);
+    // gl_FragColor = vec4(vec3(vUV.y, vUV.x, 0.0), alpha);
 }

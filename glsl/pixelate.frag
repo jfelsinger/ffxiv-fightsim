@@ -11,17 +11,17 @@ void main(void) {
 // uniform vec4 resolution;
 // uniform float normalEdgeStrength;
 // uniform float depthEdgeStrength;
-// varying vec2 vUv;
+// varying vec2 vUV;
 //
 // float getDepth(int x, int y) {
 //
-//     return texture2D( tDepth, vUv + vec2(x, y) * resolution.zw ).r;
+//     return texture2D( tDepth, vUV + vec2(x, y) * resolution.zw ).r;
 //
 // }
 //
 // vec3 getNormal(int x, int y) {
 //
-//     return texture2D( tNormal, vUv + vec2(x, y) * resolution.zw ).rgb * 2.0 - 1.0;
+//     return texture2D( tNormal, vUV + vec2(x, y) * resolution.zw ).rgb * 2.0 - 1.0;
 //
 // }
 //
@@ -68,7 +68,7 @@ void main(void) {
 //
 // void main() {
 //
-//     vec4 texel = texture2D( tDiffuse, vUv );
+//     vec4 texel = texture2D( tDiffuse, vUV );
 //
 //     float depth = 0.0;
 //     vec3 normal = vec3(0.0);

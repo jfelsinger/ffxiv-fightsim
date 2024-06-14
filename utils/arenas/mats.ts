@@ -1,12 +1,14 @@
 import * as Bab from '@babylonjs/core';
 import { GridMaterial } from '@babylonjs/materials';
 import { yalmsToM } from '../conversions';
+import { default as createPolarGrid } from '../../materials/polarGrid';
 
 export const arenaMats = {
     'default': arenaGridMat,
     'grid': arenaGridMat,
     'image': imageArenaMat,
     'e12s': e12sArenaMat,
+    'p9s': p9sArenaMat,
 } as const;
 
 export function arenaGridMat(scene: Bab.Scene) {
@@ -36,6 +38,11 @@ export function e12sArenaMat(scene: Bab.Scene) {
     })
     mat.diffuseTexture!.hasAlpha = true;
     mat.specularColor = new Bab.Color3(0, 0, 0.05);
+    return mat;
+}
+
+export function p9sArenaMat(scene: Bab.Scene) {
+    const mat = createPolarGrid(scene);
     return mat;
 }
 

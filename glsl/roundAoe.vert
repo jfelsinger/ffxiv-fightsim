@@ -6,7 +6,7 @@ attribute vec2 uv;
 uniform mat4 viewProjection;
 uniform float arenaRadius;
 
-varying vec2 vuv;
+varying vec2 vUV;
 varying vec3 vPos;
 varying float iid;
 varying float arenaDistance;
@@ -24,5 +24,5 @@ void main(void) {
     gl_Position = viewProjection * finalWorld * vec4(position, 1.0);
     arenaDistance = length(finalWorld * vec4(position, 1.0)) / arenaRadius;
 
-    vuv = uv;
+    vUV = uv;
 }
