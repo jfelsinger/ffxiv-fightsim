@@ -3,7 +3,7 @@ const route = useRoute();
 console.log('Route, [raid]/[section]: ', route.fullPath, route.params.raid, route.params.section);
 const { data } = await useFightContent();
 const fightData = data.value?.fight;
-console.log('info: ', data.value?.info);
+console.log('info: ', fightData, data.value?.info);
 </script>
 <template>
     <div class="overflow-hidden max-h-screen max-w-screen h-screen relative">

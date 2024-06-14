@@ -110,12 +110,11 @@ export class AoeRingEffect extends Effect {
         const globalTelegraph = useState<number>('telegraph', () => 1.0);
         ringMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
         ringMat.setFloat('elapsed', this.getDurationPercent());
-        const onTick = (time: number) => {
+        this.on('tick', ({ time, durationPercent }) => {
             ringMat.setFloat('time', time);
             ringMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
-            ringMat.setFloat('elapsed', this.getDurationPercent());
-        }
-        this.clock.on('tick', onTick);
+            ringMat.setFloat('elapsed', durationPercent);
+        });
         this.on('dispose', () => {
             this.clock.removeListener('tick', onTick);
         });

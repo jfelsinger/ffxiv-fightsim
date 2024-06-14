@@ -6,7 +6,8 @@ import { Character } from '../character';
 import { parseNumber } from '../parse-number';
 import { getBasicValues } from '../decode-fight';
 import type { PositionType, PositionOption } from '../positioning';
-import { getPosition } from '../positioning';
+import { getPosition, getInterpolatedPosition } from '../positioning';
+import type { ScheduledParent } from '../scheduled';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:effect');
@@ -31,8 +32,13 @@ export type EffectOptions = {
     telegraph?: number
 
     target?: EffectTarget | (EffectTarget[])
-    position?: PositionOption[] | PositionOption
-    positionType?: EffectPositionType[] | EffectPositionType
+    position?: PositionOption
+    positionType?: EffectPositionType
+    followPosition?: boolean
+
+    positions?: PositionOption[]
+    easing?: string,
+    positionTypes?: EffectPositionType[]
     positionSteps?: number[]
 
     // Whether or not the same random target can be selected more than once,
@@ -41,6 +47,9 @@ export type EffectOptions = {
 }
 
 export class Effect extends EventEmitter {
+    n?: number;
+    scheduledParent?: ScheduledParent<Effect>;
+
     name: string = 'default';
     label?: string;
     clock: Clock
@@ -50,9 +59,16 @@ export class Effect extends EventEmitter {
 
     duration: number;
     target: EffectTarget[] = [];
+
     position: EffectOptions['position'];
     positionType: EffectOptions['positionType'];
-    positionSteps: EffectOptions['positionSteps'];
+    followPosition: EffectOptions['followPosition'];
+
+    positions?: EffectOptions['positions'];
+    positionTypes?: EffectOptions['positionTypes'];
+    positionSteps?: EffectOptions['positionSteps'];
+    easing?: string
+
     repeatTarget: boolean;
     telegraph: number;
 
@@ -81,22 +97,20 @@ export class Effect extends EventEmitter {
 
         this.position = options.position || Bab.Vector3.Zero();
         this.positionType = options.positionType || 'arena';
-        this.positionSteps = [];
-        // if (Array.isArray(this.position)) {
-        //     if (this.position.length <= 1) {
-        //         this.position = this.position[0] || Bab.Vector3.Zero();
-        //     }
+        this.followPosition = options.followPosition || false;
 
-        //     // By default, create an even position gradient
-        //     // position: ['0,0', '0,1']
-        //     // steps: [1.0]
-        //     //
-        //     // position: ['0,0', '0,1', '0,2']
-        //     // steps: [0.5, 1.0]
-        //     const len = this.position.length - 1;
-        //     this.positionSteps = Array(len).fill(1.0 / len);
-        // }
+        this.positions = options.positions;
+        this.positionTypes = options.positionTypes;
+        this.positionSteps = options.positionSteps;
+        this.easing = options.easing;
 
+        const onTickUpdate = (time: number) => {
+            this.tickUpdate(time);
+        };
+        this.clock.on('tick', onTickUpdate);
+        this.on('dispose', () => {
+            this.clock.off('tick', onTickUpdate);
+        });
     }
 
     setColor(color: string) {
@@ -143,12 +157,57 @@ export class Effect extends EventEmitter {
         this.telegraph = parseNumber(telegraph);
     }
 
-    getPosition(): Bab.Vector3 {
+    getPosition(value?: number): Bab.Vector3 {
+        if (this.scheduledParent?.scheduled?.item) {
+            if (this.position === 'parent') {
+                return this.scheduledParent.scheduled.item.getPosition();
+            } else if (this.position === 'parent-end') {
+                return this.scheduledParent.scheduled.item.getPosition(1.0);
+            } else if (this.position === 'parent-start') {
+                return this.scheduledParent.scheduled.item.getPosition(0.0);
+            } else if (typeof (this.position) === 'string' && this.position.startsWith('parent-')) {
+                const v = parseNumber(this.position.split('-').slice(1).join('-'));
+                return this.scheduledParent.scheduled.item.getPosition(v);
+            }
+        }
+
+        if (this.positions) {
+            return getInterpolatedPosition({
+                positions: this.positions,
+                positionTypes: this.positionTypes,
+                positionType: this.positionType,
+                steps: this.positionSteps,
+                value: value ?? this.getDurationPercent(),
+                easing: this.easing,
+                collection: this.collection,
+            });
+        }
+
         return getPosition(
             this.position,
             this.positionType,
             this.collection
         )
+    }
+
+    updatePosition(value?: number) {
+        if ((this.positions || this.followPosition) && this.mesh) {
+            console.log('update position...');
+            const { x, z } = this.getPosition(value);
+            const y = this.mesh.position.y;
+            this.mesh.position.set(x, y, z);
+        }
+    }
+
+    tickUpdate(time: number) {
+        if (this.isActive) {
+            const durationPercent = this.getDurationPercent();
+            this.updatePosition(durationPercent);
+            this.emit('tick', {
+                time,
+                durationPercent,
+            });
+        }
     }
 
     startTime: number = 0;
@@ -157,7 +216,7 @@ export class Effect extends EventEmitter {
 
     getDurationPercent() {
         const duration = this.getDuration();
-        if (!duration || !this.isActive) {
+        if (!duration || (!this.isActive && !this.startTime)) {
             return 0;
         }
 
@@ -170,7 +229,11 @@ export class Effect extends EventEmitter {
     }
 
 
-    async start() {
+    async start(n = 0, parent?: ScheduledParent<Effect>) {
+        this.n = n;
+        this.scheduledParent = parent;
+        console.log('EFFECT: ', n, parent, parent?.scheduled?.item, parent?.scheduled?.item?.position, parent?.scheduled?.item?.getPosition());
+
         this.startTime = this.clock.time;
         console.log('EFFECT START: ', this.name, this.startTime, this);
         this.emit('start');
@@ -257,6 +320,10 @@ export class Effect extends EventEmitter {
             duration: this.options.duration || this.duration,
             position: positionValue,
             positionType: this.options.positionType || this.positionType,
+
+            positions: this.options.positions,
+            positionSteps: this.options.positionSteps,
+            positionTypes: this.options.positionTypes,
         }
     }
 }

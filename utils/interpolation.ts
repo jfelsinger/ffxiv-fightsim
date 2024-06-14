@@ -10,6 +10,7 @@ export function invlerp(x: number, y: number, a: number) {
     return clamp((a - x) / (y - x));
 }
 
+// Based on A, interpolate between x2-y2, given a bounds of x1-y1
 export function rangex1(x1: number, y1: number, x2: number, y2: number, a: number) {
     return lerp(x2, y2, invlerp(x1, y1, a));
 }

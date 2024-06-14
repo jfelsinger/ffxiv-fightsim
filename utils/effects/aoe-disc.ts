@@ -57,10 +57,10 @@ export class AoeDiscEffect extends Effect {
         const globalTelegraph = useState<number>('telegraph', () => 1.0);
         discMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
         discMat.setFloat('elapsed', this.getDurationPercent());
-        this.clock.on('tick', (time) => {
+        this.on('tick', ({ time, durationPercent }) => {
             discMat.setFloat('time', time);
             discMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
-            discMat.setFloat('elapsed', this.getDurationPercent());
+            discMat.setFloat('elapsed', durationPercent);
         });
 
         const disc = Bab.MeshBuilder.CreateDisc('area', { radius: yalmsToM(this.yalms) }, this.scene);

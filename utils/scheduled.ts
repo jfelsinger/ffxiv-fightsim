@@ -1,3 +1,4 @@
+import { Clock } from './clock';
 export type ScheduleMode = 'sequential' | 'parallel';
 export type Scheduled<T> = {
     item: T
@@ -42,12 +43,18 @@ export function getScheduledDuration<T>(scheduled: Scheduled<T>, getItemDuration
     return duration;
 }
 
-export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T) => Promise<any>, clock: Clock, repeatNumber = 0) {
+export type ScheduledParent<T> = {
+    scheduled: Scheduled<T>,
+    n: number,
+    parent?: ScheduledParent<T>,
+}
+
+export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T, n: number, parent?: ScheduledParent<T>) => Promise<any>, clock: Clock, repeatNumber = 0) {
     if (scheduled.startDelay) {
         await clock.wait(scheduled.startDelay);
     }
 
-    await func(scheduled.item);
+    await func(scheduled.item, repeatNumber);
 
     if (scheduled.endDelay) {
         await clock.wait(scheduled.endDelay);
@@ -56,9 +63,17 @@ export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: 
     if (scheduled.after) {
         if (isScheduled(scheduled.after)) {
             if (scheduled.after.preStartDelay) { await wait(scheduled.after.preStartDelay); }
-            await executeScheduled(scheduled.after, func, clock)
+            await executeScheduled(
+                scheduled.after,
+                (i, n, p) => {
+                    if (p) { p.parent = { n: repeatNumber, scheduled }; }
+                    else { p = { n: repeatNumber, scheduled }; }
+                    return func(i, n, p);
+                },
+                clock,
+            )
         } else {
-            await func(scheduled.after);
+            await func(scheduled.after, repeatNumber, { n: repeatNumber, scheduled });
         }
     }
 
@@ -68,9 +83,17 @@ export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: 
         } else if (scheduled.afterRepeats) {
             if (isScheduled(scheduled.afterRepeats)) {
                 if (scheduled.afterRepeats.preStartDelay) { await wait(scheduled.afterRepeats.preStartDelay); }
-                await executeScheduled(scheduled.afterRepeats, func, clock)
+                await executeScheduled(
+                    scheduled.afterRepeats,
+                    (i, n, p) => {
+                        if (p) { p.parent = { n: repeatNumber, scheduled }; }
+                        else { p = { n: repeatNumber, scheduled }; }
+                        return func(i, n, p);
+                    },
+                    clock,
+                )
             } else {
-                await func(scheduled.afterRepeats);
+                await func(scheduled.afterRepeats, repeatNumber, { n: repeatNumber, scheduled });
             }
         }
     }

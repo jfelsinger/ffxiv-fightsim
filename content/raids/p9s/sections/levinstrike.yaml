@@ -1,0 +1,37 @@
+name: p9s
+startPosition: 0,-0.35
+startPositionType: arena
+arena:
+  yalms: 58
+  floorType: p9s
+sections:
+  - startDelay: 500
+    item:
+      name: test-section
+      scheduling: sequential
+      mechanics:
+        - repeat: 0
+          startDelay: 0
+          endDelay: 2500
+          item:
+            name: levinstrike
+            telegraph: 1.0
+            effects:
+              - label: Test
+                item:
+                  duration: 1000
+                  name: aoe-disc
+                  color: 9,180,219
+                  yalms: 5
+                  positionType: arena
+                  positions:
+                    - 0,0
+                    - 0,-1.0
+                after:
+                  duration: 15000
+                  name: aoe-disc
+                  color: 180,9,219
+                  yalms: 5
+                  followPosition: true
+                  positionType: character
+                  position: player

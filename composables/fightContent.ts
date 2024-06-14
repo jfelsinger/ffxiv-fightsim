@@ -23,7 +23,9 @@ export function useFightContent(fightParams?: Array<string>) {
 
     return useAsyncData(path, async () => {
         const fightPromise = queryContent(path).only(fightParams).findOne();
-        const infoPromise = queryContent(path + '.info').findOne()
+        const infoPromise = queryContent(path + '.info').findOne().catch((err) => {
+            console.error('info error: ', err);
+        });
 
         const result = {
             fight: await fightPromise,

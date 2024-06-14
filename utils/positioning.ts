@@ -1,6 +1,8 @@
 import * as Bab from '@babylonjs/core';
 import { FightCollection } from './fight-collection';
+import { parseNumber } from './parse-number';
 import { rangex1 } from './interpolation';
+import { easingFunctions } from './easing';
 
 export type PositionType =
     | 'arena'
@@ -69,43 +71,67 @@ export function getPosition(position: PositionOption | undefined, positionType: 
     return vec;
 }
 
-export function getInterpolatedPosition(
-    positions: PositionOption[] | undefined,
-    positionTypes: PositionType[] | undefined,
-    steps: number[] | undefined,
+export function getInterpolatedPosition(options: {
+    positions?: PositionOption[],
+    positionTypes?: PositionType[],
+    positionType?: PositionType,
+    steps?: number[],
+    easing?: string,
     value: number,
     collection: FightCollection
-) {
+}) {
+    let {
+        positions,
+        positionTypes,
+        positionType,
+        easing,
+        steps,
+        value,
+        collection,
+    } = options;
+
+    if (easing && easing !== 'linear') {
+        const easingFunc = easingFunctions[easing];
+        if (easingFunc) {
+            value = easingFunc(value);
+        }
+    }
+
     if (!positions || positions?.length <= 1) {
         console.log('Nothing to interpolate, return default positioning');
         return getPosition(
             positions && positions[0],
-            positionTypes && positionTypes[0],
+            (positionTypes ? positionTypes[0] : positionType) || positionType,
             collection
         )
     }
 
 
     if (!steps || !steps.length) {
-        const stepsLength = positions.length - 1;
+        const stepsLength = positions.length;
         steps = Array(stepsLength)
             .fill(1.0 / stepsLength)
-            .map((v, i) => v * (i + 1));
+            .map((v, i) => v * (i));
+    }
+
+    if (steps.length < 2) {
+        steps.unshift(0);
     }
 
     let currentStepIndex = steps.findIndex((v) => v >= value);
     if (currentStepIndex === -1) currentStepIndex = steps.length - 1;
+    if (currentStepIndex === 0) currentStepIndex = 1;
     // console.log('steps: ', steps, currentStepIndex);
 
     const startValue = steps[currentStepIndex - 1] || 0;
-    const startPosition = positions[currentStepIndex];
-    const startPositionType = positionTypes && positionTypes[currentStepIndex];
+    const startPosition = positions[currentStepIndex - 1];
+    const startPositionType = (positionTypes ? positionTypes[currentStepIndex - 1] : positionType) || positionType;
     const start = getPosition(startPosition, startPositionType, collection)
     // console.log('start: ', startPosition, startPositionType);
 
     const endValue = steps[currentStepIndex];
-    const endPosition = positions[currentStepIndex + 1];
-    const endPositionType = positionTypes && positionTypes[currentStepIndex + 1];
+    const endPosition = positions[currentStepIndex];
+    const endPositionType = (positionTypes ? positionTypes[currentStepIndex] : positionType) || positionType;
     const end = getPosition(endPosition, endPositionType, collection)
     // console.log('end: ', endPosition, endPositionType);
 

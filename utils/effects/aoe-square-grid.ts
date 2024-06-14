@@ -182,10 +182,10 @@ export class AoeSquareGridEffect extends AoeSquareEffect {
         const globalTelegraph = useState<number>('telegraph', () => 1.0);
         squareMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
         squareMat.setFloat('elapsed', this.getDurationPercent());
-        this.clock.on('tick', (time) => {
+        this.on('tick', ({ time, durationPercent }) => {
             squareMat.setFloat('time', time);
             squareMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
-            squareMat.setFloat('elapsed', this.getDurationPercent());
+            squareMat.setFloat('elapsed', durationPercent);
         });
 
         const size = yalmsToM(this.yalms);

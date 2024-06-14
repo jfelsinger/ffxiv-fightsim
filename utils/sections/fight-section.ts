@@ -3,6 +3,7 @@ import { EventEmitter } from 'eventemitter3';
 import { Clock } from '../clock';
 import { FightCollection } from '../fight-collection';
 import { getBasicValues } from '../decode-fight';
+import type { ScheduledParent } from '../scheduled';
 
 import {
     type ScheduleMode,
@@ -23,6 +24,9 @@ export type SectionOptions = {
 }
 
 export class FightSection extends EventEmitter {
+    n?: number;
+    scheduledParent?: ScheduledParent<FightSection>;
+
     name: string = 'default';
     label?: string;
     scheduling: ScheduleMode;
@@ -87,7 +91,10 @@ export class FightSection extends EventEmitter {
         }
     }
 
-    async execute() {
+    async execute(n = 0, parent?: ScheduledParent<FightSection>) {
+        this.n = n;
+        this.scheduledParent = parent;
+
         this.isActive = true;
         this.emit('start-execute');
 
@@ -108,7 +115,7 @@ export class FightSection extends EventEmitter {
     async executeMechanic(mechanic: Scheduled<Mechanic>) {
         this.emit('start-mechanic', { mechanic });
         if (mechanic?.preStartDelay) { await this.clock.wait(mechanic.preStartDelay); }
-        await executeScheduled(mechanic, (item) => Promise.resolve(this.isActive && item.execute()), this.clock)
+        await executeScheduled(mechanic, (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)), this.clock)
         this.emit('end-mechanic', { mechanic });
     }
 

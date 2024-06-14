@@ -1,5 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 import { Clock } from '../clock';
+import type { ScheduledParent } from '../scheduled';
 
 import {
     type ScheduleMode,
@@ -25,8 +26,11 @@ export type MechanicOptions = {
 }
 
 export class Mechanic extends EventEmitter {
+    n?: number;
+    scheduledParent?: ScheduledParent<Mechanic>;
+
     name: string = 'default';
-    label?: string
+    label?: string;
     scheduling: ScheduleMode;
     effects: Scheduled<Effect>[];
     activeEffects: Scheduled<Effect>[] = [];
@@ -103,7 +107,10 @@ export class Mechanic extends EventEmitter {
         return this.effects;
     }
 
-    async execute() {
+    async execute(n = 0, parent?: ScheduledParent<Mechanic>) {
+        this.n = n;
+        this.scheduledParent = parent;
+
         this.isActive = true;
         this.emit('start-execute');
 
@@ -126,7 +133,7 @@ export class Mechanic extends EventEmitter {
     async executeEffect(effect: Scheduled<Effect>) {
         this.emit('start-effect', { effect });
         if (effect?.preStartDelay) { await this.clock.wait(effect.preStartDelay); }
-        await executeScheduled(effect, (item) => Promise.resolve(this.isActive && item.start()), this.clock)
+        await executeScheduled(effect, (item, n, p) => Promise.resolve(this.isActive && item.start(n, p)), this.clock)
         this.emit('end-effect', { effect });
     }
 

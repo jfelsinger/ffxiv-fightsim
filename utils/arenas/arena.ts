@@ -44,7 +44,7 @@ export class Arena {
     }
 
     getPosition(vec: Bab.Vector3) {
-        const size = this.size;
+        const size = this.size / 2;
         const result = vec.multiply(new Bab.Vector3(size, 1, size));
 
         if (this?.floor?.position) {

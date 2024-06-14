@@ -143,7 +143,7 @@ export class Fight extends EventEmitter {
     async executeSection(section: Scheduled<FightSection>) {
         this.emit('start-section', { section });
         if (section?.preStartDelay) { await this.clock.wait(section.preStartDelay); }
-        await executeScheduled(section, (item) => Promise.resolve(this.isActive && item.execute()), this.clock)
+        await executeScheduled(section, (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)), this.clock)
         this.emit('end-section', { section });
     }
 
