@@ -149,12 +149,29 @@ export class Effect extends EventEmitter {
     }
 
     getTargets() {
+        const targets: Character[] = [];
+
+        const len = this.target.length;
+        for (let i = 0; i < len; i++) {
+            const target = this.getTarget(this.target[i], targets);
+            if (target) {
+                targets.push(target);
+            }
+        }
+
+        return targets;
     }
 
-    getTarget(targetType: EffectTargetType) {
+    getTarget(targetType: EffectTargetType, currentTargets?: Character[]) {
+        let result: Character | undefined;
+
         if (targetType === 'player') {
-            return this.collection.player;
+            if (!currentTargets?.some(t => t.name === this.collection.player?.name)) {
+                result = this.collection.player;
+            }
         }
+
+        return result;
     }
 
     setDuration(duration: number | string) {

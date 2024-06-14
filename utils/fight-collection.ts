@@ -69,6 +69,11 @@ export class FightCollection {
         return this.filterCharacters((_, char) => tagsArray.every((tag) => char.tags.has(tag)));
     }
 
+    getRandomTagged(tags: string[] | string) {
+        const chars = this.getCharactersWithTags(tags);
+        return chars[Math.floor(Math.random() * chars.length)];
+    }
+
     setArena(arena: Arena) {
         this.arena = arena;
     }

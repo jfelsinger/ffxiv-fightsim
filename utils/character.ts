@@ -79,6 +79,10 @@ export class Character {
         return this.marker?.position;
     }
 
+    get uniqueId() {
+        return this.marker?.uniqueId;
+    }
+
     set position(pos: Bab.Vector3) {
         if (this.marker) {
             this.marker.position = pos;
@@ -186,7 +190,12 @@ export class Character {
     makeMarker(charMat: Bab.StandardMaterial) {
         const markerSize = yalmsToM(1.25);
         const markerMat = createMarkerMat(this.scene, charMat.diffuseColor);
-        const marker = Bab.MeshBuilder.CreatePlane('charMarker', { height: markerSize, width: markerSize }, this.scene);
+        const marker = Bab.MeshBuilder.CreatePlane(`${this.name}-marker`, { height: markerSize, width: markerSize }, this.scene);
+        marker.metadata = {
+            ...marker.metadata,
+            character: this,
+            label: this.name,
+        };
         marker.material = markerMat;
         marker.rotation.x = Math.PI / 2;
 
@@ -203,7 +212,7 @@ export class Character {
 
     makeBody(charMat: Bab.Material) {
         const torsoHeight = this.height * ((this.heads - 1) / this.heads);
-        const body = Bab.MeshBuilder.CreateCylinder('body', {
+        const body = Bab.MeshBuilder.CreateCylinder(`${this.name}-body`, {
             tessellation: 3,
             height: (torsoHeight * 0.945) * 0.75,
             diameterTop: this.height / (this.heads / 1.325),
@@ -217,7 +226,7 @@ export class Character {
     }
 
     makeCollider(invisMat: Bab.Material) {
-        const collider = Bab.MeshBuilder.CreateCylinder('charCollider', {
+        const collider = Bab.MeshBuilder.CreateCylinder(`${this.name}-collider`, {
             tessellation: 3,
             height: (this.height * 3),
             diameter: 0.015,
@@ -230,7 +239,7 @@ export class Character {
 
     makeHead(charMat: Bab.Material) {
         // The Head
-        const sphere = Bab.MeshBuilder.CreateSphere('sphere', { diameter: this.height * (1.25 / this.heads), segments: 32 }, this.scene);
+        const sphere = Bab.MeshBuilder.CreateSphere(`${this.name}-head`, { diameter: this.height * (1.25 / this.heads), segments: 32 }, this.scene);
         sphere.position.y = this.height;
         sphere.position.y -= (this.height * (1 / this.heads)) / 2;
         sphere.material = charMat;
@@ -240,7 +249,7 @@ export class Character {
     }
 
     makeCamMarker() {
-        const camMarker = Bab.MeshBuilder.CreatePlane('camHead', { width: 0.01, height: 0.01 }, this.scene);
+        const camMarker = Bab.MeshBuilder.CreatePlane(`${this.name}-cam-marker`, { width: 0.01, height: 0.01 }, this.scene);
         camMarker.position.y = this.height;
         camMarker.position.y += 0.65;
         camMarker.rotation.y = Math.PI / 2;
@@ -251,11 +260,11 @@ export class Character {
     }
 
     getMaterials() {
-        const charMat = new Bab.StandardMaterial('charMat', this.scene);
+        const charMat = new Bab.StandardMaterial(`${this.name}-char-mat`, this.scene);
         charMat.diffuseColor = this.diffuseColor;
         charMat.specularColor = this.specularColor;
 
-        const invisMat = new Bab.StandardMaterial('mat', this.scene);
+        const invisMat = new Bab.StandardMaterial(`${this.name}-mat`, this.scene);
         invisMat.alpha = 0;
 
         return {
