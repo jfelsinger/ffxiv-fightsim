@@ -17,7 +17,18 @@ sections:
             name: levinstrike
             telegraph: 1.0
             effects:
-              - Label: Halfway
+              - label: Dice
+                item:
+                  duration: 5000
+                  name: dice
+                  pips: 2,4,6,8
+                  usePlayerTick: true
+                  label: levin-dice
+                  followPosition: true
+                  positionType: character
+                  position: player
+
+              - label: Halfway
                 startDelay: 300
                 item:
                   duration: 1000

@@ -29,6 +29,7 @@ export type EffectOptions = {
     duration: number | string
     collection: FightCollection
     clock?: Clock
+    usePlayerTick?: boolean;
     telegraph?: number
 
     target?: EffectTarget | (EffectTarget[])
@@ -56,6 +57,7 @@ export class Effect extends EventEmitter {
     collection: FightCollection;
     color?: string;
     isActive: boolean = false;
+    usePlayerTick: boolean = false;
 
     duration: number;
     target: EffectTarget[] = [];
@@ -107,10 +109,19 @@ export class Effect extends EventEmitter {
         const onTickUpdate = (time: number) => {
             this.tickUpdate(time);
         };
-        this.clock.on('tick', onTickUpdate);
-        this.on('dispose', () => {
-            this.clock.off('tick', onTickUpdate);
-        });
+
+        this.usePlayerTick = options.usePlayerTick || false;
+        if (this.usePlayerTick) {
+            this.collection.playerClock.on('tick', onTickUpdate);
+            this.on('dispose', () => {
+                this.collection.playerClock.off('tick', onTickUpdate);
+            });
+        } else {
+            this.clock.on('tick', onTickUpdate);
+            this.on('dispose', () => {
+                this.clock.off('tick', onTickUpdate);
+            });
+        }
     }
 
     setColor(color: string) {
