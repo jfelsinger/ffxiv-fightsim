@@ -6,6 +6,7 @@ import { Character } from '../character';
 import { parseNumber } from '../parse-number';
 import { getBasicValues } from '../decode-fight';
 import type { PositionType, PositionOption } from '../positioning';
+import { getPosition } from '../positioning';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:effect');
@@ -124,69 +125,12 @@ export class Effect extends EventEmitter {
         this.telegraph = parseNumber(telegraph);
     }
 
-    getPositionVector(): Bab.Vector3 {
-        let positionValue = typeof (this.position) === 'function' ? this.position() : this.position;
-
-        if (typeof positionValue === 'string') {
-            if (this.positionType === 'mesh') {
-                const mesh = this.scene.getMeshByName(positionValue);
-                if (mesh) { return mesh.position.clone(); }
-
-                const character = this.collection.characters[positionValue as any];
-                if (character?.position) { return character.position.clone(); }
-            } else if (this.positionType === 'character') {
-                const character = this.collection.characters[positionValue as any];
-                if (character?.position) { return character.position.clone(); }
-
-                const mesh = this.scene.getMeshByName(positionValue);
-                if (mesh) { return mesh.position.clone(); }
-            }
-
-            // Convert to number value
-            positionValue = positionValue.split(',').map((value) => +value);
-        }
-
-        if (Array.isArray(positionValue)) {
-            const split = positionValue.map(v => parseNumber(v));
-            if (
-                split.length >= 2 &&
-                split.length <= 3 &&
-                split.every(val => !isNaN(val))
-            ) {
-                if (split.length === 2) {
-                    // Assume that we want the x,y on the arena plane: z is what we would think as the y plane kinda...
-                    return new Bab.Vector3(split[0], 0, split[1]);
-                } else {
-                    // A regular Vector3
-                    return new Bab.Vector3(split[0], split[1], split[2]);
-                }
-            }
-
-            return Bab.Vector3.Zero();
-        }
-
-        return positionValue?.clone() || Bab.Vector3.Zero();
-    }
-
     getPosition(): Bab.Vector3 {
-        let vec = this.getPositionVector();
-
-        if (!this.positionType || this.positionType === 'global') {
-            return vec;
-
-        } else if (this.positionType === 'arena') {
-            if (this.collection.arena) {
-                vec = this.collection.arena.getPosition(vec);
-            }
-
-        } else if (this.positionType === 'character') {
-            return vec;
-
-        } else if (this.positionType === 'mesh') {
-            return vec;
-        }
-
-        return vec;
+        return getPosition(
+            this.position,
+            this.positionType,
+            this.collection
+        )
     }
 
     startTime: number = 0;
