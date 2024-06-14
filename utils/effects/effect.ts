@@ -31,8 +31,9 @@ export type EffectOptions = {
     telegraph?: number
 
     target?: EffectTarget | (EffectTarget[])
-    position?: PositionOption
-    positionType?: EffectPositionType
+    position?: PositionOption[] | PositionOption
+    positionType?: EffectPositionType[] | EffectPositionType
+    positionSteps?: number[]
 
     // Whether or not the same random target can be selected more than once,
     // when randomly selecting from a group of targets
@@ -51,6 +52,7 @@ export class Effect extends EventEmitter {
     target: EffectTarget[] = [];
     position: EffectOptions['position'];
     positionType: EffectOptions['positionType'];
+    positionSteps: EffectOptions['positionSteps'];
     repeatTarget: boolean;
     telegraph: number;
 
@@ -59,6 +61,43 @@ export class Effect extends EventEmitter {
     options: EffectOptions;
 
     get scene() { return this.collection.scene; }
+
+    constructor(options: EffectOptions) {
+        super();
+        this.options = options;
+        this.telegraph = parseNumber(options.telegraph ?? 1.0);
+        this.label = options.label;
+        this.duration = parseNumber(options.duration ?? 0);
+        this.collection = options.collection;
+        this.clock = options.clock || this.collection.worldClock;
+        this.color = options.color;
+        this.repeatTarget = options.repeatTarget ?? false;
+
+        if (Array.isArray(options.target)) {
+            this.target = options.target;
+        } else if (options.target) {
+            this.target = [options.target];
+        }
+
+        this.position = options.position || Bab.Vector3.Zero();
+        this.positionType = options.positionType || 'arena';
+        this.positionSteps = [];
+        // if (Array.isArray(this.position)) {
+        //     if (this.position.length <= 1) {
+        //         this.position = this.position[0] || Bab.Vector3.Zero();
+        //     }
+
+        //     // By default, create an even position gradient
+        //     // position: ['0,0', '0,1']
+        //     // steps: [1.0]
+        //     //
+        //     // position: ['0,0', '0,1', '0,2']
+        //     // steps: [0.5, 1.0]
+        //     const len = this.position.length - 1;
+        //     this.positionSteps = Array(len).fill(1.0 / len);
+        // }
+
+    }
 
     setColor(color: string) {
         this.color = color;
@@ -90,27 +129,6 @@ export class Effect extends EventEmitter {
         if (targetType === 'player') {
             return this.collection.player;
         }
-    }
-
-    constructor(options: EffectOptions) {
-        super();
-        this.options = options;
-        this.telegraph = parseNumber(options.telegraph ?? 1.0);
-        this.label = options.label;
-        this.duration = parseNumber(options.duration ?? 0);
-        this.collection = options.collection;
-        this.clock = options.clock || this.collection.worldClock;
-        this.color = options.color;
-        this.repeatTarget = options.repeatTarget ?? false;
-
-        if (Array.isArray(options.target)) {
-            this.target = options.target;
-        } else if (options.target) {
-            this.target = [options.target];
-        }
-
-        this.position = options.position || Bab.Vector3.Zero();
-        this.positionType = options.positionType || 'arena';
     }
 
     setDuration(duration: number | string) {

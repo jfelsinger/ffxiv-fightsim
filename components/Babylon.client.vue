@@ -14,6 +14,7 @@ import { FightSection, } from '../utils/sections';
 import { Mechanic, } from '../utils/mechanics';
 import { decodeFight } from '../utils/decode-fight';
 import { vectorAngle } from '../utils/vector-helpers';
+import { getInterpolatedPosition } from '~/utils/positioning';
 
 (window as any).Bab = Bab;
 
@@ -153,6 +154,9 @@ function makeScene(game: Engine) {
         worldClock,
         playerClock,
     });
+    (window as any).getInterpolatedPosition = (p: any, pt: any, st: any, val: any) => {
+        return getInterpolatedPosition(p, pt, st, val, collection);
+    };
 
     const fight = getFight(collection);
     const arena = fight?.arena;

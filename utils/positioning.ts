@@ -1,5 +1,6 @@
 import * as Bab from '@babylonjs/core';
 import { FightCollection } from './fight-collection';
+import { rangex1 } from './interpolation';
 
 export type PositionType =
     | 'arena'
@@ -66,6 +67,59 @@ export function getPosition(position: PositionOption | undefined, positionType: 
     }
 
     return vec;
+}
+
+export function getInterpolatedPosition(
+    positions: PositionOption[] | undefined,
+    positionTypes: PositionType[] | undefined,
+    steps: number[] | undefined,
+    value: number,
+    collection: FightCollection
+) {
+    if (!positions || positions?.length <= 1) {
+        console.log('Nothing to interpolate, return default positioning');
+        return getPosition(
+            positions && positions[0],
+            positionTypes && positionTypes[0],
+            collection
+        )
+    }
+
+
+    if (!steps || !steps.length) {
+        const stepsLength = positions.length - 1;
+        steps = Array(stepsLength)
+            .fill(1.0 / stepsLength)
+            .map((v, i) => v * (i + 1));
+    }
+
+    let currentStepIndex = steps.findIndex((v) => v >= value);
+    if (currentStepIndex === -1) currentStepIndex = steps.length - 1;
+    // console.log('steps: ', steps, currentStepIndex);
+
+    const startValue = steps[currentStepIndex - 1] || 0;
+    const startPosition = positions[currentStepIndex];
+    const startPositionType = positionTypes && positionTypes[currentStepIndex];
+    const start = getPosition(startPosition, startPositionType, collection)
+    // console.log('start: ', startPosition, startPositionType);
+
+    const endValue = steps[currentStepIndex];
+    const endPosition = positions[currentStepIndex + 1];
+    const endPositionType = positionTypes && positionTypes[currentStepIndex + 1];
+    const end = getPosition(endPosition, endPositionType, collection)
+    // console.log('end: ', endPosition, endPositionType);
+
+    // console.log(`interpolate: from ${startValue} to ${endValue}: `, startValue, value);
+    // console.log(`interpolate: x ${start.x} to ${end.x}`);
+    // console.log(`interpolate: y ${start.y} to ${end.y}`);
+    // console.log(`interpolate: z ${start.z} to ${end.z}`);
+
+    // (window as any).rangex1 = rangex1;
+    return new Bab.Vector3(
+        rangex1(startValue, endValue, start.x, end.x, value),
+        rangex1(startValue, endValue, start.y, end.y, value),
+        rangex1(startValue, endValue, start.z, end.z, value),
+    )
 }
 
 export function getArenaPosition(vec: Bab.Vector3, collection: FightCollection) {
