@@ -3,6 +3,7 @@ import { Clock } from './clock';
 import { Character } from './character';
 import { Arena } from '../utils/arenas/arena';
 import { Effect } from './effects';
+import { hasTags } from './meta-helpers';
 
 export type CharacterName =
     | 'player'
@@ -67,6 +68,19 @@ export class FightCollection {
     getCharactersWithTags(tags: string[] | string) {
         const tagsArray = Array.isArray(tags) ? tags : [tags];
         return this.filterCharacters((_, char) => tagsArray.every((tag) => char.tags.has(tag)));
+    }
+
+    getMeshesWithTags(tags: string[] | string) {
+        return this.scene.meshes.filter((mesh) => hasTags(mesh, tags));
+    }
+
+    getAllWithTags(tags: string[] | string) {
+        const characters = this.getCharactersWithTags(tags);
+        const meshes = this.getMeshesWithTags(tags).filter(m => !characters.some(c => c.uniqueId === m.uniqueId));
+        return [
+            ...characters,
+            ...meshes,
+        ];
     }
 
     getRandomTagged(tags: string[] | string) {

@@ -136,18 +136,17 @@ export class DiceEffect extends Effect {
         //     diceMat.setFloat('elapsed', durationPercent);
         // });
 
-        const dice = new Bab.Mesh('dice', this.scene);
-
         const pipCount = this.pipCount;
+        const dice = new Bab.Mesh(`dice-${pipCount}`, this.scene);
+        dice.position = this.getPosition() || Bab.Vector3.Zero();
+        dice.position.y += 2;
+        dice.billboardMode = Bab.Mesh.BILLBOARDMODE_ALL;
+
         for (let i = 0; i < pipCount; i++) {
             const pip = this.getPip(i, pipCount);
             pip.material = diceMat;
             pip.parent = dice;
         }
-
-        dice.position = this.getPosition() || Bab.Vector3.Zero();
-        dice.position.y = 2;
-        dice.billboardMode = Bab.Mesh.BILLBOARDMODE_ALL;
 
         return {
             dice
@@ -157,7 +156,6 @@ export class DiceEffect extends Effect {
     getPip(index: number, total: number) {
         const positions = PipPositions[total - 1]
         const positionArr = positions && positions[index];
-        console.log('Got Pip Position: ', index, total, positionArr);
         const position = positionArr ? Bab.Vector3.FromArray(positionArr) : Bab.Vector3.Zero();
 
         const pip = Bab.MeshBuilder.CreateSphere(`pip-${index + 1}`, {

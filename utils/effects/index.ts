@@ -8,6 +8,7 @@ import { AoeGroupEffect } from './aoe-group';
 import { AoeSquareGridEffect } from './aoe-square-grid';
 import { DiceEffect } from './dice';
 import { TetherEffect } from './tether';
+import { DistributeEffect } from './distribute';
 
 export const effectsCollection = {
     'default': Effect,
@@ -19,6 +20,7 @@ export const effectsCollection = {
     'test-aoe': AoeDiscEffect,
     'tether': TetherEffect,
     'dice': DiceEffect,
+    'distribute': DistributeEffect,
 } as const;
 
 export default effectsCollection;

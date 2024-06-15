@@ -1,7 +1,3 @@
-import { EventEmitter } from 'eventemitter3';
-import { Clock } from '../clock';
-import { shuffleArray } from '../array-shuffle';
-
 import {
     type ScheduleMode,
     type Scheduled,

@@ -7,7 +7,7 @@ arena:
 sections:
   - startDelay: 500
     item:
-      name: test-section
+      name: p9s-levinstrike
       scheduling: sequential
       mechanics:
         - repeat: 0
@@ -17,44 +17,39 @@ sections:
             name: levinstrike
             telegraph: 1.0
             effects:
-              - label: Dice
+              - label: OrbDice
                 item:
                   duration: 5000
-                  name: dice
-                  pips: 2,4,6,8
-                  usePlayerTick: true
-                  label: levin-dice
-                  followPosition: true
-                  target: player
-                  positionType: target
-                  position: player
+                  name: distribute
+                  target: tag-levinorb
+                  effect:
+                    name: dice
+                  items:
+                    - tag: levinorb-1
+                      effect:
+                        target: levinorb-1
+                        pips: 1
+                    - tag: levinorb-2
+                      effect:
+                        target: levinorb-2
+                        pips: 3
+                    - tag: levinorb-3
+                      effect:
+                        target: levinorb-3
+                        pips: 5
+                    - tag: levinorb-4
+                      effect:
+                        target: levinorb-4
+                        pips: 7
 
-              - label: Halfway
-                startDelay: 300
-                item:
-                  duration: 1000
-                  name: aoe-disc
-                  color: 180,219,9
-                  yalms: 5
-                  # followPosition: true
-                  positionType: effect
-                  position: moving-aoe
-              - label: Test
-                item:
-                  label: moving-aoe
-                  duration: 2000
-                  name: aoe-disc
-                  color: 9,180,219
-                  yalms: 5
-                  positionType: arena
-                  positions:
-                    - 0,0
-                    - 0,-1.0
-                after:
-                  duration: 15000
-                  name: aoe-disc
-                  color: 180,9,219
-                  yalms: 5
-                  followPosition: true
-                  positionType: effect
-                  position: moving-aoe
+              # - label: Dice
+              #   item:
+              #     duration: 5000
+              #     name: dice
+              #     pips: 2,4,6,8
+              #     usePlayerTick: true
+              #     label: levin-dice
+              #     followPosition: true
+              #     target: player
+              #     positionType: target
+              #     position: player

@@ -16,7 +16,7 @@ export type EffectTargetType =
     | 'boss' | 'adds'
     | 'all' // All players
     | 'player' | 'party' | 'maintank'
-    | 'tank' | 'healer' | 'dps';
+    | 'tank' | 'healer' | 'dps' | `tag-${string}`;
 
 export type EffectTarget =
     // | Bab.Mesh
@@ -149,29 +149,34 @@ export class Effect extends EventEmitter {
     }
 
     getTargets() {
-        const targets: Character[] = [];
+        const targets: (Character | Bab.AbstractMesh)[] = [];
 
         const len = this.target.length;
         for (let i = 0; i < len; i++) {
             const target = this.getTarget(this.target[i], targets);
             if (target) {
-                targets.push(target);
+                targets.push(...target);
             }
         }
 
-        return targets;
+        const uniqueTargets = [...new Map(targets.map(item => [item.uniqueId, item])).values()];
+        return uniqueTargets;
     }
 
-    getTarget(targetType: EffectTargetType, currentTargets?: Character[]) {
-        let result: Character | undefined;
+    getTarget(targetType: EffectTargetType, currentTargets?: (Character | Bab.AbstractMesh)[]) {
+        let results: (Character | Bab.AbstractMesh)[] = [];
 
         if (targetType === 'player') {
-            if (!currentTargets?.some(t => t.name === this.collection.player?.name)) {
-                result = this.collection.player;
+            const player = this.collection.player;
+            if (player && !currentTargets?.some(t => t.uniqueId === player?.uniqueId)) {
+                results.push(player);
             }
+        } else if (targetType.startsWith('tag-')) {
+            const tag = targetType.split('-').slice(1).join('-');
+            results = this.collection.getAllWithTags(tag);
         }
 
-        return result;
+        return results;
     }
 
     setDuration(duration: number | string) {
