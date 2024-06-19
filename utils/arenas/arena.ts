@@ -66,13 +66,13 @@ export class Arena {
 
         const arenaMat = this.makeArenaMat();
         const { floor, boundary } = this.makeFloor(arenaMat);
+        floor.alphaIndex = 2;
         this.floor = floor;
         this.boundary = boundary;
 
         if (options.globalFloor) {
             const globalFloorResult = this.makeGlobalFloor();
             this.globalFloor = globalFloorResult?.globalFloor;
-
         }
         this.makeCamCollider();
     }
@@ -100,6 +100,7 @@ export class Arena {
         gridFloor.rotation.x = Math.PI / 2;
         gridFloor.material = gridMat;
         gridFloor.bakeCurrentTransformIntoVertices();
+        gridFloor.alphaIndex = 1;
 
         return {
             globalFloor: gridFloor,
@@ -193,6 +194,7 @@ export class Arena {
         boundary.position.y += height / 2;
         boundary.position.z += 0;
         boundary.material = boundaryMat;
+        boundary.alphaIndex = 2;
 
         return { floor, boundary };
     }
@@ -210,6 +212,7 @@ export class Arena {
 
     makeBoundaryMat() {
         const boundaryMat = getArenaBoundsMat(this.scene);
+        boundaryMat.alpha = 0.39;
         let time = 0;
         this.scene.registerAfterRender(() => {
             const charPos = this.collection?.player?.position ?? Bab.Vector3.Zero();

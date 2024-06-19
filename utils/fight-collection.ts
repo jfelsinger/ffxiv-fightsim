@@ -24,12 +24,20 @@ export class FightCollection {
     worldClock: Clock;
     playerClock: Clock;
     arena?: Arena;
+    gl?: Bab.GlowLayer;
 
     get player(): Character | undefined { return this.characters.player }
     set player(value: Character) { this.characters.player = value; }
 
     get groundMesh() { return this.getMeshByName('ground'); }
     get bossMesh() { return this.getMeshByName('boss'); }
+
+    addGlow(mesh: Bab.Mesh) {
+        if (!this.gl) {
+            this.gl = new Bab.GlowLayer('glow', this.scene);
+        }
+        this.gl.addIncludedOnlyMesh(mesh);
+    }
 
     getMeshByName(name: string) {
         return this.scene.getMeshByName(name);

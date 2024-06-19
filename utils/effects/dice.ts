@@ -122,8 +122,13 @@ export class DiceEffect extends Effect {
 
     makeAoe() {
         const diceMat = new Bab.StandardMaterial('dice', this.scene);
-        diceMat.diffuseColor = Bab.Color3.FromInts(150, 150, 255);
-        diceMat.emissiveColor = Bab.Color3.FromInts(100, 100, 255);
+        // For Blues
+        diceMat.diffuseColor = new Bab.Color3(0.14901960784313725, 0.21568627450980393, 0.9803921568627451);// (HEX : #2637FA , debugNode as Bab.StandardMaterial)
+        diceMat.specularColor = new Bab.Color3(0.1568627450980392, 0.20784313725490197, 0.7725490196078432);// (HEX : #2835C5 , debugNode as Bab.StandardMaterial)
+        diceMat.specularPower = 1;// (debugNode as Bab.StandardMaterial)
+        diceMat.emissiveColor = new Bab.Color3(0.24313725490196078, 0.3568627450980392, 0.7725490196078432);// (HEX : #3E5BC5 , debugNode as BABYLON.StandardMaterial)
+        diceMat.ambientColor = new Bab.Color3(0.10196078431372549, 0.6549019607843137, 0.8470588235294118);// (HEX : #1AA7D8 , debugNode as BABYLON.StandardMaterial)
+
         // const diceMat = createAoeMat(this.scene, this.getColor(), 'diceMat');
         // diceMat.alpha = 0.7;
 
@@ -144,6 +149,7 @@ export class DiceEffect extends Effect {
 
         for (let i = 0; i < pipCount; i++) {
             const pip = this.getPip(i, pipCount);
+            this.collection.addGlow(pip);
             pip.material = diceMat;
             pip.parent = dice;
         }

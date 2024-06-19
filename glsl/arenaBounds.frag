@@ -51,7 +51,7 @@ void main(void) {
     st += vec2(0.5);
     float dist = distance(smoothstep(0., 1.0, st.x), 1.0);
     float alpha = dist;
-    alpha *= 0.3;
+    // alpha /= 0.5;
 
     // -----  UNCOMMENT FOR SOME FX  -----
     // alpha = step(0.5, 1.0 - dist); // Outer ring

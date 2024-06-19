@@ -158,6 +158,7 @@ function makeScene(game: Engine) {
         return getInterpolatedPosition(p, pt, st, val, collection);
     };
 
+
     const fight = getFight(collection);
     const arena = fight?.arena;
 
@@ -373,5 +374,20 @@ function onScaleTime(value: number) {
         transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         transition-duration: 150ms
     }
+}
+
+#inspector-host {
+    position: fixed !important;
+    right: 0 !important;
+    z-index: 99999 !important;
+    max-height: 100vh !important;
+}
+
+div:is(div #scene-explorer-host) {
+    max-height: 100vh !important;
+}
+
+div:has(~ div #scene-explorer-host) {
+    display: none !important;
 }
 </style>
