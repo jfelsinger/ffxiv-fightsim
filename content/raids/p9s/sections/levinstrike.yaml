@@ -5,25 +5,39 @@ arena:
   yalms: 60
   floorType: p9s
 sections:
-  - startDelay: 500
+  - label: Levinstrike / Limit Cut
+    startDelay: 500
     item:
       name: p9s-levinstrike
-      scheduling: sequential
+      scheduling: parallel
       mechanics:
-        - repeat: 0
-          startDelay: 0
-          endDelay: 2500
+        - label: Levinstrike Summoning
           item:
-            name: levinstrike
-            telegraph: 1.0
             effects:
+              - item:
+                  name: mechanic-bar
+                  label: Levinstrike Summoning
+                  duration: 3683 # 3683
+
+        - label: Scrambled Succession
+          startDelay: 6033 # 3683 + 2350
+          item:
+            effects:
+              - item:
+                  name: mechanic-bar
+                  label: Scrambled Succession
+                  duration: 9420
+
+              # The dice labels for the orbs
               - label: OrbDice
                 item:
-                  duration: 5000
+                  duration: 8400
                   name: distribute
+                  distributionType: random-rotation
                   target: tag-levinorb
                   effect:
                     name: dice
+                    duration: 8400
                   items:
                     - tag: levinorb-1
                       effect:
@@ -42,44 +56,229 @@ sections:
                         target: levinorb-4
                         pips: 7
 
-              # - label: Dice
-              #   item:
-              #     duration: 5000
-              #     name: dice
-              #     pips: 2,4,6,8
-              #     usePlayerTick: true
-              #     label: levin-dice
-              #     followPosition: true
-              #     target: player
-              #     positionType: target
-              #     position: player
+              # The dice labels for the players
+              - label: Dice
+                item:
+                  duration: 8400
+                  name: distribute
+                  distributionType: random
+                  target: player
+                  label: levin-mark
+                  effect:
+                    name: dice
+                    duration: 8400
+                    usePlayerTick: true
+                    followPosition: true
+                    target: player
+                    positionType: target
+                    position: player
+                  items:
+                    - tag: levin-mark-1
+                      effect:
+                        target: player
+                        pips: 2
+                    - tag: levin-mark-2
+                      effect:
+                        target: player
+                        pips: 4
+                    - tag: levin-mark-3
+                      effect:
+                        target: player
+                        pips: 6
+                    - tag: levin-mark-4
+                      effect:
+                        target: player
+                        pips: 8
 
-              - label: Halfway
-                startDelay: 300
-                item:
-                  duration: 1000
-                  name: aoe-disc
-                  color: 180,219,9
-                  yalms: 5
+                  # label: levin-mark
+                  # pips: 2,4,6,8
+                  # usePlayerTick: true
                   # followPosition: true
-                  positionType: effect
-                  position: moving-aoe
-              - label: Test
+                  # target: player
+                  # positionType: target
+                  # position: player
+
+        # The Melds
+        - label: Icemelds & Firemelds
+          startDelay: 12000
+          item:
+            effects:
+              - label: First Meld
+                startDelay: 0
                 item:
-                  label: moving-aoe
-                  duration: 2000
-                  name: aoe-disc
-                  color: 9,180,219
-                  yalms: 5
-                  positionType: arena
-                  positions:
-                    - 0,0
-                    - 0,-1.0
+                  name: aoe-group
+                  duration: 9550
+                  aoes:
+                    - name: aoe-icemeld
+                    - name: aoe-firemeld
+                      target: levin-mark-1
+
+              - label: Second Meld
+                startDelay: 5700
+                item:
+                  name: aoe-group
+                  duration: 9550
+                  aoes:
+                    - name: aoe-icemeld
+                    - name: aoe-firemeld
+                      target: levin-mark-2
+
+              - label: Third Meld
+                startDelay: 11400 # 5700 * 2
+                item:
+                  name: aoe-group
+                  duration: 9550
+                  aoes:
+                    - name: aoe-icemeld
+                    - name: aoe-firemeld
+                      target: levin-mark-3
+              - label: Fourth Meld
+                startDelay: 17100 # 5700 * 3
+                item:
+                  name: aoe-group
+                  duration: 9550
+                  aoes:
+                    - name: aoe-icemeld
+                    - name: aoe-firemeld
+                      target: levin-mark-4
+
+        # The Towers & Kicks
+        - label: Towers
+          startDelay: 18436
+          item:
+            effects:
+              # 1st Kick
+              - startDelay: 0
+                item:
+                  name: orb-kick
+                  label: orb-kick-1
+                  duration: 683
+                  target: levinorb-1
                 after:
-                  duration: 15000
-                  name: aoe-disc
-                  color: 180,9,219
-                  yalms: 5
-                  followPosition: true
-                  positionType: effect
-                  position: moving-aoe
+                  startDelay: 600
+                  item:
+                    name: tower
+                    label: tower-1
+                    duration: 2080
+                    followPosition: true
+                    positionType: effect
+                    position: orb-kick-1
+
+              # 2nd Kick
+              - startDelay: 5700
+                item:
+                  name: orb-kick
+                  label: orb-kick-2
+                  duration: 683
+                  target: levinorb-2
+                after:
+                  startDelay: 600
+                  item:
+                    name: tower
+                    label: tower-2
+                    duration: 2080
+                    followPosition: true
+                    positionType: effect
+                    position: orb-kick-2
+
+              # 3rd Kick
+              - startDelay: 11400 # 5700 * 2
+                item:
+                  name: orb-kick
+                  label: orb-kick-3
+                  duration: 683
+                  target: levinorb-3
+                after:
+                  startDelay: 600
+                  item:
+                    name: tower
+                    label: tower-3
+                    duration: 2080
+                    followPosition: true
+                    positionType: effect
+                    position: orb-kick-3
+
+              # 4th Kick
+              - startDelay: 17100 # 5700 * 3
+                item:
+                  name: orb-kick
+                  label: orb-kick-4
+                  duration: 683
+                  target: levinorb-4
+                after:
+                  startDelay: 600
+                  item:
+                    name: tower
+                    label: tower-4
+                    duration: 2080
+                    followPosition: true
+                    positionType: effect
+                    position: orb-kick-4
+
+  # - startDelay: 2350
+  #   item:
+  #     name: p9s-levinstrike
+  #     scheduling: sequential
+  #     mechanics:
+  #       - repeat: 0
+  #         startDelay: 0
+  #         endDelay: 2500
+  #         item:
+  #           name: levinstrike
+  #           label: Levinstrike Summoning
+  #           telegraph: 1.0
+  #           effects:
+
+  #       - label: Scrambled Succession
+  #         item:
+  #           effects:
+  #             # - label: Frostmeld
+  #             #   item:
+  #             #     name: aoe-disc
+  #             #     duration: 9250
+
+  #             - label: Kick
+  #               startDelay: 4500
+  #               item:
+  #                 name: aoe-disc
+  #                 duration: 1500
+
+  #             - label: Kick Explode
+  #               item:
+  #                 name: aoe-disc
+  #                 duration: 500
+
+  #             - label: Tower
+  #               item:
+  #                 name: aoe-disc
+  #                 duration: 2500
+
+  #             ## - label: Halfway
+  #             ##   startDelay: 300
+  #             ##   item:
+  #             ##     duration: 1000
+  #             ##     name: aoe-disc
+  #             ##     color: 180,219,9
+  #             ##     yalms: 5
+  #             ##     # followPosition: true
+  #             ##     positionType: effect
+  #             ##     position: moving-aoe
+  #             ## - label: Test
+  #             ##   item:
+  #             ##     label: moving-aoe
+  #             ##     duration: 2000
+  #             ##     name: aoe-disc
+  #             ##     color: 9,180,219
+  #             ##     yalms: 5
+  #             ##     positionType: arena
+  #             ##     positions:
+  #             ##       - 0,0
+  #             ##       - 0,-1.0
+  #             ##   after:
+  #             ##     duration: 15000
+  #             ##     name: aoe-disc
+  #             ##     color: 180,9,219
+  #             ##     yalms: 5
+  #             ##     followPosition: true
+  #             ##     positionType: effect
+  #             ##     position: moving-aoe

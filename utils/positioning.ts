@@ -28,17 +28,18 @@ export function getPositionVector(
     position: PositionOption | undefined,
     positionType: PositionType | undefined,
     collection: FightCollection,
-    target?: PositionTarget
+    target?: PositionTarget[]
 ) {
     let positionValue = typeof (position) === 'function' ? position() : position;
 
     if (typeof positionValue === 'string') {
         if (positionType === 'target') {
-            if (target?.position) {
-                return target.position.clone();
+            const firstTarget = target && target[0];
+            if (firstTarget?.position) {
+                return firstTarget.position.clone();
             }
-            if (target?.getPosition) {
-                return target.getPosition();
+            if (firstTarget?.getPosition) {
+                return firstTarget.getPosition();
             }
         } else if (positionType === 'mesh') {
             const mesh = collection.scene.getMeshByName(positionValue);
@@ -87,7 +88,12 @@ export function getPositionVector(
     return positionValue?.clone() || Bab.Vector3.Zero();
 }
 
-export function getPosition(position: PositionOption | undefined, positionType: PositionType | undefined, collection: FightCollection, target?: PositionTarget) {
+export function getPosition(
+    position: PositionOption | undefined,
+    positionType: PositionType | undefined,
+    collection: FightCollection,
+    target?: PositionTarget[]
+) {
     let vec = getPositionVector(position, positionType, collection, target);
 
     if (positionType === 'arena') {
@@ -105,7 +111,7 @@ export function getInterpolatedPosition(options: {
     easing?: string,
     value: number,
     collection: FightCollection,
-    target?: PositionTarget,
+    target?: PositionTarget[],
 }) {
     let {
         positions,

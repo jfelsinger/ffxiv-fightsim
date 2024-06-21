@@ -3,6 +3,8 @@ import { parseNumber } from '../parse-number';
 import { decodeEffect } from '../decode-fight';
 import { addTag } from '../meta-helpers';
 import type { Character } from '../character';
+import { shuffleArray } from '../array-shuffle';
+import { rotateArray } from '../array-rotate';
 
 import {
     Effect,
@@ -61,21 +63,38 @@ export class DistributeEffect extends Effect {
                 targets[1],
             ];
 
+            if (this.distributionType === 'random-start') {
+                targets = rotateArray(targets, Math.floor(Math.random() * targets.length) + 1);
+            } else if (this.distributionType === 'random-direction') {
+                if (Math.random() < 0.5) {
+                    targets = targets.reverse();
+                }
+            } else if (this.distributionType === 'random-rotation') {
+                targets = rotateArray(targets, Math.floor(Math.random() * targets.length) + 1);
+                if (Math.random() < 0.5) {
+                    targets = targets.reverse();
+                }
+            } else if (this.distributionType === 'random') {
+                targets = shuffleArray(targets);
+            }
+
             (window as any).targets = targets;
             console.log('GOT TARGETS: ', targets);
 
             const len = this.items.length;
             for (let i = 0; i < len; i++) {
                 const item = this.items[i];
+                if (!item) { continue; }
+
                 const target = targets[i];
+                if (!target) { continue; }
+
                 const effect = this.spawnEffect(i, target);
+                if (!effect) { continue; }
                 (window as any).effect = effect;
 
-                if (item && target && effect) {
-                    if (item.tag) {
-                        addTag(target, item.tag);
-                    }
-
+                if (item.tag) {
+                    addTag(target, item.tag);
                 }
             }
         })

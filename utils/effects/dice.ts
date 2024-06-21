@@ -121,13 +121,25 @@ export class DiceEffect extends Effect {
     }
 
     makeAoe() {
+        const pipCount = this.pipCount;
+
         const diceMat = new Bab.StandardMaterial('dice', this.scene);
-        // For Blues
-        diceMat.diffuseColor = new Bab.Color3(0.14901960784313725, 0.21568627450980393, 0.9803921568627451);// (HEX : #2637FA , debugNode as Bab.StandardMaterial)
-        diceMat.specularColor = new Bab.Color3(0.1568627450980392, 0.20784313725490197, 0.7725490196078432);// (HEX : #2835C5 , debugNode as Bab.StandardMaterial)
-        diceMat.specularPower = 1;// (debugNode as Bab.StandardMaterial)
-        diceMat.emissiveColor = new Bab.Color3(0.24313725490196078, 0.3568627450980392, 0.7725490196078432);// (HEX : #3E5BC5 , debugNode as BABYLON.StandardMaterial)
-        diceMat.ambientColor = new Bab.Color3(0.10196078431372549, 0.6549019607843137, 0.8470588235294118);// (HEX : #1AA7D8 , debugNode as BABYLON.StandardMaterial)
+
+        if (pipCount % 2) { // is even
+            // Blues
+            diceMat.diffuseColor = new Bab.Color3(0.14901960784313725, 0.21568627450980393, 0.9803921568627451);// (HEX : #2637FA , debugNode as Bab.StandardMaterial)
+            diceMat.specularColor = new Bab.Color3(0.1568627450980392, 0.20784313725490197, 0.7725490196078432);// (HEX : #2835C5 , debugNode as Bab.StandardMaterial)
+            diceMat.specularPower = 1;// (debugNode as Bab.StandardMaterial)
+            diceMat.emissiveColor = new Bab.Color3(0.24313725490196078, 0.3568627450980392, 0.7725490196078432);// (HEX : #3E5BC5 , debugNode as BABYLON.StandardMaterial)
+            diceMat.ambientColor = new Bab.Color3(0.10196078431372549, 0.6549019607843137, 0.8470588235294118);// (HEX : #1AA7D8 , debugNode as BABYLON.StandardMaterial)
+        } else {
+            // Reds
+            diceMat.diffuseColor = new Bab.Color3(0.9137254901960784, 0.058823529411764705, 0.0784313725490196);// (HEX : #E90F14 , debugNode as BABYLON.StandardMaterial)
+            diceMat.specularColor = new Bab.Color3(0.9254901960784314, 0.26666666666666666, 0.25098039215686274);// (HEX : #EC4440 , debugNode as BABYLON.StandardMaterial)
+            diceMat.specularPower = 4.8;// (debugNode as BABYLON.StandardMaterial)
+            diceMat.emissiveColor = new Bab.Color3(0.611764705882353, 0.23529411764705882, 0.24705882352941178);// (HEX : #9C3C3F , debugNode as BABYLON.StandardMaterial)
+            diceMat.ambientColor = new Bab.Color3(0.8666666666666667, 0.0784313725490196, 0.3254901960784314);// (HEX : #DD1453 , debugNode as BABYLON.StandardMaterial)
+        }
 
         // const diceMat = createAoeMat(this.scene, this.getColor(), 'diceMat');
         // diceMat.alpha = 0.7;
@@ -141,7 +153,6 @@ export class DiceEffect extends Effect {
         //     diceMat.setFloat('elapsed', durationPercent);
         // });
 
-        const pipCount = this.pipCount;
         const dice = new Bab.Mesh(`dice-${pipCount}`, this.scene);
         dice.position = this.getPosition() || Bab.Vector3.Zero();
         dice.position.y += 2;
