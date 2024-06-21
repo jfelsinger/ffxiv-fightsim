@@ -63,7 +63,7 @@ sections:
                   name: distribute
                   distributionType: random
                   target: player
-                  label: levin-mark
+                  label: levinmark
                   effect:
                     name: dice
                     duration: 8400
@@ -73,24 +73,24 @@ sections:
                     positionType: target
                     position: player
                   items:
-                    - tag: levin-mark-1
+                    - tag: levinmark-1
                       effect:
                         target: player
                         pips: 2
-                    - tag: levin-mark-2
+                    - tag: levinmark-2
                       effect:
                         target: player
                         pips: 4
-                    - tag: levin-mark-3
+                    - tag: levinmark-3
                       effect:
                         target: player
                         pips: 6
-                    - tag: levin-mark-4
+                    - tag: levinmark-4
                       effect:
                         target: player
                         pips: 8
 
-                  # label: levin-mark
+                  # label: levinmark
                   # pips: 2,4,6,8
                   # usePlayerTick: true
                   # followPosition: true
@@ -111,7 +111,7 @@ sections:
                   aoes:
                     - name: aoe-icemeld
                     - name: aoe-firemeld
-                      target: levin-mark-1
+                      target: tag-levinmark-1
 
               - label: Second Meld
                 startDelay: 5700
@@ -121,7 +121,7 @@ sections:
                   aoes:
                     - name: aoe-icemeld
                     - name: aoe-firemeld
-                      target: levin-mark-2
+                      target: tag-levinmark-2
 
               - label: Third Meld
                 startDelay: 11400 # 5700 * 2
@@ -131,7 +131,7 @@ sections:
                   aoes:
                     - name: aoe-icemeld
                     - name: aoe-firemeld
-                      target: levin-mark-3
+                      target: tag-levinmark-3
               - label: Fourth Meld
                 startDelay: 17100 # 5700 * 3
                 item:
@@ -140,7 +140,7 @@ sections:
                   aoes:
                     - name: aoe-icemeld
                     - name: aoe-firemeld
-                      target: levin-mark-4
+                      target: tag-levinmark-4
 
         # The Towers & Kicks
         - label: Towers
