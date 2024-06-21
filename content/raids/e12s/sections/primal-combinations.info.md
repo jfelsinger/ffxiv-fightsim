@@ -17,5 +17,5 @@ Two of these AOEs will be telegraphed at random, and occur at the same time, whi
 and coordinate to dodge.
 
 ### Other Resources
-* [SaltedXIV's Page & Diagram](https://saltedxiv.com/encounters/e12s#primal-combinations)
-* [joonbob's E12S Pickup Guide | Youtube](https://www.youtube.com/watch?v=wyWpOHeoCPo&t=35s)
+* [SaltedXIV's Page & Diagram](https://saltedxiv.com/encounters/e12s#primal-combinations){:target="_blank"}
+* [joonbob's E12S Pickup Guide | Youtube](https://www.youtube.com/watch?v=wyWpOHeoCPo&t=35s){:target="_blank"}
