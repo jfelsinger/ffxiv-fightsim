@@ -43,9 +43,22 @@
                 <div class="p-2 xl:w-2/3">
                     <h2 class="text-2xl my-2 text-base-300 font-thin">Available Encounters</h2>
                     <p class="text-base-300 font-thin my-2 mb-4">
-                        Sorry, there's only the one right now. More to come!
+                        Sorry, there's only a couple right now. More to come!
                     </p>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-wrap justify-center">
+
+                        <div class="card bg-base-100/50 glass">
+                            <div class="card-body">
+                                <h2 class="card-title">M2S Centerstage/Outerstage Combos</h2>
+                                <p>Positioning for M2S Outerstage and Centerstage Combos. (Very Rough Draft)</p>
+                                <div class="card-actions justify-end">
+                                    <NuxtLink to="/raids/m2s/stage-combo" class="btn min-w-20">Play
+                                    </NuxtLink>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="card bg-base-100/50 glass">
                             <div class="card-body">
                                 <h2 class="card-title">E12S Primal Unions</h2>
@@ -56,6 +69,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
