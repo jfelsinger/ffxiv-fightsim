@@ -24,6 +24,7 @@ sections:
               - label: Ifrit
                 item:
                   name: aoe-group
+                  castName: Cast
                   color: 199,42,45
                   outerRadius: 30
                   innerRadius: 0
@@ -44,6 +45,7 @@ sections:
               - label: Garuda
                 item:
                   name: aoe-group
+                  castName: Cast
                   color: 64,229,90
                   outerRadius: 30
                   innerRadius: 0
@@ -69,6 +71,7 @@ sections:
               - label: Ramuh
                 item:
                   name: aoe-group
+                  castName: Cast
                   positionType: arena
                   color: 43,40,255
                   aoes:
@@ -83,6 +86,7 @@ sections:
               - label: Leviathan
                 item:
                   name: aoe-group
+                  castName: Cast
                   color: 9,180,219
                   outerRadius: 30
                   innerRadius: 0

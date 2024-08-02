@@ -8,9 +8,12 @@ import { getBasicValues } from '../decode-fight';
 import type { PositionType, PositionOption } from '../positioning';
 import { getPosition, getInterpolatedPosition } from '../positioning';
 import type { ScheduledParent } from '../scheduled';
+import { useCastState } from '../../composables/castState';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:effect');
+
+const castState = useCastState();
 
 export type EffectTargetType =
     | 'boss' | 'adds'
@@ -32,6 +35,7 @@ export type EffectOptions = {
     clock?: Clock
     usePlayerTick?: boolean
     telegraph?: number
+    castName?: string
 
     target?: EffectTarget | (EffectTarget[])
     position?: PositionOption
@@ -238,6 +242,15 @@ export class Effect extends EventEmitter {
     tickUpdate(time: number) {
         if (this.isActive) {
             const durationPercent = this.getDurationPercent();
+            if (this.options.castName) {
+                if (durationPercent < 1) {
+                    castState.value = {
+                        name: this.options.castName,
+                        percent: durationPercent,
+                    };
+                }
+            }
+
             this.updatePosition(durationPercent);
             this.emit('tick', {
                 time,
@@ -331,6 +344,9 @@ export class Effect extends EventEmitter {
 
     async cleanup() {
         this.isActive = false;
+        if (this.options.castName) {
+            castState.value = undefined;
+        }
     }
 
     async dispose() {

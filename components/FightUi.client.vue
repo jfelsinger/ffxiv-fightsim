@@ -143,16 +143,22 @@ function updateSection(section: Scheduled<FightSection>, i: number) {
 
 const openSide = ref('');
 
+const { isEditing, toggleEditMode } = useEditMode();
+
 function open(side: string) {
     if (openSide.value === side) {
         openSide.value = '';
+        isEditing.value = false;
     } else {
         if (side === 'code') {
             resetEncoded(true);
+        } else if (side === 'ui') {
+            isEditing.value = true;
         }
 
         openSide.value = side;
     }
+
 }
 
 function reset() {
@@ -213,7 +219,6 @@ onBeforeUnmount(() => {
 function updateTime(val: number) {
     emit('scale-time', val);
 }
-
 </script>
 
 <template>
@@ -289,9 +294,15 @@ function updateTime(val: number) {
                         </button>
                     </li>
                     <li v-if="info">
-                        <button @click="open('info')" class="tooltip tooltip-right px-2" data-tip="Info">
+                        <button @click="open('info')" class="tooltip tooltip-right px-2" data-tip="Fight Info">
                             <Icon name="solar:info-circle-linear" />
                         </button>
+                    </li>
+                    <li>
+                        <NuxtLink @click="toggleEditMode" class="tooltip tooltip-right px-2"
+                            data-tip="Edit Position of Some UI Items">
+                            <Icon name="solar:pen-broken" />
+                        </NuxtLink>
                     </li>
                     <li>
                         <NuxtLink to="/" class="tooltip tooltip-right px-2" data-tip="Home">

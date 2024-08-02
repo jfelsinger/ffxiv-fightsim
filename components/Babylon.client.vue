@@ -56,6 +56,9 @@ watch(hits, (value: number, oldValue: number) => {
     }
 });
 
+const castState = useCastState();
+(window as any).castState = castState;
+
 function onResize() {
     game?.resize();
 }
@@ -354,6 +357,8 @@ function onScaleTime(value: number) {
                 <canvas class="bg-sky-100 w-screen h-screen" ref="canvas" id="gamecanvas"></canvas>
             </slot>
         </div>
+
+        <UiCastBar v-if="castState?.name" />
     </div>
 </template>
 
