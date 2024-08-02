@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             posthogPublicKey: 'phc_ciwvnZ8zRN5wAplUtGB2Z9h4QYYICwdxOjeKcCMDO5O',
-            posthogHost: 'https://us.i.posthog.com',
+            posthogHost: 'https://ph.xivfightsim.com',
             sentryDsn: 'https://d24fcbfa8584af0cdf53e285f7916b93@o4507425505542144.ingest.us.sentry.io/4507425533460480',
             sentryOrg: 'fightsim',
             sentryProjectId: 4507425533460480,

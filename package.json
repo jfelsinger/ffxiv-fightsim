@@ -9,7 +9,10 @@
         "server": "bun run ./.output/server/index.mjs",
         "generate": "nuxt generate",
         "preview": "nuxt preview",
-        "postinstall": "nuxt prepare"
+        "postinstall": "nuxt prepare",
+        "pages:build": "NITRO_PRESET=cloudflare_pages nuxi build --preset=cloudflare_pages",
+        "pages:preview": "CLOUDFLARE_ACCOUNT_ID=4c19ea9d2a95ab80f023d7888c3eeca7 wrangler pages dev ./dist",
+        "pages:deploy": "CLOUDFLARE_ACCOUNT_ID=4c19ea9d2a95ab80f023d7888c3eeca7 wrangler pages deploy --branch main --project-name xivfightsim ./dist"
     },
     "dependencies": {
         "@nuxt/image": "^1.7.0",
@@ -49,8 +52,10 @@
         "sass": "^1.77.8",
         "typescript": "^5.5.4",
         "ua-parser-js": "^2.0.0-beta.3",
+        "unenv": "^1.10.0",
         "vite-plugin-glsl": "^1.3.0",
         "vue-codemirror6": "^1.3.4",
+        "wrangler": "^3.68.0",
         "xstate": "^5.17.1",
         "yaml": "^2.5.0"
     }

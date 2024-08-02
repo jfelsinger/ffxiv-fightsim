@@ -15,7 +15,7 @@
                     </p>
 
                     <p>
-                        Learn encounters &amp; mechanics in a way that feels like the real thing,
+                        Learn encounters &amp; mechanics in a way that feels hopefully, kinda like the real thing,
                         and without the stress of PF.
                     </p>
                 </div>
