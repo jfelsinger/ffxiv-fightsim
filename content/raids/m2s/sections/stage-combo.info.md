@@ -4,7 +4,7 @@ raid: M2S - Arcadion Light-heavyweight
 category: Mechanic
 ---
 
-For this mechanic Honey B. Lovely will cast one of two combos, *Centerstage Combo* or *Outerstage Combo*.
+For this mechanic Honey B. Lovely will cast one of two combos, **Centerstage Combo** or **Outerstage Combo**.
 After which, three preset AOEs will fire in quick succession, with different safe-spots on each. Both
 *Outerstage Combo* and *Centerstage Combo* use the same three AOEs, but fired in different orders.
 

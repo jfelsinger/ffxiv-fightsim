@@ -32,7 +32,6 @@ export function useFightContent(fightParams?: Array<string>) {
             info: await infoPromise,
         };
 
-        console.log('result: ', result);
         return result;
     });
 }
