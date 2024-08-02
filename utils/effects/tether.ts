@@ -13,7 +13,7 @@ export type TetherEffectOptions = EffectOptions & {
 };
 
 export class TetherEffect extends Effect {
-    name = 'aoe-square';
+    name = 'tether';
     from: string;
     to?: string;
 

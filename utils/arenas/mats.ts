@@ -9,6 +9,7 @@ export const arenaMats = {
     'grid': arenaGridMat,
     'image': imageArenaMat,
     'e12s': e12sArenaMat,
+    'm2s': m2sArenaMat,
     'p9s': p9sArenaMat,
     'polar': polarArenaMat,
     'polar-grid': polarArenaMat,
@@ -38,6 +39,16 @@ export function e12sArenaMat(scene: Bab.Scene) {
     const mat = imageArenaMat(scene, {
         name: 'e12sArenaMat',
         image: '/images/fights/e12s/arena.png',
+    })
+    mat.diffuseTexture!.hasAlpha = true;
+    mat.specularColor = new Bab.Color3(0, 0, 0.05);
+    return mat;
+}
+
+export function m2sArenaMat(scene: Bab.Scene) {
+    const mat = imageArenaMat(scene, {
+        name: 'm2sArenaMat',
+        image: '/images/fights/m2s/arena.png',
     })
     mat.diffuseTexture!.hasAlpha = true;
     mat.specularColor = new Bab.Color3(0, 0, 0.05);

@@ -11,8 +11,11 @@ import {
 import { Effect } from '../effects';
 import { FightCollection } from '../fight-collection';
 import { getBasicValues } from '../decode-fight';
+import { useCastState } from '../../composables/castState';
 
 export const DefaultMechanicSchedulingMode = 'parallel';
+
+const castState = useCastState();
 
 export type MechanicOptions = {
     label?: string
@@ -23,6 +26,7 @@ export type MechanicOptions = {
     clock?: Clock
     duration?: number | string
     telegraph?: number | string
+    usePlayerTick?: boolean
 }
 
 export class Mechanic extends EventEmitter {
@@ -37,6 +41,7 @@ export class Mechanic extends EventEmitter {
     collection: FightCollection;
     clock: Clock;
     isActive: boolean = false;
+    usePlayerTick: boolean = false;
     options: MechanicOptions;
 
     toJSON() {
@@ -78,6 +83,23 @@ export class Mechanic extends EventEmitter {
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
 
+        const onTickUpdate = (time: number) => {
+            this.tickUpdate(time);
+        };
+
+        this.usePlayerTick = options.usePlayerTick || false;
+        if (this.usePlayerTick) {
+            this.collection.playerClock.on('tick', onTickUpdate);
+            this.on('dispose', () => {
+                this.collection.playerClock.off('tick', onTickUpdate);
+            });
+        } else {
+            this.clock.on('tick', onTickUpdate);
+            this.on('dispose', () => {
+                this.clock.off('tick', onTickUpdate);
+            });
+        }
+
         const len = this.effects.length;
         for (let i = 0; i < len; i++) {
             const effect = this.effects[i];
@@ -107,11 +129,30 @@ export class Mechanic extends EventEmitter {
         return this.effects;
     }
 
+    startTime: number = 0;
+    endTime: number = 0;
+    get elapsed() { return this.clock.time - this.startTime; }
+
+    getDurationPercent(duration?: number) {
+        duration = duration || this.getDuration();
+        if (!duration || (!this.isActive && !this.startTime)) {
+            return 0;
+        }
+
+        if (this.endTime > this.startTime) {
+            return 1.0;
+        }
+
+        const elapsed = Math.min(duration, this.elapsed);
+        return Math.min(1.0, Math.max(0.0, elapsed / duration));
+    }
+
     async execute(n = 0, parent?: ScheduledParent<Mechanic>) {
         this.n = n;
         this.scheduledParent = parent;
 
         this.isActive = true;
+        this.startTime = this.clock.time;
         this.emit('start-execute');
 
         const effects = this.getEffects();
@@ -126,8 +167,31 @@ export class Mechanic extends EventEmitter {
             await Promise.all(effects.map(effect => this.executeEffect(effect)));
         }
 
+        this.endTime = this.clock.time;
         this.isActive = false;
         this.emit('end-execute');
+    }
+
+    tickUpdate(time: number) {
+        if (this.isActive) {
+            const durationPercent = this.getDurationPercent();
+            if (this.options.castName) {
+                const castPercent = this.options.castTime ? this.getDurationPercent(this.options.castTime) : durationPercent;
+                if (castPercent < 1) {
+                    castState.value = {
+                        name: this.options.castName,
+                        percent: castPercent,
+                    };
+                } else {
+                    castState.value = undefined;
+                }
+            }
+
+            this.emit('tick', {
+                time,
+                durationPercent,
+            });
+        }
     }
 
     async executeEffect(effect: Scheduled<Effect>) {

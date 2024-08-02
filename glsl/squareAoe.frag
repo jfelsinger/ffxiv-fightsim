@@ -2,10 +2,8 @@ precision highp float;
 
 uniform sampler2D textureSampler;
 uniform float elapsed;
-uniform vec3 color;
-
-uniform float elapsed;
 uniform float telegraph;
+uniform vec3 color;
 varying vec2 vUV;
 varying vec3 vPos;
 varying float iid;

@@ -31,11 +31,11 @@ export type EffectOptions = {
     label?: string
     color?: string
     duration: number | string
+    shiftSnapshot: number | string
     collection: FightCollection
     clock?: Clock
     usePlayerTick?: boolean
     telegraph?: number
-    castName?: string
 
     target?: EffectTarget | (EffectTarget[])
     position?: PositionOption
@@ -65,6 +65,7 @@ export class Effect extends EventEmitter {
     usePlayerTick: boolean = false;
 
     duration: number;
+    shiftSnapshot: number;
     target: EffectTarget[] = [];
 
     position: EffectOptions['position'];
@@ -91,6 +92,7 @@ export class Effect extends EventEmitter {
         this.telegraph = parseNumber(options.telegraph ?? 1.0);
         this.label = options.label;
         this.duration = parseNumber(options.duration ?? 0);
+        this.shiftSnapshot = parseNumber(options.shiftSnapshot ?? 0);
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
         this.color = options.color;
@@ -191,6 +193,10 @@ export class Effect extends EventEmitter {
         return this.duration || 0;
     }
 
+    getShift() {
+        return this.shiftSnapshot || 0;
+    }
+
     setTelegraph(telegraph: number | string) {
         this.telegraph = parseNumber(telegraph);
     }
@@ -263,8 +269,8 @@ export class Effect extends EventEmitter {
     endTime: number = 0;
     get elapsed() { return this.clock.time - this.startTime; }
 
-    getDurationPercent() {
-        const duration = this.getDuration();
+    getDurationPercent(duration?: number, unshifted?: boolean) {
+        duration = duration || (this.getDuration() - (unshifted ? 0 : this.getShift()));
         if (!duration || (!this.isActive && !this.startTime)) {
             return 0;
         }
@@ -299,12 +305,14 @@ export class Effect extends EventEmitter {
 
     async execute() {
         if (this.duration) {
-            await this.clock.wait(this.duration);
+            await this.clock.wait(this.duration - this.shiftSnapshot);
         }
 
         if (this.isActive) {
             this.snapshot();
         }
+
+        await this.clock.wait(this.shiftSnapshot);
     }
 
     snapshot() {

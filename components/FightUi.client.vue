@@ -301,7 +301,7 @@ function updateTime(val: number) {
                     <li>
                         <NuxtLink @click="toggleEditMode" class="tooltip tooltip-right px-2"
                             data-tip="Edit Position of Some UI Items">
-                            <Icon name="solar:pen-broken" />
+                            <Icon name="solar:ruler-pen-line-duotone" />
                         </NuxtLink>
                     </li>
                     <li>

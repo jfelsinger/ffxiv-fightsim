@@ -9,6 +9,7 @@ import { AoeSquareGridEffect } from './aoe-square-grid';
 import { DiceEffect } from './dice';
 import { TetherEffect } from './tether';
 import { DistributeEffect } from './distribute';
+import { CastBarEffect } from './cast-bar';
 
 export const effectsCollection = {
     'default': Effect,
@@ -21,6 +22,8 @@ export const effectsCollection = {
     'tether': TetherEffect,
     'dice': DiceEffect,
     'distribute': DistributeEffect,
+    'cast-bar': CastBarEffect,
+    'cast': CastBarEffect,
 } as const;
 
 export default effectsCollection;

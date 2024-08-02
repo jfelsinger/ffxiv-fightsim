@@ -11,15 +11,21 @@ import {
 
 export type AoeSquareEffectOptions = EffectOptions & {
     yalms?: number | string,
+    width?: number | string,
+    height?: number | string,
 };
 
 export class AoeSquareEffect extends Effect {
     name = 'aoe-square';
     yalms: number;
+    width: number;
+    height: number;
 
     constructor(options: AoeSquareEffectOptions) {
         super(options);
         this.yalms = parseNumber(options.yalms || 15);
+        this.width = parseNumber(options.width || options.yalms || 15);
+        this.height = parseNumber(options.height || options.yalms || 15);
     }
 
     async startup() {
@@ -45,7 +51,11 @@ export class AoeSquareEffect extends Effect {
             squareMat.setFloat('elapsed', durationPercent);
         });
 
-        const square = Bab.MeshBuilder.CreatePlane('area', { size: yalmsToM(this.yalms) }, this.scene);
+        const square = Bab.MeshBuilder.CreatePlane('area', {
+            size: yalmsToM(this.yalms),
+            width: yalmsToM(this.width),
+            height: yalmsToM(this.height),
+        }, this.scene);
         square.rotation.x = Math.PI / 2;
         square.position.y = 0.01;
         square.bakeCurrentTransformIntoVertices();
