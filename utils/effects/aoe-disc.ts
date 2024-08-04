@@ -54,12 +54,11 @@ export class AoeDiscEffect extends Effect {
             discMat.setFloat('arenaRadius', this.collection.arena.size / 2);
         }
 
-        const globalTelegraph = useState<number>('telegraph', () => 1.0);
-        discMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
+        discMat.setFloat('telegraph', this.adjustedTelegraph);
         discMat.setFloat('elapsed', this.getDurationPercent());
-        this.on('tick', ({ time, durationPercent }) => {
+        this.on('tick', ({ time, durationPercent, telegraph }) => {
             discMat.setFloat('time', time);
-            discMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
+            discMat.setFloat('telegraph', telegraph);
             discMat.setFloat('elapsed', durationPercent);
         });
 

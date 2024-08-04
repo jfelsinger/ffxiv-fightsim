@@ -144,7 +144,6 @@ export class DiceEffect extends Effect {
         // const diceMat = createAoeMat(this.scene, this.getColor(), 'diceMat');
         // diceMat.alpha = 0.7;
 
-        // const globalTelegraph = useState<number>('telegraph', () => 1.0);
         // diceMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
         // diceMat.setFloat('elapsed', this.getDurationPercent());
         // this.on('tick', ({ time, durationPercent }) => {

@@ -226,12 +226,14 @@ function updateTime(val: number) {
         <div class="fight-bot-center flex flex-col absolute bottom-12 z-50">
 
             <div class="flex p-2 bg-slate-100/45 rounded-box bg-blur min-w-96 gap-2 items-center">
-                <label @click="togglePause()"
-                    class="swap swap-rotate btn btn-sm bg-transparent border-transparent shadow-none px-2 "
-                    :class="{ 'swap-active': isPaused }">
-                    <Icon class="swap-on" name="solar:play-circle-linear" />
-                    <Icon class="swap-off" name="solar:pause-circle-linear" />
-                </label>
+                <div class="tooltip tooltip-bottom" data-tip="Start/Pause <Space>">
+                    <label @click="togglePause()"
+                        class="swap swap-rotate btn btn-sm bg-transparent border-transparent shadow-none px-2"
+                        :class="{ 'swap-active': isPaused }">
+                        <Icon class="swap-on" name="solar:play-circle-linear" />
+                        <Icon class="swap-off" name="solar:pause-circle-linear" />
+                    </label>
+                </div>
                 <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
                 <div class="pr-1 text-xs flex items-center">
                     <span class="countdown font-mono">

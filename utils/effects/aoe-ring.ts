@@ -107,16 +107,12 @@ export class AoeRingEffect extends Effect {
             ringMat.setFloat('arenaRadius', this.collection.arena.size / 2);
         }
 
-        const globalTelegraph = useState<number>('telegraph', () => 1.0);
-        ringMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
+        ringMat.setFloat('telegraph', this.adjustedTelegraph);
         ringMat.setFloat('elapsed', this.getDurationPercent());
-        this.on('tick', ({ time, durationPercent }) => {
+        this.on('tick', ({ time, durationPercent, telegraph }) => {
             ringMat.setFloat('time', time);
-            ringMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
+            ringMat.setFloat('telegraph', telegraph);
             ringMat.setFloat('elapsed', durationPercent);
-        });
-        this.on('dispose', () => {
-            this.clock.removeListener('tick', onTick);
         });
 
         const innerRadius = yalmsToM(this.innerRadius);

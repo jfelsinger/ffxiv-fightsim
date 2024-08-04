@@ -4,13 +4,18 @@ const route = useRoute();
 const { data } = await useFightContent();
 const fightData = data.value?.fight;
 // console.log('info: ', fightData, data.value?.info);
+
+const showInfo = ref(false);
+if (route.query.info) {
+    showInfo.value = true;
+}
 </script>
 <template>
     <div class="overflow-hidden max-h-screen max-w-screen h-screen relative">
         <Babylon :fight-data="fightData" :info-data="data?.info" :show-ui="true" />
 
         <div class="drawer drawer-end info-drawer z-[999] absolute top-0 right-0" v-if="data?.info">
-            <input id="info-drawer" type="checkbox" class="drawer-toggle" checked />
+            <input id="info-drawer" type="checkbox" class="drawer-toggle" :checked="showInfo" />
             <div class="drawer-content">
                 <label for="info-drawer"
                     class="drawer-button font-bold text-lg btn btn-ghost btn-sm absolute top-1 right-4">

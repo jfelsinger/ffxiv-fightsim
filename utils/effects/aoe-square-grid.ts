@@ -179,12 +179,11 @@ export class AoeSquareGridEffect extends AoeSquareEffect {
         const squareMat = createAoeMat(this.scene, this.getColor(), 'squareMat');
         squareMat.alpha = 0.7;
 
-        const globalTelegraph = useState<number>('telegraph', () => 1.0);
-        squareMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
+        squareMat.setFloat('telegraph', this.adjustedTelegraph);
         squareMat.setFloat('elapsed', this.getDurationPercent());
-        this.on('tick', ({ time, durationPercent }) => {
+        this.on('tick', ({ time, durationPercent, telegraph }) => {
             squareMat.setFloat('time', time);
-            squareMat.setFloat('telegraph', this.telegraph * globalTelegraph.value);
+            squareMat.setFloat('telegraph', telegraph);
             squareMat.setFloat('elapsed', durationPercent);
         });
 

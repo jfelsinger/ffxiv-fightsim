@@ -42,6 +42,8 @@ export type EffectOptions = {
     positionType?: EffectPositionType
     followPosition?: boolean
 
+    castName?: string
+
     positions?: PositionOption[]
     easing?: string,
     positionTypes?: EffectPositionType[]
@@ -51,6 +53,8 @@ export type EffectOptions = {
     // when randomly selecting from a group of targets
     repeatTarget?: boolean
 }
+
+const globalTelegraph = useState<number>('telegraph', () => 1.0);
 
 export class Effect extends EventEmitter {
     n?: number;
@@ -79,12 +83,15 @@ export class Effect extends EventEmitter {
 
     repeatTarget: boolean;
     telegraph: number;
+    telegraphShown = false;
 
     // The mesh for the effect itself
     mesh?: Bab.Mesh;
     options: EffectOptions;
 
     get scene() { return this.collection.scene; }
+
+    get adjustedTelegraph() { return this.telegraph * globalTelegraph.value; }
 
     constructor(options: EffectOptions) {
         super();
@@ -248,6 +255,7 @@ export class Effect extends EventEmitter {
     tickUpdate(time: number) {
         if (this.isActive) {
             const durationPercent = this.getDurationPercent();
+            const adjustedTelegraph = this.adjustedTelegraph;
             if (this.options.castName) {
                 if (durationPercent < 1) {
                     castState.value = {
@@ -257,10 +265,20 @@ export class Effect extends EventEmitter {
                 }
             }
 
+            if (!this.telegraphShown && adjustedTelegraph && durationPercent >= adjustedTelegraph) {
+                this.telegraphShown = true;
+                this.emit('show-telegraph', {
+                    time,
+                    durationPercent,
+                    telegraph: adjustedTelegraph,
+                });
+            }
+
             this.updatePosition(durationPercent);
             this.emit('tick', {
                 time,
                 durationPercent,
+                telegraph: adjustedTelegraph,
             });
         }
     }
@@ -287,7 +305,16 @@ export class Effect extends EventEmitter {
     async start(n = 0, parent?: ScheduledParent<Effect>) {
         this.n = n;
         this.scheduledParent = parent;
+        this.telegraphShown = false;
         console.log('EFFECT: ', n, parent, parent?.scheduled?.item, parent?.scheduled?.item?.position, parent?.scheduled?.item?.getPosition());
+
+        this.on('show-telegraph', () => {
+            this.clock.pause();
+        });
+
+        this.on('pre-snapshot', () => {
+            this.clock.pause();
+        });
 
         this.startTime = this.clock.time;
         console.log('EFFECT START: ', this.name, this.startTime, this);
@@ -308,14 +335,27 @@ export class Effect extends EventEmitter {
             await this.clock.wait(this.duration - this.shiftSnapshot);
         }
 
-        if (this.isActive) {
-            this.snapshot();
-        }
+        await this.preSnapshot();
+        this.snapshot();
 
         await this.clock.wait(this.shiftSnapshot);
     }
 
+    async preSnapshot() {
+        if (!this.isActive) { return; }
+        // else:
+
+        this.emit('pre-snapshot', { mesh: this.mesh });
+
+        // Shhh. No-one has to know that we're throwing the timing off by
+        // ~1ms + whatever the clock/frame delay is
+        await this.clock.wait(1);
+    }
+
     snapshot() {
+        if (!this.isActive) { return; }
+        // else:
+
         this.emit('snapshot', { mesh: this.mesh });
         this.checkCollisions();
     }
