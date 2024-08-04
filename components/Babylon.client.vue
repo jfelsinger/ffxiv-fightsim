@@ -47,6 +47,7 @@ let game: Engine | undefined;
 const cameraDirection = useState<number>('cameraDirection', () => 0);
 const characterDirection = useState<number>('characterDirection', () => 0);
 
+const { isTutorial } = useTutorialMode();
 const isHit = useState<boolean>('isHit', () => false);
 const hits = useState<number>('hits', () => 0);
 let hitTimeoutKey: ReturnType<typeof setTimeout> | undefined;
@@ -355,7 +356,7 @@ function onScaleTime(value: number) {
 
         <Minimap v-if="showUi" />
 
-        <div v-if="showUi"
+        <div v-if="showUi && !isTutorial"
             class="ui-extras absolute top-6 flex justify-center items-center p-2 px-4 bg-blur rounded bg-slate-100/50">
             <p>
                 Hits:

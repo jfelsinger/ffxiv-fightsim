@@ -22,6 +22,7 @@ const props = defineProps<{
 }>();
 
 const isPaused = ref(true);
+const { isTutorial } = useTutorialMode();
 
 const name = computed(() => props.fight?.name || 'Unnamed');
 const sections = computed(() => props.fight?.sections || []);
@@ -164,7 +165,9 @@ function open(side: string) {
 function reset() {
     open('');
     if (props.fight) {
-        emit('update', props.fight.clone());
+        const fight = props.fight;
+        emit('update', fight.clone());
+        fight.dispose();
     }
 }
 
@@ -275,12 +278,12 @@ function updateTime(val: number) {
         <div class="fight__sidebar z-50">
             <div class="fight__sidebar-content p-2 z-70">
                 <ul class="menu bg-slate-100/45  rounded-box">
-                    <li>
+                    <li v-if="!isTutorial">
                         <button @click="open('ui')" class="tooltip tooltip-right px-2" data-tip="Open UI">
                             <Icon name="solar:round-alt-arrow-right-broken" />
                         </button>
                     </li>
-                    <li>
+                    <li v-if="!isTutorial">
                         <button @click="open('code')" class="tooltip tooltip-right px-2" data-tip="Edit Fight Code">
                             <Icon name="solar:code-square-broken" />
                         </button>

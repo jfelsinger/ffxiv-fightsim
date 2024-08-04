@@ -10,6 +10,7 @@ export const fightsCollection = {
 
     // Tutorials
     'clock-spots-tutorial': ClockSpotsTutorial,
+    'tutorial-clock-spots': ClockSpotsTutorial,
 } as const;
 
 export default fightsCollection;

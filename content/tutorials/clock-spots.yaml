@@ -14,97 +14,97 @@ waymarks:
 waymarksPositionType: arena
 arena:
   yalms: 60
-sections:
-  - item:
-      name: test-section
-      scheduling: sequential
-      mechanics:
-        - startDelay: 100
-          # repeat: 2
-          endDelay: 1500
-          item:
-            name: m2s-stage-combo
-            telegraph: 0.5
-            duration: 4500
-            scheduling: sequential
-            castTime: 3500
-            effects:
-              - label: centerstage-cast
-                endDelay: 0
-                item:
-                  name: cast-bar
-                  castName: Centerstage Combo
-                  duration: 2000
-
-              - label: outerstage-cast
-                endDelay: 0
-                item:
-                  name: cast-bar
-                  castName: Outerstage Combo
-                  duration: 2000
-
-              # Center Inercards
-              - label: center-intercards
-                item:
-                  name: aoe-group
-                  color: 199,42,45
-                  shiftSnapshot: 500
-                  outerRadius: 30
-                  innerRadius: 0
-                  thetaLength: pi / 2
-                  angle: 45.5
-                  positionType: arena
-                  aoes:
-                    - name: aoe-disc
-                      yalms: 8
-                    - name: aoe-ring
-                      direction: 45
-                    - name: aoe-ring
-                      direction: -45
-                    - name: aoe-ring
-                      direction: 135
-                    - name: aoe-ring
-                      direction: -135
-
-              # Cardinals Cross
-              - label: cross-cards
-                item:
-                  name: aoe-group
-                  color: 199,42,45
-                  shiftSnapshot: 500
-                  aoes:
-                    - name: aoe-square
-                      yalms: 18
-                      height: 62
-                    - name: aoe-square
-                      yalms: 18
-                      width: 62
-
-              # Outer Cards
-              - label: outer-cards
-                item:
-                  name: aoe-group
-                  color: 199,42,45
-                  shiftSnapshot: 500
-                  outerRadius: 30
-                  innerRadius: 0
-                  thetaLength: pi / 2
-                  positionType: arena
-                  aoes:
-                    - name: aoe-ring
-                      yalms: 14.325
-                      outerRadius: 30
-                      innerRadius: 10
-                      thetaLength: pi * 2
-                    - name: aoe-ring
-                      direction: -90
-                      angle: 45.5
-                    - name: aoe-ring
-                      direction: 0
-                      angle: 45.5
-                    - name: aoe-ring
-                      direction: 90
-                      angle: 45.5
-                    - name: aoe-ring
-                      direction: 180
-                      angle: 45.5
+# sections:
+#   - item:
+#       name: test-section
+#       scheduling: sequential
+#       mechanics:
+#         - startDelay: 100
+#           # repeat: 2
+#           endDelay: 1500
+#           item:
+#             name: m2s-stage-combo
+#             telegraph: 0.5
+#             duration: 4500
+#             scheduling: sequential
+#             castTime: 3500
+#             effects:
+#               - label: centerstage-cast
+#                 endDelay: 0
+#                 item:
+#                   name: cast-bar
+#                   castName: Centerstage Combo
+#                   duration: 2000
+#
+#               - label: outerstage-cast
+#                 endDelay: 0
+#                 item:
+#                   name: cast-bar
+#                   castName: Outerstage Combo
+#                   duration: 2000
+#
+#               # Center Inercards
+#               - label: center-intercards
+#                 item:
+#                   name: aoe-group
+#                   color: 199,42,45
+#                   shiftSnapshot: 500
+#                   outerRadius: 30
+#                   innerRadius: 0
+#                   thetaLength: pi / 2
+#                   angle: 45.5
+#                   positionType: arena
+#                   aoes:
+#                     - name: aoe-disc
+#                       yalms: 8
+#                     - name: aoe-ring
+#                       direction: 45
+#                     - name: aoe-ring
+#                       direction: -45
+#                     - name: aoe-ring
+#                       direction: 135
+#                     - name: aoe-ring
+#                       direction: -135
+#
+#               # Cardinals Cross
+#               - label: cross-cards
+#                 item:
+#                   name: aoe-group
+#                   color: 199,42,45
+#                   shiftSnapshot: 500
+#                   aoes:
+#                     - name: aoe-square
+#                       yalms: 18
+#                       height: 62
+#                     - name: aoe-square
+#                       yalms: 18
+#                       width: 62
+#
+#               # Outer Cards
+#               - label: outer-cards
+#                 item:
+#                   name: aoe-group
+#                   color: 199,42,45
+#                   shiftSnapshot: 500
+#                   outerRadius: 30
+#                   innerRadius: 0
+#                   thetaLength: pi / 2
+#                   positionType: arena
+#                   aoes:
+#                     - name: aoe-ring
+#                       yalms: 14.325
+#                       outerRadius: 30
+#                       innerRadius: 10
+#                       thetaLength: pi * 2
+#                     - name: aoe-ring
+#                       direction: -90
+#                       angle: 45.5
+#                     - name: aoe-ring
+#                       direction: 0
+#                       angle: 45.5
+#                     - name: aoe-ring
+#                       direction: 90
+#                       angle: 45.5
+#                     - name: aoe-ring
+#                       direction: 180
+#                       angle: 45.5

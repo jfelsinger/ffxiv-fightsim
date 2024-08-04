@@ -55,6 +55,7 @@ export class Fight extends EventEmitter {
 
     startPosition?: PositionOption
     startPositionType?: PositionType
+    waymarks?: Waymark[]
 
     getDuration() {
         let duration = 0;
@@ -91,11 +92,14 @@ export class Fight extends EventEmitter {
             keys.forEach((name) => {
                 const position = waymarks[name];
                 if (position) {
-                    new Waymark(this, {
-                        name,
-                        position,
-                        positionType: this.options.waymarksPositionType || (this.options as any).waymarkPositionType,
-                    });
+                    this.waymarks = this.waymarks || [];
+                    this.waymarks?.push(
+                        new Waymark(this, {
+                            name,
+                            position,
+                            positionType: this.options.waymarksPositionType || (this.options as any).waymarkPositionType,
+                        })
+                    );
                 }
             })
         }
@@ -141,14 +145,15 @@ export class Fight extends EventEmitter {
             ...results,
             arena: this.arena?.toJSON(),
             sections: this.sections,
+            waymarks: this.options.waymarks,
         };
     }
 
     async execute() {
         this.isActive = true;
+        this.createWaymarks();
         this.emit('start-execute');
 
-        this.createWaymarks();
         if (this.scheduling === 'sequential') {
             const len = this.sections.length;
             for (let i = 0; i < len; i++) {
@@ -172,6 +177,7 @@ export class Fight extends EventEmitter {
 
     async dispose() {
         this.isActive = false;
+        this.emit('dispose');
         const len = this.sections.length;
         const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 const route = useRoute();
+const { isTutorial } = useTutorialMode();
+isTutorial.value = true;
+
 const { data } = await useFightContent();
 const fightData = data.value?.fight;
 // console.log('info: ', fightData, data.value?.info);

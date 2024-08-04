@@ -146,7 +146,9 @@ export class Character {
         this.camMarker.setParent(this.body)
 
         this.marker = this.makeMarker(charMat);
-        this.steering = new Steering(this.marker, this.clock);
+        this.steering = new Steering(this.marker, this.clock, {
+            maxForce: this.speed,
+        });
         this.position = this.startPosition.clone();
     }
 
@@ -271,5 +273,13 @@ export class Character {
             charMat,
             invisMat,
         };
+    }
+
+    dispose() {
+        this.head.dispose()
+        this.body.dispose()
+        this.marker.dispose()
+        this.camMarker.dispose()
+        this.collider.dispose()
     }
 }
