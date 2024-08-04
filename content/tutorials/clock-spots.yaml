@@ -1,6 +1,6 @@
-name: m2s
+name: tutorial-clock-spots
 scheduling: sequential
-startPosition: 0,-0.60
+startPosition: 0,-0.85
 startPositionType: arena
 waymarks:
   A: 0.0,0.5
@@ -13,9 +13,7 @@ waymarks:
   Four: -0.345,0.345
 waymarksPositionType: arena
 arena:
-  name: m2s-arena
-  yalms: 58
-  floorType: m2s
+  yalms: 60
 sections:
   - item:
       name: test-section

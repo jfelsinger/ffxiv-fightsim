@@ -360,16 +360,22 @@ export class Effect extends EventEmitter {
         this.checkCollisions();
     }
 
-    checkCollisions() {
+    checkCollisions(skipEmit?: boolean) {
         // TODO: Add checks for different party members later
 
         const target = this.collection.player;
         if (target && this.checkCharacterCollision(target)) {
-            this.emit('effect-hit', {
-                effect: this,
-                target: this.collection.player,
-            });
+            if (!skipEmit) {
+                this.emit('effect-hit', {
+                    effect: this,
+                    target: this.collection.player,
+                });
+            }
+
+            return true;
         }
+
+        return false;
     }
 
     checkCharacterCollision(target: Character) {

@@ -18,10 +18,11 @@ export function useFightContent(fightParams?: Array<string>) {
     ];
 
 
-    const raid = `${route.params.raid}`;
-    let path = `/raids/${raid}`;
+    const tutorial = route.params.tutorial;
+    const raid = route.params.raid;
+    let path = raid ? `/raids/${raid}` : `/tutorials/${tutorial}`;
 
-    const section = `${route.params.section}`;
+    const section = route.params.section;
     if (section) { path += `/sections/${section}`; }
 
     return useAsyncData(path, async () => {

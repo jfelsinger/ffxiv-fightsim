@@ -13,3 +13,48 @@
         clip-path: inset(0 0 100% 0px);
     }
 }
+
+$c-tank: #465ece;
+$c-healer: #477938;
+$c-dps: #7b3839;
+
+.prose {
+    .dps, .tank, .healer {
+        &::before {
+            content: "";
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin: 0 0.2rem;
+            outline: 1px solid #d9b126;
+        }
+    }
+
+    .dps {
+        color: $c-dps;
+        font-weight: 500;
+
+        &::before {
+            background: $c-dps;
+        }
+    }
+
+    .tank {
+        color: $c-tank;
+        font-weight: 500;
+
+        &::before {
+            background: $c-tank;
+        }
+    }
+
+    .healer {
+        color: $c-healer;
+        font-weight: 500;
+
+        &::before {
+            background: $c-healer;
+        }
+    }
+}

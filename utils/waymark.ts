@@ -4,56 +4,81 @@ import { getPosition } from './positioning';
 import getWaymarkSquareMat from '~/materials/waymarkSquare';
 import getWaymarkRoundMat from '~/materials/waymarkRound';
 import { Fight } from './fights';
+import { isWithinRadius } from './vector-helpers';
 
 export type WaymarkName =
-    | 'n1'
-    | 'n2'
-    | 'n3'
-    | 'n4'
-    | 'a'
-    | 'b'
-    | 'c'
-    | 'd'
+    | 'One'
+    | 'Two'
+    | 'Three'
+    | 'Four'
+    | 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+
+const WaymarkNameAliases: Record<string, WaymarkName> = {
+    'a': 'A',
+    'b': 'B',
+    'c': 'C',
+    'd': 'D',
+    'n1': 'One',
+    'n2': 'Two',
+    'n3': 'Three',
+    'n4': 'Four',
+    '1': 'One',
+    '2': 'Two',
+    '3': 'Three',
+    '4': 'Four',
+} as const;
 
 const WaymarkNameToSidesMapping: Record<WaymarkName, number> = {
-    'n1': 4,
-    'n2': 4,
-    'n3': 4,
-    'n4': 4,
-    'a': 11,
-    'b': 11,
-    'c': 11,
-    'd': 11,
+    'One': 4,
+    'Two': 4,
+    'Three': 4,
+    'Four': 4,
+    'A': 11,
+    'B': 11,
+    'C': 11,
+    'D': 11,
 } as const;
 
 const WaymarkNameToColorsMapping: Record<WaymarkName, string> = {
-    'a': 'red',
-    'n1': 'red',
-    'b': 'yellow',
-    'n2': 'yellow',
-    'c': 'blue',
-    'n3': 'blue',
-    'd': 'purple',
-    'n4': 'purple',
+    'A': 'red',
+    'One': 'red',
+    'B': 'yellow',
+    'Two': 'yellow',
+    'C': 'blue',
+    'Three': 'blue',
+    'D': 'purple',
+    'Four': 'purple',
 } as const;
 
 export type WaymarkOptions = {
-    name: WaymarkName
+    name: WaymarkName | keyof typeof WaymarkNameAliases
     label?: string
     position: PositionOption
     positionType?: PositionType
 }
 
+const SquareWaymarkRadius = 1.5;
+const RoundWaymarkRadius = 1.125;
+
 export class Waymark {
+    name: WaymarkName;
     fight: Fight;
     options: WaymarkOptions;
 
     icon?: Bab.Mesh;
     mesh?: Bab.Mesh;
 
+    get sides() { return WaymarkNameToSidesMapping[this.name]; }
+    get isSquare() { return this.sides === 4; }
+    get color() { return WaymarkNameToColorsMapping[this.name]; }
+
     constructor(fight: Fight, options: WaymarkOptions) {
         this.fight = fight;
         this.options = options;
+        this.name = WaymarkNameAliases[this.options.name] || this.options.name;
 
         this.fight.on('dispose', () => {
             this.dispose();
@@ -63,7 +88,7 @@ export class Waymark {
     }
 
     createMesh() {
-        const waymarkName = `waymark-${this.options.name}`;
+        const waymarkName = `waymark-${this.name.toLowerCase()}`;
 
         const position = this.getPosition();
         const iconSize = 2;
@@ -77,7 +102,7 @@ export class Waymark {
         iconMat.diffuseTexture.hasAlpha = true;
         iconMat.useAlphaFromDiffuseTexture = true;
 
-        const color = WaymarkNameToColorsMapping[this.options.name];
+        const color = WaymarkNameToColorsMapping[this.name];
         if (color === 'red') {
             iconMat.emissiveColor = new Bab.Color3(0.4588235294117647, 0.3843137254901961, 0.3843137254901961);// (HEX : #756262 , debugNode as BABYLON.StandardMaterial)
         } else if (color === 'yellow') {
@@ -93,12 +118,12 @@ export class Waymark {
         this.fight.collection.addGlow(icon);
         this.icon = icon;
 
-        let sides = WaymarkNameToSidesMapping[this.options.name];
+        let sides = WaymarkNameToSidesMapping[this.name];
         const bodyHeight = 4.5;
         const mesh = Bab.MeshBuilder.CreateCylinder(
             `${waymarkName}-body`,
             {
-                diameter: sides === 4 ? 3 : 2.25,
+                diameter: (sides === 4 ? SquareWaymarkRadius : RoundWaymarkRadius) * 2,
                 height: bodyHeight,
                 tessellation: sides,
                 sideOrientation: Bab.Mesh.DOUBLESIDE,
@@ -144,6 +169,31 @@ export class Waymark {
         return {
             mesh,
         };
+    }
+
+    // tickUpdate(time: number) {
+    // }
+
+    checkMeshCollision(target: Bab.Mesh) {
+        const isSquare = this.isSquare;
+        const mesh = this.mesh;
+        if (!mesh || !target) {
+            return false;
+        }
+
+        if (!isSquare) {
+            return isWithinRadius(
+                target.absolutePosition.x - mesh.absolutePosition.x,
+                target.absolutePosition.z - mesh.absolutePosition.z,
+                RoundWaymarkRadius // radius
+            );
+        } else {
+            return isWithinRadius(
+                target.absolutePosition.x - mesh.absolutePosition.x,
+                target.absolutePosition.z - mesh.absolutePosition.z,
+                RoundWaymarkRadius // radius
+            );
+        }
     }
 
     dispose() {

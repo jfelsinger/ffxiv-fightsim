@@ -77,7 +77,27 @@ export default defineNuxtConfig({
         '@vueuse/nuxt',
         [
             'nuxt-icon',
-            { class: 'nx-icon', },
+            {
+                class: 'nx-icon',
+                // customCollections: [
+                //     {
+                //         prefix: 'role',
+                //         dir: './public/images/roles',
+                //     },
+                //     {
+                //         prefix: 'role2',
+                //         dir: './images/roles',
+                //     },
+                //     {
+                //         prefix: 'role3',
+                //         dir: '/images/roles',
+                //     },
+                //     {
+                //         prefix: 'field',
+                //         dir: 'public/images/field-icons',
+                //     },
+                // ],
+            },
         ],
         [
             'dayjs-nuxt',
