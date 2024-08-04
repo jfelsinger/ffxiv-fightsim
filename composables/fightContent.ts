@@ -10,6 +10,9 @@ export function useFightContent(fightParams?: Array<string>) {
         'arenaType',
         'scheduling',
         'sections',
+        'waymarks',
+        'waymarksPositionType',
+        'waymarkPositionType',
         'startPosition',
         'startPositionType',
     ];

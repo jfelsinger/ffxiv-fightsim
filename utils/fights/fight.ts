@@ -8,6 +8,7 @@ import { decodeFight, getBasicValues } from '../decode-fight';
 import { FightSection } from '../sections';
 import type { PositionType, PositionOption } from '../positioning';
 import { getPosition } from '../positioning';
+import { type WaymarkName, Waymark } from '../waymark';
 
 import {
     type ScheduleMode,
@@ -32,6 +33,9 @@ export type FightOptions = {
     clock?: Clock
     arenaType?: string
     arena: ArenaOptions & any
+
+    waymarks?: Partial<Record<WaymarkName, PositionOption>>
+    waymarksPositionType?: PositionType
 
     startPosition?: PositionOption
     startPositionType?: PositionType
@@ -77,6 +81,24 @@ export class Fight extends EventEmitter {
             this.startPositionType,
             this.collection
         )
+    }
+
+    createWaymarks() {
+        const waymarks = this.options.waymarks;
+        console.log('Create Waymarks: ', waymarks);
+        if (waymarks) {
+            const keys = Object.keys(waymarks) as any as WaymarkName[];
+            keys.forEach((name) => {
+                const position = waymarks[name];
+                if (position) {
+                    new Waymark(this, {
+                        name,
+                        position,
+                        positionType: this.options.waymarksPositionType || (this.options as any).waymarkPositionType,
+                    });
+                }
+            })
+        }
     }
 
     constructor(options: FightOptions) {
@@ -126,6 +148,7 @@ export class Fight extends EventEmitter {
         this.isActive = true;
         this.emit('start-execute');
 
+        this.createWaymarks();
         if (this.scheduling === 'sequential') {
             const len = this.sections.length;
             for (let i = 0; i < len; i++) {

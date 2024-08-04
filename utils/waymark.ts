@@ -6,20 +6,20 @@ import getWaymarkRoundMat from '~/materials/waymarkRound';
 import { Fight } from './fights';
 
 export type WaymarkName =
-    | '1'
-    | '2'
-    | '3'
-    | '4'
+    | 'n1'
+    | 'n2'
+    | 'n3'
+    | 'n4'
     | 'a'
     | 'b'
     | 'c'
     | 'd'
 
 const WaymarkNameToSidesMapping: Record<WaymarkName, number> = {
-    '1': 4,
-    '2': 4,
-    '3': 4,
-    '4': 4,
+    'n1': 4,
+    'n2': 4,
+    'n3': 4,
+    'n4': 4,
     'a': 11,
     'b': 11,
     'c': 11,
@@ -28,20 +28,20 @@ const WaymarkNameToSidesMapping: Record<WaymarkName, number> = {
 
 const WaymarkNameToColorsMapping: Record<WaymarkName, string> = {
     'a': 'red',
-    '1': 'red',
+    'n1': 'red',
     'b': 'yellow',
-    '2': 'yellow',
+    'n2': 'yellow',
     'c': 'blue',
-    '3': 'blue',
+    'n3': 'blue',
     'd': 'purple',
-    '4': 'purple',
+    'n4': 'purple',
 } as const;
 
 export type WaymarkOptions = {
     name: WaymarkName
     label?: string
     position: PositionOption
-    positionType: PositionType
+    positionType?: PositionType
 }
 
 export class Waymark {
@@ -127,7 +127,7 @@ export class Waymark {
         } else if (color === 'blue') {
             matColor = Bab.Color3.FromHexString('#4883f1');
         } else if (color === 'purple') {
-            matColor = Bab.Color3.FromHexString('#8340d7');
+            matColor = Bab.Color3.FromHexString('#d653dd');
         }
 
         const bodyMat = sides === 4 ? getWaymarkSquareMat(this.fight.collection.scene, matColor) : getWaymarkRoundMat(this.fight.collection.scene, matColor);

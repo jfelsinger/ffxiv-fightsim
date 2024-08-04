@@ -179,6 +179,9 @@ export function decodeFight(data: any, options: FightDecodeOptions) {
 
     const sections = data?.sections?.map((section: any) => decodeScheduledFightSection(section, options)) || [];
 
+    console.log('FIGHT: OPTS - ', options);
+    console.log('FIGHT: DATA - ', data);
+
     return new fightClass({
         ...options,
         ...data,

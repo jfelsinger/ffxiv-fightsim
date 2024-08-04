@@ -265,15 +265,15 @@ function makeScene(game: Engine) {
         fight.execute();
 
         // TODO: Move positioning to be on the fight
-        const spacing = 0.2;
-        new Waymark(fight, { name: 'a', position: [(-0.25 + -1.5) * spacing, -1 * spacing], positionType: 'arena' });
-        new Waymark(fight, { name: 'b', position: [(-0.25 + -0.5) * spacing, -1 * spacing], positionType: 'arena' });
-        new Waymark(fight, { name: 'c', position: [(-0.25 + 0.5) * spacing, -1 * spacing], positionType: 'arena' });
-        new Waymark(fight, { name: 'd', position: [(-0.25 + 1.5) * spacing, -1 * spacing], positionType: 'arena' });
-        new Waymark(fight, { name: '1', position: [(-0.25 + -1.0) * spacing, -2 * spacing], positionType: 'arena' });
-        new Waymark(fight, { name: '2', position: [(-0.25 + 0) * spacing, -2 * spacing], positionType: 'arena' });
-        new Waymark(fight, { name: '3', position: [(-0.25 + 1.0) * spacing, -2 * spacing], positionType: 'arena' });
-        new Waymark(fight, { name: '4', position: [(-0.25 + 2.0) * spacing, -2 * spacing], positionType: 'arena' });
+        // const spacing = 0.2;
+        // new Waymark(fight, { name: 'a', position: [(-0.25 + -1.5) * spacing, -1 * spacing], positionType: 'arena' });
+        // new Waymark(fight, { name: 'b', position: [(-0.25 + -0.5) * spacing, -1 * spacing], positionType: 'arena' });
+        // new Waymark(fight, { name: 'c', position: [(-0.25 + 0.5) * spacing, -1 * spacing], positionType: 'arena' });
+        // new Waymark(fight, { name: 'd', position: [(-0.25 + 1.5) * spacing, -1 * spacing], positionType: 'arena' });
+        // new Waymark(fight, { name: '1', position: [(-0.25 + -1.0) * spacing, -2 * spacing], positionType: 'arena' });
+        // new Waymark(fight, { name: '2', position: [(-0.25 + 0) * spacing, -2 * spacing], positionType: 'arena' });
+        // new Waymark(fight, { name: '3', position: [(-0.25 + 1.0) * spacing, -2 * spacing], positionType: 'arena' });
+        // new Waymark(fight, { name: '4', position: [(-0.25 + 2.0) * spacing, -2 * spacing], positionType: 'arena' });
     }
 
     (window as any).__scenery = {

@@ -2,6 +2,16 @@ name: m2s
 scheduling: sequential
 startPosition: 0,-0.60
 startPositionType: arena
+waymarks:
+  a: 0.0,0.5
+  b: 0.5,0.0
+  c: 0.0,-0.5
+  d: -0.5,0.0
+  n1: 0.345,0.345
+  n2: 0.345,-0.345
+  n3: -0.345,-0.345
+  n4: -0.345,0.345
+waymarksPositionType: arena
 arena:
   name: m2s-arena
   yalms: 58
