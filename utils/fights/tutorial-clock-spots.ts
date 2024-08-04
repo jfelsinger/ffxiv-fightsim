@@ -11,6 +11,33 @@ import {
 export type ClockSpotsTutorialOptions = FightOptions & {
 };
 
+const WayMarkClockwiseListing = [
+    'A',
+    'One',
+    'B',
+    'Two',
+    'C',
+    'Three',
+    'D',
+    'Four',
+] as const;
+
+function getNextWaymark(name: string) {
+    const index = WayMarkClockwiseListing.indexOf(name as any);
+    if (index && index < WayMarkClockwiseListing.length - 1) {
+        return WayMarkClockwiseListing[index + 1];
+    }
+    return WayMarkClockwiseListing[0];
+}
+
+function getPrevWaymark(name: string) {
+    const index = WayMarkClockwiseListing.indexOf(name as any);
+    if (index && index >= 1) {
+        return WayMarkClockwiseListing[index - 1];
+    }
+    return WayMarkClockwiseListing[WayMarkClockwiseListing.length - 1];
+}
+
 export class ClockSpotsTutorial extends Fight {
     options: ClockSpotsTutorialOptions;
 
@@ -72,12 +99,26 @@ export class ClockSpotsTutorial extends Fight {
 
             const playerWaymark = waymarks[0];
             const npcsWithMark = npcs.map((npc, i) => {
+                const waymark = waymarks[i + 1];
+
+                const nextName = getNextWaymark(waymark.name);
+                const next = this.findWaymark(nextName);
+
+                const prevName = getPrevWaymark(waymark.name);
+                const prev = this.findWaymark(prevName);
+
                 return {
                     npc,
                     waymark: waymarks[i + 1],
+                    next,
+                    prev
                 };
             });
 
+
+            const bossPosition = Bab.Vector3.Zero();
+            (window as any).step = 1;
+            const getStep = () => (window as any).step;
             this.collection.worldClock.on('tick', () => {
                 marker = marker || this.collection.getMeshByName('waymark-one');
                 player = player || this.collection.characters['player'];
@@ -89,9 +130,39 @@ export class ClockSpotsTutorial extends Fight {
                 // // npc.steering.velocity = new Bab.Vector3(0.05, 0.0, 0.1);
                 // npc.steering.lookWhereGoing(true);
 
-                npcsWithMark.forEach(({ npc, waymark }) => {
-                    const target = waymark?.mesh?.position;
+                npcsWithMark.forEach(({ npc, waymark, next, prev }) => {
+                    const waymarkName = waymark?.name;
+                    let target = waymark?.mesh?.position?.clone();
                     if (target) {
+
+                        if (getStep() === 1) {
+                            if (['One', 'Two', 'Three', 'Four'].includes(waymarkName)) {
+                                target = bossPosition.add(target.scale(0.18))
+                            } else {
+                                target = bossPosition.add(target.scale(0.65))
+                            }
+                        } else if (getStep() === 2) {
+                            if (['One', 'Two', 'Three', 'Four'].includes(waymarkName)) {
+                                target = bossPosition.add(target.scale(0.65))
+                            } else {
+                                target = bossPosition.add(target.scale(0.18))
+                            }
+                        } else if (getStep() === 3) {
+                            if (['One', 'Two', 'Three', 'Four'].includes(waymarkName)) {
+                                target = next?.mesh?.position?.clone() || target;
+                                target = bossPosition.add(target.scale(0.45))
+                            } else {
+                                target = bossPosition.add(target.scale(0.18))
+                            }
+                        } else if (getStep() === 4) {
+                            if (['One', 'Two', 'Three', 'Four'].includes(waymarkName)) {
+                                target = bossPosition.add(target.scale(0.45))
+                            } else {
+                                target = prev?.mesh?.position?.clone() || target;
+                                target = bossPosition.add(target.scale(0.18))
+                            }
+                        }
+
                         npc.steering.seekWithArrive(target, { priority: 10.0 });
                     }
                     npc.steering.lookWhereGoing(true);

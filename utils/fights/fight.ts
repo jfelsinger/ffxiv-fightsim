@@ -105,6 +105,10 @@ export class Fight extends EventEmitter {
         }
     }
 
+    findWaymark(name: string) {
+        return this.waymarks?.find(w => w.name === name);
+    }
+
     constructor(options: FightOptions) {
         super();
         this.options = options;
