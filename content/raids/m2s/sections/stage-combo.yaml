@@ -3,18 +3,18 @@ scheduling: sequential
 startPosition: 0,-0.60
 startPositionType: arena
 waymarks:
-  A: 0.0,0.5
-  B: 0.5,0.0
-  C: 0.0,-0.5
-  D: -0.5,0.0
-  One: 0.345,0.345
-  Two: 0.345,-0.345
-  Three: -0.345,-0.345
-  Four: -0.345,0.345
+  A: 0.0,0.33
+  B: 0.33,0.0
+  C: 0.0,-0.33
+  D: -0.33,0.0
+  One: -0.340, 0.340
+  Two: 0.340, 0.340
+  Three: 0.340,-0.340
+  Four: -0.340,-0.340
 waymarksPositionType: arena
 arena:
-  name: m2s-arena
-  yalms: 58
+  yalms: 53
+  # floorType: m2s-2
   floorType: m2s
 sections:
   - item:
@@ -22,7 +22,7 @@ sections:
       scheduling: sequential
       mechanics:
         - startDelay: 100
-          # repeat: 2
+          repeat: 2
           endDelay: 1500
           item:
             name: m2s-stage-combo
@@ -34,15 +34,17 @@ sections:
               - label: centerstage-cast
                 endDelay: 0
                 item:
-                  name: cast-bar
+                  name: stage-combo-cast-bar
                   castName: Centerstage Combo
+                  telegraphDirection: cardinals
                   duration: 2000
 
               - label: outerstage-cast
                 endDelay: 0
                 item:
-                  name: cast-bar
+                  name: stage-combo-cast-bar
                   castName: Outerstage Combo
+                  telegraphDirection: intercardinals
                   duration: 2000
 
               # Center Inercards
@@ -58,7 +60,7 @@ sections:
                   positionType: arena
                   aoes:
                     - name: aoe-disc
-                      yalms: 8
+                      yalms: 6.5
                     - name: aoe-ring
                       direction: 45
                     - name: aoe-ring
@@ -76,10 +78,10 @@ sections:
                   shiftSnapshot: 500
                   aoes:
                     - name: aoe-square
-                      yalms: 18
+                      yalms: 15.5
                       height: 62
                     - name: aoe-square
-                      yalms: 18
+                      yalms: 15.5
                       width: 62
 
               # Outer Cards
@@ -96,7 +98,7 @@ sections:
                     - name: aoe-ring
                       yalms: 14.325
                       outerRadius: 30
-                      innerRadius: 10
+                      innerRadius: 6.5
                       thetaLength: pi * 2
                     - name: aoe-ring
                       direction: -90

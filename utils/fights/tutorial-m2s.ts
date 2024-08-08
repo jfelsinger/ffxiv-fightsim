@@ -9,7 +9,7 @@ import {
     type FightOptions,
 } from './';
 
-export type ClockSpotsTutorialOptions = FightOptions & {
+export type M2STutorialOptions = FightOptions & {
 };
 
 const WayMarkClockwiseListing = [
@@ -39,14 +39,14 @@ function getPrevWaymark(name: string) {
     return WayMarkClockwiseListing[WayMarkClockwiseListing.length - 1];
 }
 
-export class ClockSpotsTutorial extends Fight {
-    options: ClockSpotsTutorialOptions;
+export class M2STutorial extends Fight {
+    options: M2STutorialOptions;
 
-    constructor(options: ClockSpotsTutorialOptions) {
+    constructor(options: M2STutorialOptions) {
         super(options);
         this.options = options;
 
-        console.log('ClockSpotsTutorial: ', this);
+        console.log('M2STutorial: ', this);
 
 
         this.on('start-execute', () => {
@@ -183,18 +183,18 @@ export class ClockSpotsTutorial extends Fight {
                 radius: yalmsToM(5.5),
             }, this.collection.scene);
             disc2.rotation.x = Math.PI / 2;
-            disc2.position.y = 0.03;
+            disc2.position.y = 0.02;
             const disc2Mat = new Bab.StandardMaterial('marker-mat', this.collection.scene);
-            disc2Mat.diffuseColor = Bab.Color3.Blue();
-            disc2Mat.alpha = 0.49;
+            disc2Mat.diffuseColor = Bab.Color3.Red();
+            disc2Mat.alpha = 0.55;
             disc2.material = disc2Mat;
 
             const disc = Bab.MeshBuilder.CreateDisc('marker', {
-                radius: yalmsToM(15),
+                radius: yalmsToM(2.5),
             }, this.collection.scene);
             disc.rotation.x = Math.PI / 2;
             // disc.position = playerWaymark.mesh?.position?.clone() || disc.position;
-            disc.position.y = 0.02;
+            disc.position.y = 0.03;
             const discMat = new Bab.StandardMaterial('marker-mat', this.collection.scene);
             discMat.diffuseColor = Bab.Color3.Green();
             discMat.alpha = 0.49;

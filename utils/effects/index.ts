@@ -10,6 +10,7 @@ import { DiceEffect } from './dice';
 import { TetherEffect } from './tether';
 import { DistributeEffect } from './distribute';
 import { CastBarEffect } from './cast-bar';
+import { StageComboCastEffect } from './stage-combo-cast';
 
 export const effectsCollection = {
     'default': Effect,
@@ -24,6 +25,7 @@ export const effectsCollection = {
     'distribute': DistributeEffect,
     'cast-bar': CastBarEffect,
     'cast': CastBarEffect,
+    'stage-combo-cast-bar': StageComboCastEffect,
 } as const;
 
 export default effectsCollection;

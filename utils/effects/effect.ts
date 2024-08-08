@@ -308,13 +308,15 @@ export class Effect extends EventEmitter {
         this.telegraphShown = false;
         console.log('EFFECT: ', n, parent, parent?.scheduled?.item, parent?.scheduled?.item?.position, parent?.scheduled?.item?.getPosition());
 
-        this.on('show-telegraph', () => {
-            this.clock.pause();
-        });
+        // TODO: Implement this somewhere else.
+        // TODO: if tutorial mode
+        // this.on('show-telegraph', () => {
+        //     this.clock.pause();
+        // });
 
-        this.on('pre-snapshot', () => {
-            this.clock.pause();
-        });
+        // this.on('pre-snapshot', () => {
+        //     this.clock.pause();
+        // });
 
         this.startTime = this.clock.time;
         console.log('EFFECT START: ', this.name, this.startTime, this);

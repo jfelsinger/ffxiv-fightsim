@@ -38,5 +38,37 @@ if (route.query.info) {
                 </div>
             </div>
         </div>
+
+        <div class="youtube">
+            <!--
+            <iframe width="560" height="315"
+                src="https://www.youtube.com/embed/OqtPbLygc-A?si=_Oh97nZuSLW9v8Pw&amp;controls=0"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            -->
+        </div>
     </div>
 </template>
+
+<style lang="scss">
+.youtube {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+
+    iframe {}
+
+    &,
+    iframe {
+        width: 100%;
+        height: 100%;
+        opacity: .85;
+        filter: hue-rotate(0.4);
+        pointer-events: none;
+
+    }
+}
+</style>
