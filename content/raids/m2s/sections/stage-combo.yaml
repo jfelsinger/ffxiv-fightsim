@@ -1,6 +1,6 @@
 name: m2s
 scheduling: sequential
-startPosition: 0,-0.60
+startPosition: 0,-0.525
 startPositionType: arena
 waymarks:
   A: 0.0,0.33
