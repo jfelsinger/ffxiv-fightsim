@@ -14,8 +14,8 @@ waymarks:
 waymarksPositionType: arena
 arena:
   yalms: 53
-  # floorType: m2s-2
-  floorType: m2s
+  floorType: m2s-2
+  # floorType: m2s
 sections:
   - item:
       name: test-section
