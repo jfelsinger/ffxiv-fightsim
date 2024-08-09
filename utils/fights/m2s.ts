@@ -1,5 +1,6 @@
 import * as Bab from '@babylonjs/core';
 import { yalmsToM } from '../conversions';
+import createMarkerMat from '../../materials/enemy-marker';
 
 import {
     Fight,
@@ -20,9 +21,11 @@ export class M2SFight extends Fight {
         const bossSize = yalmsToM(5.5);
         const height = bossSize * 1.333;
         const width = height * 1.508;
+
         const boss = Bab.MeshBuilder.CreatePlane('boss', { width, height }, this.collection.scene);
         this.boss = boss;
         boss.position.y = bossSize / 1.25;
+
         const bossMat = new Bab.StandardMaterial('m2s-boss-mat', this.collection.scene);
         bossMat.diffuseTexture = new Bab.Texture('/images/fights/m2s/boss.png');
         bossMat.diffuseTexture.hasAlpha = true;
@@ -31,15 +34,17 @@ export class M2SFight extends Fight {
         boss.material = bossMat;
         boss.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
 
-        const disc2 = Bab.MeshBuilder.CreateDisc('marker', {
-            radius: bossSize,
+        const bossMarkerMat = createMarkerMat(this.collection.scene);
+
+        const bossMarker = Bab.MeshBuilder.CreatePlane('boss-marker', {
+            size: bossSize * 2,
         }, this.collection.scene);
-        disc2.rotation.x = Math.PI / 2;
-        disc2.position.y = 0.02;
-        const disc2Mat = new Bab.StandardMaterial('marker-mat', this.collection.scene);
-        disc2Mat.diffuseColor = Bab.Color3.Red();
-        disc2Mat.alpha = 0.55;
-        disc2.material = disc2Mat;
+        bossMarker.rotation.x = Math.PI / 2;
+        bossMarker.position.y = 0.02;
+        bossMarker.material = bossMarkerMat;
+        bossMarker.rotation.z = -Math.PI / 2;
+        bossMarker.position.y += 0.05;
+        bossMarker.bakeCurrentTransformIntoVertices();
     }
 
     async dispose() {

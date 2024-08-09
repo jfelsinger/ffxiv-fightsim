@@ -126,8 +126,8 @@ export class M2SStageCombo extends Mechanic {
             position.add(new Bab.Vector3(-0.1, 0.45, 0.1)),
         );
 
-        particles.minEmitPower = 1;
-        particles.maxEmitPower = 3;
+        particles.minEmitPower = 2.25;
+        particles.maxEmitPower = 3.5;
         particles.updateSpeed = 0.005;
         return particles;
     }
