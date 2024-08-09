@@ -98,6 +98,13 @@ export class M2SStageCombo extends Mechanic {
             }
         });
 
+        this.on('dispose', () => {
+            for (const p of particles) {
+                p.stop();
+                p.dispose();
+            }
+        });
+
         return result;
         // return [
         //     ...stageCombos[comboName].map(e => stageEffects[e]).filter(e => typeof e !== 'undefined'),

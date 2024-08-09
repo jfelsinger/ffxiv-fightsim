@@ -203,6 +203,7 @@ export class Mechanic extends EventEmitter {
 
     async dispose() {
         this.isActive = false;
+        this.emit('dispose');
         const len = this.effects.length;
         const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
