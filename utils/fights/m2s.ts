@@ -22,12 +22,12 @@ export class M2SFight extends Fight {
         const width = height * 1.508;
         const boss = Bab.MeshBuilder.CreatePlane('boss', { width, height }, this.collection.scene);
         this.boss = boss;
-        boss.position.y = bossSize / 1.5;
+        boss.position.y = bossSize / 1.25;
         const bossMat = new Bab.StandardMaterial('m2s-boss-mat', this.collection.scene);
         bossMat.diffuseTexture = new Bab.Texture('/images/fights/m2s/boss.png');
         bossMat.diffuseTexture.hasAlpha = true;
-        bossMat.specularColor = new Bab.Color3(0, 0, 0);
         bossMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
+        bossMat.useAlphaFromDiffuseTexture = true;
         boss.material = bossMat;
         boss.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
 
