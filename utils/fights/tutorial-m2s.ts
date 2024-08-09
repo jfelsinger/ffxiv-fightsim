@@ -2,44 +2,20 @@ import * as Bab from '@babylonjs/core';
 import { Character } from '../character';
 import { getPosition } from '../positioning';
 import { shuffleArray } from '../array-shuffle';
+import { rotateArray } from '../array-rotate';
+import { isWithinRadius } from '../vector-helpers';
 import { yalmsToM } from '../conversions';
+import { Indicator } from '../indicator';
 
 import {
-    Fight,
-    type FightOptions,
-} from './';
+    M2SFight,
+    type M2SFightOptions,
+} from './m2s';
 
-export type M2STutorialOptions = FightOptions & {
+export type M2STutorialOptions = M2SFightOptions & {
 };
 
-const WayMarkClockwiseListing = [
-    'A',
-    'One',
-    'B',
-    'Two',
-    'C',
-    'Three',
-    'D',
-    'Four',
-] as const;
-
-function getNextWaymark(name: string) {
-    const index = WayMarkClockwiseListing.indexOf(name as any);
-    if (index && index < WayMarkClockwiseListing.length - 1) {
-        return WayMarkClockwiseListing[index + 1];
-    }
-    return WayMarkClockwiseListing[0];
-}
-
-function getPrevWaymark(name: string) {
-    const index = WayMarkClockwiseListing.indexOf(name as any);
-    if (index && index >= 1) {
-        return WayMarkClockwiseListing[index - 1];
-    }
-    return WayMarkClockwiseListing[WayMarkClockwiseListing.length - 1];
-}
-
-export class M2STutorial extends Fight {
+export class M2STutorial extends M2SFight {
     options: M2STutorialOptions;
 
     constructor(options: M2STutorialOptions) {
@@ -48,25 +24,74 @@ export class M2STutorial extends Fight {
 
         console.log('M2STutorial: ', this);
 
-
         this.on('start-execute', () => {
-            const makeNpc = (name: string, position: string) => {
+            const roles = shuffleArray([
+                'tank',
+                'tank',
+                'healer',
+                'healer',
+                'dps',
+                'dps',
+                'dps',
+                'dps',
+            ]);
+
+            let dpsCount = 1;
+            let supportCount = 1;
+            const makeNpc = (name: string, position: string, role: string) => {
+                let color = Bab.Color3.FromHexString('#e9c8aa');
+                let specular = Bab.Color3.FromHexString('#e9c8aa');
+
+                if (role === 'tank') {
+                    color = Bab.Color3.FromHexString('#889aef');
+                    specular = Bab.Color3.FromHexString('#465ece');
+                } else if (role === 'healer') {
+                    color = Bab.Color3.FromHexString('#a2cc96');
+                    specular = Bab.Color3.FromHexString('477938');
+                } else if (role === 'dps') {
+                    color = Bab.Color3.FromHexString('#de9899');
+                    specular = Bab.Color3.FromHexString('#7b3839');
+                }
+
                 const npc = new Character(name, {
-                    diffuseColor: Bab.Color3.FromHexString('#e9c8aa'),
-                    specularColor: Bab.Color3.Magenta(),
+                    role: role as any,
+                    diffuseColor: color,
+                    specularColor: specular,
                     startPosition: getPosition(
                         position,
                         'arena',
                         this.collection
                     ),
                 }, this.collection.scene, this.collection.worldClock);
+                npc.tags.add(role);
+                if (role === 'tank' || role === 'healer') {
+                    npc.tags.add('support');
+                }
+
                 this.collection.addCharacter(npc);
                 return npc;
             };
 
             let player = this.collection.characters['player'];
-            let marker = this.collection.getMeshByName('waymark-one');
-            const waymarks = shuffleArray(this.waymarks || []);
+            if (player) {
+                const role = roles[0];
+                player.role = role;
+                player.tags.add(role);
+                if (role === 'tank' || role === 'healer') {
+                    player.tags.add('support');
+                }
+
+                if (role === 'tank') {
+                    (player.body.material as Bab.StandardMaterial).diffuseColor = Bab.Color3.FromHexString('#465ece');
+                    (player.body.material as Bab.StandardMaterial).specularColor = Bab.Color3.FromHexString('#889aef');
+                } else if (role === 'healer') {
+                    (player.body.material as Bab.StandardMaterial).diffuseColor = Bab.Color3.FromHexString('#477938');
+                    (player.body.material as Bab.StandardMaterial).specularColor = Bab.Color3.FromHexString('#a2cc96');
+                } else if (role === 'dps') {
+                    (player.body.material as Bab.StandardMaterial).diffuseColor = Bab.Color3.FromHexString('#7b3839');
+                    (player.body.material as Bab.StandardMaterial).specularColor = Bab.Color3.FromHexString('#de9899');
+                }
+            }
 
             const getRandPosition = () => {
                 let x = 0 + (Math.random() - 0.5) * 0.18;
@@ -77,7 +102,7 @@ export class M2STutorial extends Fight {
                     x - 0.35;
                 }
 
-                let y = -0.72 + (Math.random() - 0.5) * 0.15;
+                let y = (Math.random() - 0.5) * 0.15;
                 y = Math.round(y * 1200) / 1000;
                 if (y > -0.85) {
                     y + 0.15;
@@ -88,144 +113,82 @@ export class M2STutorial extends Fight {
 
                 return `${x},${y}`;
             };
+
             const npcs = [
-                makeNpc('npc-1', getRandPosition()),
-                makeNpc('npc-2', getRandPosition()),
-                makeNpc('npc-3', getRandPosition()),
-                makeNpc('npc-4', getRandPosition()),
-                makeNpc('npc-5', getRandPosition()),
-                makeNpc('npc-6', getRandPosition()),
-                makeNpc('npc-7', getRandPosition()),
+                makeNpc('npc-1', getRandPosition(), roles[1]),
+                makeNpc('npc-2', getRandPosition(), roles[2]),
+                makeNpc('npc-3', getRandPosition(), roles[3]),
+                makeNpc('npc-4', getRandPosition(), roles[4]),
+                makeNpc('npc-5', getRandPosition(), roles[5]),
+                makeNpc('npc-6', getRandPosition(), roles[6]),
+                makeNpc('npc-7', getRandPosition(), roles[7]),
             ] as const;
 
-            const playerWaymark = waymarks[0];
-            const npcsWithMark = npcs.map((npc, i) => {
-                const waymark = waymarks[i + 1];
+            const characters = shuffleArray([
+                player,
+                ...npcs,
+            ]);
 
-                const nextName = getNextWaymark(waymark.name);
-                const next = this.findWaymark(nextName);
-
-                const prevName = getPrevWaymark(waymark.name);
-                const prev = this.findWaymark(prevName);
-
-                return {
-                    npc,
-                    waymark: waymarks[i + 1],
-                    next,
-                    prev
-                };
+            characters.forEach((character) => {
+                if (character?.tags?.has('support')) {
+                    character.tags.add(`support-${supportCount++}`);
+                } else if (character?.tags?.has('dps')) {
+                    character.tags.add(`dps-${dpsCount++}`);
+                }
             });
 
+            (window as any).characters = characters;
 
-            const bossPosition = Bab.Vector3.Zero();
-            (window as any).step = 1;
-            const getStep = () => (window as any).step;
+            // (window as any).step = 1;
+            // const getStep = () => (window as any).step;
+
             this.collection.worldClock.on('tick', () => {
-                marker = marker || this.collection.getMeshByName('waymark-one');
-                player = player || this.collection.characters['player'];
-                // if (player) {
-                //     npc.steering.lookAtMesh(player);
-                // }
-                // const direction = npc.getDirection(Bab.Vector3.Forward());
-                // npc.velocity = direction;
-                // // npc.steering.velocity = new Bab.Vector3(0.05, 0.0, 0.1);
-                // npc.steering.lookWhereGoing(true);
-
-                npcsWithMark.forEach(({ npc, waymark, next, prev }) => {
-                    const waymarkName = waymark?.name;
-                    let target = waymark?.mesh?.position?.clone();
-                    if (target) {
-
-                        if (getStep() === 1) {
-                            if (['One', 'Two', 'Three', 'Four'].includes(waymarkName)) {
-                                target = bossPosition.add(target.scale(0.18))
-                            } else {
-                                target = bossPosition.add(target.scale(0.65))
-                            }
-                        } else if (getStep() === 2) {
-                            if (['One', 'Two', 'Three', 'Four'].includes(waymarkName)) {
-                                target = bossPosition.add(target.scale(0.65))
-                            } else {
-                                target = bossPosition.add(target.scale(0.18))
-                            }
-                        } else if (getStep() === 3) {
-                            if (['One', 'Two', 'Three', 'Four'].includes(waymarkName)) {
-                                target = next?.mesh?.position?.clone() || target;
-                                target = bossPosition.add(target.scale(0.45))
-                            } else {
-                                target = bossPosition.add(target.scale(0.18))
-                            }
-                        } else if (getStep() === 4) {
-                            if (['One', 'Two', 'Three', 'Four'].includes(waymarkName)) {
-                                target = bossPosition.add(target.scale(0.45))
-                            } else {
-                                target = prev?.mesh?.position?.clone() || target;
-                                target = bossPosition.add(target.scale(0.18))
-                            }
-                        }
-
-                        npc.steering.seekWithArrive(target, { priority: 10.0 });
-                    }
-                    npc.steering.lookWhereGoing(true);
-                    npc.steering.animate();
-                })
-                // if (marker) {
-                //     npc.steering.seekWithArrive(marker?.position, { priority: 10.0 });
-                // }
-                // if (player) {
-                //     npc.steering.persue(player.position, player.velocity.scale(0.1), { weight: 0.01 });
-                // }
-                // npc.steering.lookWhereGoing(true);
-                // npc.steering.animate();
             });
 
-            const disc2 = Bab.MeshBuilder.CreateDisc('marker', {
-                radius: yalmsToM(5.5),
-            }, this.collection.scene);
-            disc2.rotation.x = Math.PI / 2;
-            disc2.position.y = 0.02;
-            const disc2Mat = new Bab.StandardMaterial('marker-mat', this.collection.scene);
-            disc2Mat.diffuseColor = Bab.Color3.Red();
-            disc2Mat.alpha = 0.55;
-            disc2.material = disc2Mat;
-
-            const disc = Bab.MeshBuilder.CreateDisc('marker', {
-                radius: yalmsToM(2.5),
-            }, this.collection.scene);
-            disc.rotation.x = Math.PI / 2;
-            // disc.position = playerWaymark.mesh?.position?.clone() || disc.position;
-            disc.position.y = 0.03;
-            const discMat = new Bab.StandardMaterial('marker-mat', this.collection.scene);
-            discMat.diffuseColor = Bab.Color3.Green();
-            discMat.alpha = 0.49;
-            disc.material = discMat;
+            const indicator = new Indicator({}, this.collection);
 
             let isInPosition = false;
             let key: any;
-            this.collection.playerClock.on('tick', () => {
-                const collider = player?.collider;
-                if (collider && playerWaymark?.checkMeshCollision(collider)) {
+
+            const checkPositionTick = () => {
+                if (indicator.playerIsInPosition(player)) {
                     if (!isInPosition) {
                         console.log('getting in position...');
                         isInPosition = true;
                         key = setTimeout(() => {
-                            console.log('WE IN POSITION!');
+                            this.emit('in-position');
+                            console.log('WE\'RE IN POSITION!');
                         }, 500);
                     }
                 } else {
                     isInPosition = false;
                     clearTimeout(key);
                 }
-            });
+            };
+            this.collection.playerClock.on('tick', checkPositionTick);
 
             this.on('dispose', () => {
+                this.collection.playerClock.off('tick', checkPositionTick);
                 npcs.forEach(npc => npc.dispose())
-                disc.dispose();
+                indicator.dispose();
             });
         });
     }
 
-    async dispose() {
+    isInPosition(player: Character | undefined, position: Bab.Vector3, radius = 1.5) {
+        const colliderPosition = player?.collider?.absolutePosition;
+        if (colliderPosition) {
+            return isWithinRadius(
+                position.x - colliderPosition.x,
+                position.z - colliderPosition.z,
+                radius
+            );
+        }
+
+        return false;
+    }
+
+    override async dispose() {
         await super.dispose();
     }
 }

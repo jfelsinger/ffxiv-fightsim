@@ -27,6 +27,9 @@ export type MechanicOptions = {
     duration?: number | string
     telegraph?: number | string
     usePlayerTick?: boolean
+
+    castName?: string
+    castTime?: number
 }
 
 export class Mechanic extends EventEmitter {

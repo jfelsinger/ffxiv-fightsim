@@ -209,7 +209,8 @@ export class Effect extends EventEmitter {
     }
 
     getPosition(value?: number): Bab.Vector3 {
-        const target = this.getTarget('player')
+        // const target = this.getTarget('player')
+        const target = this.getTargets();
         if (this.scheduledParent?.scheduled?.item) {
             if (this.position === 'parent') {
                 return this.scheduledParent.scheduled.item.getPosition();
@@ -306,7 +307,7 @@ export class Effect extends EventEmitter {
         this.n = n;
         this.scheduledParent = parent;
         this.telegraphShown = false;
-        console.log('EFFECT: ', n, parent, parent?.scheduled?.item, parent?.scheduled?.item?.position, parent?.scheduled?.item?.getPosition());
+        // console.log('EFFECT: ', n, parent, parent?.scheduled?.item, parent?.scheduled?.item?.position, parent?.scheduled?.item?.getPosition());
 
         // TODO: Implement this somewhere else.
         // TODO: if tutorial mode
@@ -319,7 +320,7 @@ export class Effect extends EventEmitter {
         // });
 
         this.startTime = this.clock.time;
-        console.log('EFFECT START: ', this.name, this.startTime, this);
+        // console.log('EFFECT START: ', this.name, this.startTime, this);
         this.emit('start');
         await this.startup();
 
@@ -340,7 +341,9 @@ export class Effect extends EventEmitter {
         await this.preSnapshot();
         this.snapshot();
 
-        await this.clock.wait(this.shiftSnapshot);
+        if (this.shiftSnapshot) {
+            await this.clock.wait(this.shiftSnapshot);
+        }
     }
 
     async preSnapshot() {

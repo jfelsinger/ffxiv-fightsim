@@ -5,7 +5,6 @@ import { clamp, lerp } from './interpolation';
 import createMarkerMat from '../materials/marker';
 import { Clock } from './clock';
 
-
 import Debug from 'debug';
 const debug = Debug('game:utils:character');
 

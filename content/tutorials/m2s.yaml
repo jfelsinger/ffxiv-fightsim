@@ -1,6 +1,6 @@
 name: tutorial-m2s
 scheduling: sequential
-startPosition: 0,-0.85
+startPosition: 0,-0.525
 startPositionType: arena
 waymarks:
   A: 0.0,0.33
@@ -15,97 +15,161 @@ waymarksPositionType: arena
 arena:
   yalms: 53
   floorType: m2s
-# sections:
-#   - item:
-#       name: test-section
-#       scheduling: sequential
-#       mechanics:
-#         - startDelay: 100
-#           # repeat: 2
-#           endDelay: 1500
-#           item:
-#             name: m2s-stage-combo
-#             telegraph: 0.5
-#             duration: 4500
-#             scheduling: sequential
-#             castTime: 3500
-#             effects:
-#               - label: centerstage-cast
-#                 endDelay: 0
-#                 item:
-#                   name: cast-bar
-#                   castName: Centerstage Combo
-#                   duration: 2000
-#
-#               - label: outerstage-cast
-#                 endDelay: 0
-#                 item:
-#                   name: cast-bar
-#                   castName: Outerstage Combo
-#                   duration: 2000
-#
-#               # Center Inercards
-#               - label: center-intercards
-#                 item:
-#                   name: aoe-group
-#                   color: 199,42,45
-#                   shiftSnapshot: 500
-#                   outerRadius: 30
-#                   innerRadius: 0
-#                   thetaLength: pi / 2
-#                   angle: 45.5
-#                   positionType: arena
-#                   aoes:
-#                     - name: aoe-disc
-#                       yalms: 8
-#                     - name: aoe-ring
-#                       direction: 45
-#                     - name: aoe-ring
-#                       direction: -45
-#                     - name: aoe-ring
-#                       direction: 135
-#                     - name: aoe-ring
-#                       direction: -135
-#
-#               # Cardinals Cross
-#               - label: cross-cards
-#                 item:
-#                   name: aoe-group
-#                   color: 199,42,45
-#                   shiftSnapshot: 500
-#                   aoes:
-#                     - name: aoe-square
-#                       yalms: 18
-#                       height: 62
-#                     - name: aoe-square
-#                       yalms: 18
-#                       width: 62
-#
-#               # Outer Cards
-#               - label: outer-cards
-#                 item:
-#                   name: aoe-group
-#                   color: 199,42,45
-#                   shiftSnapshot: 500
-#                   outerRadius: 30
-#                   innerRadius: 0
-#                   thetaLength: pi / 2
-#                   positionType: arena
-#                   aoes:
-#                     - name: aoe-ring
-#                       yalms: 14.325
-#                       outerRadius: 30
-#                       innerRadius: 10
-#                       thetaLength: pi * 2
-#                     - name: aoe-ring
-#                       direction: -90
-#                       angle: 45.5
-#                     - name: aoe-ring
-#                       direction: 0
-#                       angle: 45.5
-#                     - name: aoe-ring
-#                       direction: 90
-#                       angle: 45.5
-#                     - name: aoe-ring
-#                       direction: 180
-#                       angle: 45.5
+  # floorType: m2s-2
+sections:
+  - label: Alarm Pheromones 2
+    startDelay: 500
+    item:
+      name: m2s-alarm-pheromones-2
+      scheduling: parallel
+      mechanics:
+        # - label: Alarm Pheromones
+        #   item:
+        #     name: m2s-alarm-pheromones-2
+        #     castName: Alarm Pheromones
+        #     castTime: 2700
+        #     telegraph: 1.0
+        #     effects:
+        #       - label: bees-1
+        #         item:
+        #           name: m2s-alarm-pheromones-2-bees
+        #           duration: 5250
+        #       - label: bees-2
+        #         startDelay: 4850 * 1
+        #         item:
+        #           name: m2s-alarm-pheromones-2-bees
+        #           duration: 5250
+        #       - label: bees-3
+        #         startDelay: 4850 * 2
+        #         item:
+        #           name: m2s-alarm-pheromones-2-bees
+        #           duration: 5250
+        #       - label: bees-4
+        #         startDelay: 4850 * 3
+        #         item:
+        #           name: m2s-alarm-pheromones-2-bees
+        #           duration: 5250
+        #       - label: bees-5
+        #         startDelay: 4850 * 4
+        #         item:
+        #           name: m2s-alarm-pheromones-2-bees
+        #           duration: 5250
+        #       - label: bees-6
+        #         startDelay: 4850 * 5
+        #         item:
+        #           name: m2s-alarm-pheromones-2-bees
+        #           duration: 5250
+
+        - label: Poison Sting
+          # startDelay: 6150
+          item:
+            name: m2s-poison-sting
+            castName: Poison Sting
+            castTime: 5250
+            telegraph: 1.0
+            effects:
+              - label: sting-1
+                item:
+                  name: m2s-poison-sting
+                  duration: 5250
+                  followPosition: true
+                  positionType: target
+                  aoes:
+                    - name: aoe-disc
+                      yalms: 2.5
+                      position: tag-support-1
+                      target: tag-support-1
+                    - name: aoe-disc
+                      yalms: 2.5
+                      position: tag-dps-1
+                      target: tag-dps-1
+                    - name: prey-marker
+                      position: tag-dps-1
+                      target: tag-dps-1
+                    - name: prey-marker
+                      position: tag-support-1
+                      target: tag-support-1
+              - label: sting-2
+                startDelay: 4850 * 1
+                item:
+                  name: m2s-poison-sting
+                  duration: 5250
+                  followPosition: true
+                  positionType: target
+                  aoes:
+                    - name: aoe-disc
+                      yalms: 2.5
+                      position: tag-support-2
+                      target: tag-support-2
+                    - name: aoe-disc
+                      yalms: 2.5
+                      position: tag-dps-2
+                      target: tag-dps-2
+                    - name: prey-marker
+                      position: tag-dps-2
+                      target: tag-dps-2
+                    - name: prey-marker
+                      position: tag-support-2
+                      target: tag-support-2
+              - label: sting-3
+                startDelay: 4850 * 2
+                item:
+                  name: m2s-poison-sting
+                  duration: 5250
+                  followPosition: true
+                  positionType: target
+                  aoes:
+                    - name: aoe-disc
+                      yalms: 2.5
+                      position: tag-support-3
+                      target: tag-support-3
+                    - name: aoe-disc
+                      yalms: 2.5
+                      position: tag-dps-3
+                      target: tag-dps-3
+                    - name: prey-marker
+                      position: tag-dps-3
+                      target: tag-dps-3
+                    - name: prey-marker
+                      position: tag-support-3
+                      target: tag-support-3
+              - label: sting-4
+                startDelay: 4850 * 3
+                item:
+                  name: m2s-poison-sting
+                  duration: 5250
+                  followPosition: true
+                  positionType: target
+                  aoes:
+                    - name: aoe-disc
+                      yalms: 2.5
+                      position: tag-support-4
+                      target: tag-support-4
+                    - name: aoe-disc
+                      yalms: 2.5
+                      position: tag-dps-4
+                      target: tag-dps-4
+                    - name: prey-marker
+                      position: tag-dps-4
+                      target: tag-dps-4
+                    - name: prey-marker
+                      position: tag-support-4
+                      target: tag-support-4
+
+        # - label: Bee Sting
+        #   startDelay: 28300
+        #   item:
+        #     name: m2s-bee-sting
+        #     castTime: 4700
+        #     telegraph: 1.0
+        #     effects:
+        #       - label: Bee Sting, Stack Supports
+        #         item:
+        #           duration: 4700
+        #           name: stack
+        #           target: support
+        #       - label: Bee Sting, Stack DPS
+        #         item:
+        #           duration: 4700
+        #           name: stack
+        #           target: dps

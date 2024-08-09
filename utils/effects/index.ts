@@ -11,6 +11,8 @@ import { TetherEffect } from './tether';
 import { DistributeEffect } from './distribute';
 import { CastBarEffect } from './cast-bar';
 import { StageComboCastEffect } from './stage-combo-cast';
+import { M2SPoisonStingEffect } from './m2s-poison-sting';
+import { PreyMarkerEffect } from './prey-marker';
 
 export const effectsCollection = {
     'default': Effect,
@@ -26,6 +28,9 @@ export const effectsCollection = {
     'cast-bar': CastBarEffect,
     'cast': CastBarEffect,
     'stage-combo-cast-bar': StageComboCastEffect,
+
+    'prey-marker': PreyMarkerEffect,
+    'm2s-poison-sting': M2SPoisonStingEffect,
 } as const;
 
 export default effectsCollection;

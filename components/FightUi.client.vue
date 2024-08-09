@@ -83,11 +83,9 @@ function resetEncoded(force = false) {
 
         try {
             if (isEncodedChanged()) {
-                console.log('reset encoded!');
                 encoded.value = resetValue;
             }
         } catch (err) {
-            console.log('reset encoded!', err);
             encoded.value = resetValue;
         }
     } else if (language.value === 'json') {
@@ -142,24 +140,13 @@ function updateSection(section: Scheduled<FightSection>, i: number) {
     }
 }
 
-const openSide = ref('');
 
-const { isEditing, toggleEditMode } = useEditMode();
-
+const { toggleEditMode } = useEditMode();
+const { currentSideSection: openSide, openSection } = useSidebar();
 function open(side: string) {
-    if (openSide.value === side) {
-        openSide.value = '';
-        isEditing.value = false;
-    } else {
-        if (side === 'code') {
-            resetEncoded(true);
-        } else if (side === 'ui') {
-            isEditing.value = true;
-        }
-
-        openSide.value = side;
+    if (openSection(side as any) === 'code') {
+        resetEncoded(true);
     }
-
 }
 
 function reset() {
@@ -177,11 +164,9 @@ function resetPosition() {
 
 if (props.fight?.clock) {
     props.fight.clock.on('start', () => {
-        console.log('CLOCK START!');
         isPaused.value = false;
     });
     props.fight.clock.on('pause', () => {
-        console.log('CLOCK PAUSE!');
         isPaused.value = true;
     });
 }
@@ -203,7 +188,6 @@ function handleKeyPress(event: KeyboardEvent) {
     }
 
     if (event.code === 'Space') {
-        console.log('event: ', event, event.target);
         event.preventDefault();
         event.stopPropagation();
         togglePause();

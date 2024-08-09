@@ -41,8 +41,8 @@ const stageCombos: Record<StageComboName, [StageComboEffectName, StageComboEffec
 } as const;
 
 export class M2SStageCombo extends Mechanic {
-    name = 'm2s-stage-combo';
-    options: M2SStageComboOptions;
+    override name = 'm2s-stage-combo';
+    override options: M2SStageComboOptions;
 
     constructor(options: M2SStageComboOptions) {
         super(options);
@@ -50,7 +50,7 @@ export class M2SStageCombo extends Mechanic {
         this.scheduling = options.scheduling || 'parallel';
     }
 
-    getEffects(): Scheduled<Effect>[] {
+    override getEffects(): Scheduled<Effect>[] {
         const allEffects = this.effects;
 
         const stageEffects: Record<StageComboEffectName, Scheduled<Effect> | undefined> = {

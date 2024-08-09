@@ -2,6 +2,7 @@ import * as YAML from 'yaml';
 import * as Bab from '@babylonjs/core';
 import { Clock } from './clock';
 import { FightCollection } from './fight-collection';
+import { parseNumber } from './parse-number';
 
 import {
     type Scheduled,
@@ -79,6 +80,10 @@ export function decodeScheduled<T>(data: any, func: (data: any, optons: FightDec
     const scheduledResult: Scheduled<T> = {
         ...data,
         item: func(data.item, options),
+        repeat: parseNumber(data.repeat || 0),
+        startDelay: parseNumber(data.startDelay || 0),
+        preStartDelay: parseNumber(data.preStartDelay || 0),
+        endDelay: parseNumber(data.endDelay || 0),
     };
 
     if (data.after) {

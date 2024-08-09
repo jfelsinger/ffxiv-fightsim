@@ -12,8 +12,8 @@ export type AoeGroupEffectOptions = EffectOptions & {
 };
 
 export class AoeGroupEffect extends Effect {
-    options: AoeGroupEffectOptions;
-    name = 'aoe-group';
+    override options: AoeGroupEffectOptions;
+    override name = 'aoe-group';
     aoes: Effect[] = [];
 
     constructor(options: AoeGroupEffectOptions) {
@@ -49,7 +49,7 @@ export class AoeGroupEffect extends Effect {
         }
     }
 
-    async execute() {
+    override async execute() {
         const len = this.aoes.length;
         const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
@@ -62,7 +62,7 @@ export class AoeGroupEffect extends Effect {
         }
     }
 
-    async startup() {
+    override async startup() {
         await super.startup();
         this.mesh = this.makeAoe().mesh;
         const len = this.aoes.length;
@@ -80,7 +80,7 @@ export class AoeGroupEffect extends Effect {
         await Promise.all(promises);
     }
 
-    setDuration(duration: number | string) {
+    override setDuration(duration: number | string) {
         super.setDuration(duration);
         this.duration = parseNumber(duration);
         const len = this.aoes.length;
@@ -89,7 +89,7 @@ export class AoeGroupEffect extends Effect {
         }
     }
 
-    setTelegraph(telegraph: number | string) {
+    override setTelegraph(telegraph: number | string) {
         super.setTelegraph(telegraph);
         const len = this.aoes.length;
         for (let i = 0; i < len; i++) {
@@ -97,7 +97,7 @@ export class AoeGroupEffect extends Effect {
         }
     }
 
-    async cleanup() {
+    override async cleanup() {
         const len = this.aoes.length;
         const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
@@ -121,7 +121,7 @@ export class AoeGroupEffect extends Effect {
         };
     }
 
-    toJSON() {
+    override toJSON() {
         return {
             ...super.toJSON(),
             aoes: this.options.aoes,

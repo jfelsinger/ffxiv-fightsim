@@ -1,6 +1,3 @@
-import { useState } from '#imports';
-// import createAoeMat from '../../materials/dice';
-import { yalmsToM } from '../conversions';
 import * as Bab from '@babylonjs/core';
 import { parseNumber } from '../parse-number';
 
@@ -73,7 +70,7 @@ export const PipPositions = [
 ] as const;
 
 export class DiceEffect extends Effect {
-    name = 'aoe-dice';
+    override name = 'aoe-dice';
     pips: DiceEffectOptions['pips'];
     pipCount: number = 1;
 
@@ -109,13 +106,13 @@ export class DiceEffect extends Effect {
         return parseNumber(pips || 1);
     }
 
-    async startup() {
+    override async startup() {
         await super.startup();
         this.pipCount = this.getPipCount();
         this.mesh = this.makeAoe().dice;
     }
 
-    async cleanup() {
+    override async cleanup() {
         this.mesh?.dispose()
         await super.cleanup();
     }
