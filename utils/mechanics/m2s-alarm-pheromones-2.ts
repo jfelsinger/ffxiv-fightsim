@@ -35,6 +35,10 @@ export class M2SAlarmPheromones2 extends Mechanic {
         });
 
         this.on('start-effect', ({ effect }) => {
+            effect.item.on('start', () => {
+                console.log('START PHERE: ', effect);
+                (window as any).pheromones = effect;
+            });
             effect.item.on('show-telegraph', effectShowTelegraph);
             effect.item.on('pre-snapshot', effectPreSnapshot);
         });

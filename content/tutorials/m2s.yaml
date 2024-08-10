@@ -18,50 +18,52 @@ arena:
   # floorType: m2s-2
 sections:
   - label: Alarm Pheromones 2
-    startDelay: 500
+    # startDelay: 500
     item:
       name: m2s-alarm-pheromones-2
       scheduling: parallel
       mechanics:
-        # - label: Alarm Pheromones
-        #   item:
-        #     name: m2s-alarm-pheromones-2
-        #     castName: Alarm Pheromones
-        #     castTime: 2700
-        #     telegraph: 1.0
-        #     effects:
-        #       - label: bees-1
-        #         item:
-        #           name: m2s-alarm-pheromones-2-bees
-        #           duration: 5250
-        #       - label: bees-2
-        #         startDelay: 4850 * 1
-        #         item:
-        #           name: m2s-alarm-pheromones-2-bees
-        #           duration: 5250
-        #       - label: bees-3
-        #         startDelay: 4850 * 2
-        #         item:
-        #           name: m2s-alarm-pheromones-2-bees
-        #           duration: 5250
-        #       - label: bees-4
-        #         startDelay: 4850 * 3
-        #         item:
-        #           name: m2s-alarm-pheromones-2-bees
-        #           duration: 5250
-        #       - label: bees-5
-        #         startDelay: 4850 * 4
-        #         item:
-        #           name: m2s-alarm-pheromones-2-bees
-        #           duration: 5250
-        #       - label: bees-6
-        #         startDelay: 4850 * 5
-        #         item:
-        #           name: m2s-alarm-pheromones-2-bees
-        #           duration: 5250
+        - label: Alarm Pheromones
+          item:
+            name: m2s-alarm-pheromones-2
+            castName: Alarm Pheromones
+            castTime: 2700
+            telegraph: 1.0
+            effects:
+              - label: bees-1
+                startDelay: 3300 + 4850 * 0
+                item:
+                  name: m2s-alarm-pheromones-2-bees
+                  duration: 5250
+                  positionType: arena
+              - label: bees-2
+                startDelay: 3300 + 4850 * 1
+                item:
+                  name: m2s-alarm-pheromones-2-bees
+                  duration: 5250
+              - label: bees-3
+                startDelay: 3300 + 4850 * 2
+                item:
+                  name: m2s-alarm-pheromones-2-bees
+                  duration: 5250
+              - label: bees-4
+                startDelay: 3300 + 4850 * 3
+                item:
+                  name: m2s-alarm-pheromones-2-bees
+                  duration: 5250
+              - label: bees-5
+                startDelay: 3300 + 4850 * 4
+                item:
+                  name: m2s-alarm-pheromones-2-bees
+                  duration: 5250
+              - label: bees-6
+                startDelay: 3300 + 4850 * 5
+                item:
+                  name: m2s-alarm-pheromones-2-bees
+                  duration: 5250
 
         - label: Poison Sting
-          # startDelay: 6150
+          startDelay: 6000
           item:
             name: m2s-poison-sting
             castName: Poison Sting

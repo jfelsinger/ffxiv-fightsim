@@ -12,6 +12,7 @@ import { DistributeEffect } from './distribute';
 import { CastBarEffect } from './cast-bar';
 import { StageComboCastEffect } from './stage-combo-cast';
 import { M2SPoisonStingEffect } from './m2s-poison-sting';
+import { M2SAlarmPheromones2Effect } from './m2s-alarm-pheromones-2';
 import { PreyMarkerEffect } from './prey-marker';
 
 export const effectsCollection = {
@@ -31,6 +32,8 @@ export const effectsCollection = {
 
     'prey-marker': PreyMarkerEffect,
     'm2s-poison-sting': M2SPoisonStingEffect,
+    'm2s-alarm-pheromones-2': M2SAlarmPheromones2Effect,
+    'm2s-alarm-pheromones-2-bees': M2SAlarmPheromones2Effect,
 } as const;
 
 export default effectsCollection;

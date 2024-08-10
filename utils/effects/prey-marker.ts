@@ -18,9 +18,6 @@ export class PreyMarkerEffect extends Effect {
 
         const { mesh } = this.makeAoe();
         this.mesh = mesh;
-
-        console.log('PREY MARKER: ', this);
-        (window as any).prey = this;
     }
 
     override async cleanup() {

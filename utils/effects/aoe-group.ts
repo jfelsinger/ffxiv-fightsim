@@ -9,6 +9,7 @@ import {
 
 export type AoeGroupEffectOptions = EffectOptions & {
     aoes?: EffectOptions[],
+    rotation: number,
 };
 
 export class AoeGroupEffect extends Effect {
@@ -115,6 +116,10 @@ export class AoeGroupEffect extends Effect {
     makeAoe() {
         const emptyMesh = new Bab.Mesh('aoe-group-empty', this.scene);
         emptyMesh.position = this.getPosition() || Bab.Vector3.Zero();
+
+        if (this.options.rotation) {
+            emptyMesh.rotation.y = this.options.rotation * (Math.PI / 180);
+        }
 
         return {
             mesh: emptyMesh,
