@@ -17,6 +17,9 @@ export type M2SAlarmPheromones2Options = MechanicOptions & {
 export class M2SAlarmPheromones2 extends Mechanic {
     override name = 'm2s-alarm-pheromones-2';
     override options: M2SAlarmPheromones2Options;
+    rotationDirction?: 'cw' | 'ccw';
+    rotations?: number[];
+    startRotation?: number;
 
     constructor(options: M2SAlarmPheromones2Options) {
         super(options);
@@ -55,15 +58,24 @@ export class M2SAlarmPheromones2 extends Mechanic {
     override getEffects(): Scheduled<Effect>[] {
         const allEffects = this.effects;
         const rotationIncrement = 22.5;
-        const startRotation = rotationIncrement * Math.round(Math.random() * 15);
-        const direction = Math.round(Math.random()) ? 'cw' : 'ccw';
 
+        // const startRotation = rotationIncrement * Math.round(Math.random() * 3);
+        const startRotation = 45;
+        this.startRotation = startRotation;
+
+        const direction = 'cw';
+        // const direction = Math.round(Math.random()) ? 'cw' : 'ccw';
+        this.rotationDirction = direction;
+
+        this.rotations = [];
         allEffects.forEach((effect, i) => {
             if (direction === 'cw') {
                 const rotation = startRotation + rotationIncrement * i;
+                this.rotations?.push(rotation);
                 effect.item.options.rotation = rotation;
             } else if (direction === 'ccw') {
                 const rotation = startRotation - rotationIncrement * i;
+                this.rotations?.push(rotation);
                 effect.item.options.rotation = rotation;
             }
         });

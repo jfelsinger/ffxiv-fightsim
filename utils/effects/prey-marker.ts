@@ -25,6 +25,11 @@ export class PreyMarkerEffect extends Effect {
         await super.cleanup();
     }
 
+    override async dispose() {
+        this.mesh?.dispose()
+        await super.dispose();
+    }
+
     makeAoe() {
         const mat = new Bab.StandardMaterial('dice', this.scene);
         mat.diffuseTexture = new Bab.Texture('/images/prey-marker.png');
@@ -32,7 +37,7 @@ export class PreyMarkerEffect extends Effect {
         mat.useAlphaFromDiffuseTexture = true;
         mat.emissiveColor = new Bab.Color3(0.85, 0.55, 0.55);
 
-        const size = yalmsToM(1.25);
+        const size = yalmsToM(1.5);
         const mesh = Bab.MeshBuilder.CreatePlane('prey-marker', {
             size,
         }, this.collection.scene);
@@ -40,6 +45,8 @@ export class PreyMarkerEffect extends Effect {
         mesh.position = this.getPosition() || Bab.Vector3.Zero();
         mesh.position.y += 2.5;
         mesh.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
+        this.on('dispose', () => mesh.dispose());
+        this.on('cleanup', () => mesh.dispose());
 
         return {
             mesh,

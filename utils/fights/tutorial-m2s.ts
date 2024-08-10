@@ -7,6 +7,8 @@ import { isWithinRadius } from '../vector-helpers';
 import { yalmsToM } from '../conversions';
 import { Indicator } from '../indicator';
 
+import { useTutorialMode } from '../../composables/tutorialMode';
+
 import {
     M2SFight,
     type M2SFightOptions,
@@ -15,16 +17,239 @@ import {
 export type M2STutorialOptions = M2SFightOptions & {
 };
 
+function r(a: number, x: number, y: number) {
+    a *= 0.0174533;
+    const cs = Math.cos(a);
+    const sn = Math.sin(a);
+    return {
+        x: Math.round((x * cs - y * sn) * 10000) / 10000,
+        y: Math.round((x * sn + y * cs) * 10000) / 10000,
+    };
+}
+
+function getRotationPosition(startRotation: number, step: 1 | 2 | 3 | 4, isCW: boolean, isDps: boolean) {
+    let pos = isDps ? { x: 0.725, y: 0 } : { x: -0.725, y: 0 };
+
+    if (startRotation) {
+        if (startRotation % 67.5 === 0) {
+            pos = r(-67.5, pos.x, pos.y);
+        } else if (startRotation % 45 === 0) {
+            pos = r(-45, pos.x, pos.y);
+        } else if (startRotation % 22.5 === 0) {
+            pos = r(-22.5, pos.x, pos.y);
+        }
+    }
+
+    if (step > 1) {
+        // Do a 11.25 cw/ccw adjustment
+
+        // if (isCW) {
+        //     pos = r(11.25, pos.x, pos.y);
+        // } else {
+        //     pos = r(-11.25, pos.x, pos.y);
+        // }
+    }
+
+    if (isCW) {
+        pos = r(22.5 * (step - 1), pos.x, pos.y);
+    } else {
+        pos = r(-22.5 * (step - 1), pos.x, pos.y);
+    }
+
+    console.log('getRotationPosition: ', startRotation, step, isCW, isDps);
+
+    return `${pos.x},${pos.y}`;
+}
+
+
 export class M2STutorial extends M2SFight {
     options: M2STutorialOptions;
+    indicator?: Indicator;
+    activeStep: string = 'none';
+    pheromonesMechanic: any;
+
 
     constructor(options: M2STutorialOptions) {
         super(options);
         this.options = options;
 
-        console.log('M2STutorial: ', this);
+        const tutorialStep1Time = 500 + 1000; // drops/plash of venom
+        const tutorialStep2Time = (500 + 2400 + 4700) + 100; // 100ms into alarm pheromones cast
+        let tutorialStep3Time = (500 + 2400 + 4700) + 6150 + 100; // 100ms into poison sting cast
+
+        const { isTutorial, showTutorialStep, canContinueTutorial } = useTutorialMode();
+
+        this.on('start-section', ({ section }) => {
+            if (section?.item?.name === 'm2s-x-of-venom') {
+                this.clock.after(() => {
+                    canContinueTutorial.value = true;
+                    showTutorialStep(1);
+                }, 2500);
+            } else if (section?.item?.name === 'm2s-alarm-pheromones-2') {
+
+                (window as any).__section = section;
+                const pheromonesMechanic = section.item.mechanics.find((sm) => sm?.item?.name === 'm2s-alarm-pheromones-2')?.item;
+                this.pheromonesMechanic = pheromonesMechanic;
+                console.log('PHERO MECH: ', pheromonesMechanic);
+
+                this.activeStep = 'alarm-pheromones';
+                this.clock.after(() => {
+                    canContinueTutorial.value = false;
+                    showTutorialStep(2);
+
+                    this.once('in-position', () => {
+                        canContinueTutorial.value = true;
+                        if (this.clock.isPaused) {
+                            this.clock.once('start', () => {
+                                this.indicator?.dispose();
+                            });
+                        } else {
+                            this.indicator?.dispose();
+                        }
+                    });
+
+                    let player = this.collection.characters['player'];
+                    if (player?.tags?.has('support')) {
+                        this.indicator = new Indicator({
+                            position: '-0.05,0.1',
+                            positionType: 'arena',
+                        }, this.collection);
+                    } else {
+                        this.indicator = new Indicator({
+                            position: '0.05,-0.1',
+                            positionType: 'arena',
+                        }, this.collection);
+                    }
+                }, 1000);
+
+                section.item.on('start-mechanic', ({ mechanic }) => {
+                    console.log('=======> start-mechanic: ', mechanic?.item);
+                    if (mechanic?.item?.name === 'm2s-poison-sting') {
+                        mechanic.item.once('start-execute', () => {
+                            console.log('Start poision sting!', mechanic);
+                            this.activeStep = 'poison-sting';
+                        });
+
+                        mechanic.item.on('start-effect', ({ effect }) => {
+                            effect.item.once('start', () => {
+                                if (effect.label === 'sting-1') {
+                                    this.activeStep = 'poison-sting-1';
+                                    console.log('Poison Sting 1');
+                                    this.clock.after(() => {
+                                        showTutorialStep(3);
+                                        let player = this.collection.characters['player'];
+                                        if (player?.tags?.has('support-1') || player?.tags?.has('dps-1')) {
+                                            canContinueTutorial.value = false;
+                                            this.indicator = new Indicator({
+                                                position: getRotationPosition(this.pheromonesMechanic.startRotation, 1, this.pheromonesMechanic.rotationDirection === 'cw', player?.tags?.has('dps')),
+                                                positionType: 'arena',
+                                            }, this.collection);
+                                            this.once('in-position', () => {
+                                                canContinueTutorial.value = true;
+                                                if (this.clock.isPaused) {
+                                                    this.clock.once('start', () => {
+                                                        this.indicator?.dispose();
+                                                    });
+                                                } else {
+                                                    this.indicator?.dispose();
+                                                }
+                                            });
+                                        }
+                                    }, 2100);
+
+                                } else if (effect.label === 'sting-2') {
+                                    console.log('Poison Sting 2');
+                                    this.clock.after(() => {
+                                        this.activeStep = 'poison-sting-2';
+                                    }, 1200);
+                                    this.clock.after(() => {
+                                        let player = this.collection.characters['player'];
+                                        if (player?.tags?.has('support-2') || player?.tags?.has('dps-2')) {
+                                            showTutorialStep(3);
+                                            canContinueTutorial.value = false;
+                                            this.indicator = new Indicator({
+                                                position: getRotationPosition(this.pheromonesMechanic.startRotation, 2, this.pheromonesMechanic.rotationDirection === 'cw', player?.tags?.has('dps')),
+                                                positionType: 'arena',
+                                            }, this.collection);
+                                            this.once('in-position', () => {
+                                                canContinueTutorial.value = true;
+                                                if (this.clock.isPaused) {
+                                                    this.clock.once('start', () => {
+                                                        this.indicator?.dispose();
+                                                    });
+                                                } else {
+                                                    this.indicator?.dispose();
+                                                }
+                                            });
+                                        }
+                                    }, 2100);
+
+                                } else if (effect.label === 'sting-3') {
+                                    console.log('Poison Sting 3');
+                                    this.clock.after(() => {
+                                        this.activeStep = 'poison-sting-3';
+                                    }, 1200);
+                                    this.clock.after(() => {
+                                        let player = this.collection.characters['player'];
+                                        if (player?.tags?.has('support-3') || player?.tags?.has('dps-3')) {
+                                            showTutorialStep(3);
+                                            canContinueTutorial.value = false;
+                                            this.indicator = new Indicator({
+                                                position: getRotationPosition(this.pheromonesMechanic.startRotation, 3, this.pheromonesMechanic.rotationDirection === 'cw', player?.tags?.has('dps')),
+                                                positionType: 'arena',
+                                            }, this.collection);
+                                            this.once('in-position', () => {
+                                                canContinueTutorial.value = true;
+                                                if (this.clock.isPaused) {
+                                                    this.clock.once('start', () => {
+                                                        this.indicator?.dispose();
+                                                    });
+                                                } else {
+                                                    this.indicator?.dispose();
+                                                }
+                                            });
+                                        }
+                                    }, 2100);
+
+                                } else if (effect.label === 'sting-4') {
+                                    console.log('Poison Sting 4');
+                                    this.clock.after(() => {
+                                        this.activeStep = 'poison-sting-4';
+                                    }, 1200);
+                                    this.clock.after(() => {
+                                        this.activeStep = 'poison-sting-next';
+                                    }, 6200);
+                                    this.clock.after(() => {
+                                        let player = this.collection.characters['player'];
+                                        if (player?.tags?.has('support-4') || player?.tags?.has('dps-4')) {
+                                            showTutorialStep(3);
+                                            canContinueTutorial.value = false;
+                                            this.indicator = new Indicator({
+                                                position: getRotationPosition(this.pheromonesMechanic.startRotation, 4, this.pheromonesMechanic.rotationDirection === 'cw', player?.tags?.has('dps')),
+                                                positionType: 'arena',
+                                            }, this.collection);
+                                            this.once('in-position', () => {
+                                                canContinueTutorial.value = true;
+                                                if (this.clock.isPaused) {
+                                                    this.clock.once('start', () => {
+                                                        this.indicator?.dispose();
+                                                    });
+                                                } else {
+                                                    this.indicator?.dispose();
+                                                }
+                                            });
+                                        }
+                                    }, 2100);
+                                }
+                            });
+                        });
+                    };
+                });
+            }
+        });
 
         this.on('start-execute', () => {
+
             const roles = shuffleArray([
                 'tank',
                 'tank',
@@ -63,12 +288,112 @@ export class M2STutorial extends M2SFight {
                         this.collection
                     ),
                 }, this.collection.scene, this.collection.worldClock);
+                npc.tags.clear();
                 npc.tags.add(role);
                 if (role === 'tank' || role === 'healer') {
                     npc.tags.add('support');
                 }
 
                 this.collection.addCharacter(npc);
+
+                const onTick = () => {
+                    if (this.activeStep === 'alarm-pheromones') {
+                        if (npc.tags.has('support')) {
+                            npc.steering.seekWithArrive(getPosition(
+                                '-0.05,0.1',
+                                'arena',
+                                this.collection
+                            ), { priority: 1.0, threshold: 1.0 });
+                        } else {
+                            npc.steering.seekWithArrive(getPosition(
+                                '0.05,-0.1',
+                                'arena',
+                                this.collection
+                            ), { priority: 1.0, threshold: 1.0 });
+                        }
+                    } else if (this.activeStep?.startsWith('poison-sting')) {
+                        if (npc.tags.has('support')) {
+
+                            if (this.activeStep === 'poison-sting-1' && npc.tags.has('support-1')) {
+                                npc.steering.seekWithArrive(getPosition(
+                                    getRotationPosition(this.pheromonesMechanic.startRotation, 1, this.pheromonesMechanic.rotationDirection === 'cw', false),
+                                    'arena',
+                                    this.collection
+                                ), { priority: 10.0 });
+                            } else if (this.activeStep === 'poison-sting-2' && npc.tags.has('support-2')) {
+                                npc.steering.seekWithArrive(getPosition(
+                                    getRotationPosition(this.pheromonesMechanic.startRotation, 2, this.pheromonesMechanic.rotationDirection === 'cw', false),
+                                    'arena',
+                                    this.collection
+                                ), { priority: 10.0 });
+                            } else if (this.activeStep === 'poison-sting-3' && npc.tags.has('support-3')) {
+                                npc.steering.seekWithArrive(getPosition(
+                                    getRotationPosition(this.pheromonesMechanic.startRotation, 3, this.pheromonesMechanic.rotationDirection === 'cw', false),
+                                    'arena',
+                                    this.collection
+                                ), { priority: 10.0 });
+                            } else if (this.activeStep === 'poison-sting-4' && npc.tags.has('support-4')) {
+                                npc.steering.seekWithArrive(getPosition(
+                                    getRotationPosition(this.pheromonesMechanic.startRotation, 4, this.pheromonesMechanic.rotationDirection === 'cw', false),
+                                    'arena',
+                                    this.collection
+                                ), { priority: 10.0 });
+                            } else {
+                                npc.steering.seekWithArrive(getPosition(
+                                    '-0.05,0.1',
+                                    'arena',
+                                    this.collection
+                                ), { priority: 1.0, threshold: 1.0 });
+                            }
+                        } else {
+
+                            if (this.activeStep === 'poison-sting-1' && npc.tags.has('dps-1')) {
+                                npc.steering.seekWithArrive(getPosition(
+                                    getRotationPosition(this.pheromonesMechanic.startRotation, 1, this.pheromonesMechanic.rotationDirection === 'cw', true),
+                                    'arena',
+                                    this.collection
+                                ), { priority: 10.0 });
+                            } else if (this.activeStep === 'poison-sting-2' && npc.tags.has('dps-2')) {
+                                npc.steering.seekWithArrive(getPosition(
+                                    getRotationPosition(this.pheromonesMechanic.startRotation, 2, this.pheromonesMechanic.rotationDirection === 'cw', true),
+                                    'arena',
+                                    this.collection
+                                ), { priority: 10.0 });
+                            } else if (this.activeStep === 'poison-sting-3' && npc.tags.has('dps-3')) {
+                                npc.steering.seekWithArrive(getPosition(
+                                    getRotationPosition(this.pheromonesMechanic.startRotation, 3, this.pheromonesMechanic.rotationDirection === 'cw', true),
+                                    'arena',
+                                    this.collection
+                                ), { priority: 10.0 });
+                            } else if (this.activeStep === 'poison-sting-4' && npc.tags.has('dps-4')) {
+                                npc.steering.seekWithArrive(getPosition(
+                                    getRotationPosition(this.pheromonesMechanic.startRotation, 4, this.pheromonesMechanic.rotationDirection === 'cw', true),
+                                    'arena',
+                                    this.collection
+                                ), { priority: 10.0 });
+                            } else {
+                                npc.steering.seekWithArrive(getPosition(
+                                    '0.05,-0.1',
+                                    'arena',
+                                    this.collection
+                                ), { priority: 1.0, threshold: 1.0 });
+                            }
+                        }
+                    }
+                    else {
+                        npc.steering.idle()
+                    }
+
+                    npc.steering.lookWhereGoing(true);
+                    npc.steering.animate();
+                };
+
+                this.collection.worldClock.on('tick', onTick);
+
+                this.on('dispose', () => {
+                    this.collection.worldClock.off('tick', onTick);
+                    npc.dispose();
+                });
                 return npc;
             };
 
@@ -94,7 +419,7 @@ export class M2STutorial extends M2SFight {
             }
 
             const getRandPosition = () => {
-                let x = 0 + (Math.random() - 0.5) * 0.18;
+                let x = 0 + (Math.random() - 0.5) * 0.54;
                 x = Math.round(x * 1500) / 1000;
                 if (x > 0) {
                     x + 0.35;
@@ -102,14 +427,13 @@ export class M2STutorial extends M2SFight {
                     x - 0.35;
                 }
 
-                let y = (Math.random() - 0.5) * 0.15;
+                let y = (Math.random() - 0.5) * 0.54;
                 y = Math.round(y * 1200) / 1000;
                 if (y > -0.85) {
-                    y + 0.15;
+                    y + 0.25;
                 } else {
-                    y - 0.15;
+                    y - 0.25;
                 }
-                y = Math.max(-0.98, y);
 
                 return `${x},${y}`;
             };
@@ -131,8 +455,14 @@ export class M2STutorial extends M2SFight {
 
             characters.forEach((character) => {
                 if (character?.tags?.has('support')) {
+                    if (character.name === 'player') {
+                    }
+
                     character.tags.add(`support-${supportCount++}`);
                 } else if (character?.tags?.has('dps')) {
+                    if (character.name === 'player') {
+                    }
+
                     character.tags.add(`dps-${dpsCount++}`);
                 }
             });
@@ -145,13 +475,11 @@ export class M2STutorial extends M2SFight {
             this.collection.worldClock.on('tick', () => {
             });
 
-            const indicator = new Indicator({}, this.collection);
-
             let isInPosition = false;
             let key: any;
 
             const checkPositionTick = () => {
-                if (indicator.playerIsInPosition(player)) {
+                if (this.indicator?.playerIsInPosition(player)) {
                     if (!isInPosition) {
                         console.log('getting in position...');
                         isInPosition = true;
@@ -170,7 +498,7 @@ export class M2STutorial extends M2SFight {
             this.on('dispose', () => {
                 this.collection.playerClock.off('tick', checkPositionTick);
                 npcs.forEach(npc => npc.dispose())
-                indicator.dispose();
+                this.indicator?.dispose();
             });
         });
     }

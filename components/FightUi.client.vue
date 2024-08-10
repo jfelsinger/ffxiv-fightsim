@@ -6,7 +6,6 @@ import {
 import { Fight, } from '../utils/fights';
 import { FightSection } from '../utils/sections';
 import { decodeFight } from '../utils/decode-fight';
-import type { NuxtLink } from '#build/components';
 
 const emit = defineEmits<{
     (e: 'update', value: Fight): void,
@@ -362,6 +361,8 @@ function updateTime(val: number) {
                     @update:lang="(l: string) => language = l" :lang="language" v-model="encoded" />
             </div>
         </div>
+
+        <TutorialWindow :fight="fight" />
     </div>
 </template>
 

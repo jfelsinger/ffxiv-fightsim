@@ -40,7 +40,6 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
                 position: '-0.365,0',
             },
         ];
-        console.log('aoes: ', options.aoes);
         super(options);
         this.options = options;
     }
@@ -48,12 +47,12 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
     override makeAoe() {
         const { mesh: empty } = super.makeAoe();
 
-        console.log('BEE MAKE AOE!');
-
         let yRotation = 0;
         if (this.options.rotation) {
             yRotation = -(this.options.rotation * (Math.PI / 180));
         }
+
+        console.log('CENTER Y ROTATION: ', yRotation);
 
         const hoverHeight = 3;
         const offset1 = '0.385';

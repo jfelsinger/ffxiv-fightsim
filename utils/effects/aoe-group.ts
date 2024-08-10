@@ -53,6 +53,7 @@ export class AoeGroupEffect extends Effect {
     override async execute() {
         const len = this.aoes.length;
         const promises: Promise<void>[] = [];
+
         for (let i = 0; i < len; i++) {
             promises.push(this.aoes[i].execute());
         }
