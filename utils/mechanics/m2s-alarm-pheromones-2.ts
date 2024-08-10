@@ -59,12 +59,10 @@ export class M2SAlarmPheromones2 extends Mechanic {
         const allEffects = this.effects;
         const rotationIncrement = 22.5;
 
-        // const startRotation = rotationIncrement * Math.round(Math.random() * 3);
-        const startRotation = 45;
+        const startRotation = rotationIncrement * Math.round(Math.random() * 3);
         this.startRotation = startRotation;
 
-        const direction = 'cw';
-        // const direction = Math.round(Math.random()) ? 'cw' : 'ccw';
+        const direction = Math.round(Math.random()) ? 'cw' : 'ccw';
         this.rotationDirction = direction;
 
         this.rotations = [];
@@ -73,7 +71,7 @@ export class M2SAlarmPheromones2 extends Mechanic {
                 const rotation = startRotation + rotationIncrement * i;
                 this.rotations?.push(rotation);
                 effect.item.options.rotation = rotation;
-            } else if (direction === 'ccw') {
+            } else {
                 const rotation = startRotation - rotationIncrement * i;
                 this.rotations?.push(rotation);
                 effect.item.options.rotation = rotation;

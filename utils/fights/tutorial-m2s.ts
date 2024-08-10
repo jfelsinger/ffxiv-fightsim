@@ -31,12 +31,22 @@ function getRotationPosition(startRotation: number, step: 1 | 2 | 3 | 4, isCW: b
     let pos = isDps ? { x: 0.725, y: 0 } : { x: -0.725, y: 0 };
 
     if (startRotation) {
-        if (startRotation % 67.5 === 0) {
-            pos = r(-67.5, pos.x, pos.y);
-        } else if (startRotation % 45 === 0) {
-            pos = r(-45, pos.x, pos.y);
-        } else if (startRotation % 22.5 === 0) {
-            pos = r(-22.5, pos.x, pos.y);
+        if (isCW) {
+            if (startRotation % 67.5 === 0) {
+                pos = r(-67.5, pos.x, pos.y);
+            } else if (startRotation % 45 === 0) {
+                pos = r(-45, pos.x, pos.y);
+            } else if (startRotation % 22.5 === 0) {
+                pos = r(-22.5, pos.x, pos.y);
+            }
+        } else {
+            if (startRotation % 67.5 === 0) {
+                pos = r(67.5, pos.x, pos.y);
+            } else if (startRotation % 45 === 0) {
+                pos = r(45, pos.x, pos.y);
+            } else if (startRotation % 22.5 === 0) {
+                pos = r(22.5, pos.x, pos.y);
+            }
         }
     }
 
@@ -50,15 +60,22 @@ function getRotationPosition(startRotation: number, step: 1 | 2 | 3 | 4, isCW: b
         // }
     }
 
+    console.log('getRotationPosition: ', isDps, isCW,
+        r(22.5 * (step - 1), pos.x, pos.y),
+        r(-22.5 * (step - 1), pos.x, pos.y)
+    );
+
     if (isCW) {
         pos = r(22.5 * (step - 1), pos.x, pos.y);
     } else {
         pos = r(-22.5 * (step - 1), pos.x, pos.y);
+        pos.y *= -1;
     }
 
-    console.log('getRotationPosition: ', startRotation, step, isCW, isDps);
+    const result = `${pos.x},${pos.y}`;
+    console.log('getRotationPosition: ', startRotation, step, isCW, isDps, result);
 
-    return `${pos.x},${pos.y}`;
+    return result;
 }
 
 
