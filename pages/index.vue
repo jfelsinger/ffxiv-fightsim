@@ -54,7 +54,8 @@
                                 <h2 class="card-title">M2S Alarm Pheromones, Second Casting</h2>
                                 <p>A tutorial for M2S's Second Alarm Pheromones cast</p>
                                 <div class="card-actions justify-end">
-                                    <NuxtLink to="/tutorials/m2s-alarm-pheromones-2" class="btn min-w-20">Play
+                                    <NuxtLink to="https://xivfightsim.com/tutorials/m2s-alarm-pheromones-2"
+                                        class="btn min-w-20">Play
                                     </NuxtLink>
                                 </div>
                             </div>
@@ -65,7 +66,7 @@
                                 <h2 class="card-title">M2S Centerstage/Outerstage Combos</h2>
                                 <p>Positioning for M2S Outerstage and Centerstage Combos.</p>
                                 <div class="card-actions justify-end">
-                                    <NuxtLink to="/raids/m2s/stage-combo" class="btn min-w-20">Play
+                                    <NuxtLink to="https://xivfightsim.com/raids/m2s/stage-combo" class="btn min-w-20">Play
                                     </NuxtLink>
                                 </div>
                             </div>
@@ -76,7 +77,8 @@
                                 <h2 class="card-title">E12S Primal Unions</h2>
                                 <p>Positioning for the primal combination AOEs in Eden's Promise: Eternity (E12 / E12S)</p>
                                 <div class="card-actions justify-end">
-                                    <NuxtLink to="/raids/e12s/primal-combinations" class="btn min-w-20">Play
+                                    <NuxtLink to="https://xivfightsim.com/raids/e12s/primal-combinations"
+                                        class="btn min-w-20">Play
                                     </NuxtLink>
                                 </div>
                             </div>
