@@ -40,23 +40,30 @@ export class M2STutorial extends M2SFight {
         const isCW = this.pheromonesMechanic.rotationDirection === 'cw';
 
         if (startRotation) {
-            if (isCW) {
-                if (startRotation % 67.5 === 0) {
-                    pos = r(-67.5, pos.x, pos.y);
-                } else if (startRotation % 45 === 0) {
-                    pos = r(-45, pos.x, pos.y);
-                } else if (startRotation % 22.5 === 0) {
-                    pos = r(-22.5, pos.x, pos.y);
-                }
-            } else {
-                if (startRotation % 67.5 === 0) {
-                    pos = r(67.5, pos.x, pos.y);
-                } else if (startRotation % 45 === 0) {
-                    pos = r(45, pos.x, pos.y);
-                } else if (startRotation % 22.5 === 0) {
-                    pos = r(22.5, pos.x, pos.y);
-                }
+            if (startRotation % 67.5 === 0) {
+                pos = r(-67.5, pos.x, pos.y);
+            } else if (startRotation % 45 === 0) {
+                pos = r(-45, pos.x, pos.y);
+            } else if (startRotation % 22.5 === 0) {
+                pos = r(-22.5, pos.x, pos.y);
             }
+            // if (isCW) {
+            //     if (startRotation % 67.5 === 0) {
+            //         pos = r(-67.5, pos.x, pos.y);
+            //     } else if (startRotation % 45 === 0) {
+            //         pos = r(-45, pos.x, pos.y);
+            //     } else if (startRotation % 22.5 === 0) {
+            //         pos = r(-22.5, pos.x, pos.y);
+            //     }
+            // } else {
+            //     if (startRotation % 67.5 === 0) {
+            //         pos = r(67.5, pos.x, pos.y);
+            //     } else if (startRotation % 45 === 0) {
+            //         pos = r(45, pos.x, pos.y);
+            //     } else if (startRotation % 22.5 === 0) {
+            //         pos = r(22.5, pos.x, pos.y);
+            //     }
+            // }
         }
 
         if (isCW) {
