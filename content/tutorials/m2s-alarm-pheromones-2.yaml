@@ -34,7 +34,6 @@ sections:
   #                 duration: 4700
 
   - label: Alarm Pheromones 2
-    # startDelay: 500
     item:
       name: m2s-alarm-pheromones-2
       scheduling: parallel
@@ -196,6 +195,39 @@ sections:
                       usePlayerTick: true
                       position: tag-support-4
                       target: tag-support-4
+
+        - label: Bee Sting
+          startDelay: (27150) + 4600
+          # startDelay: 3000
+          item:
+            name: m2s-bee-sting
+            castTime: 4700
+            castName: Bee Sting
+            scheduling: parallel
+            effects:
+              - label: Bee Sting
+                item:
+                  name: aoe-group
+                  duration: 4700
+                  followPosition: true
+                  positionType: target
+                  usePlayerTick: true
+                  telegraph: 0.5
+                  aoes:
+                    - name: aoe-disc
+                      duration: 4700
+                      yalms: 4
+                      target: tag-support-2
+                      positionType: target
+                      usePlayerTick: true
+                      followPosition: true
+                    - name: aoe-disc
+                      duration: 4700
+                      yalms: 4
+                      target: tag-dps-2
+                      positionType: target
+                      usePlayerTick: true
+                      followPosition: true
 
         # - label: Bee Sting
         #   startDelay: 28300

@@ -216,7 +216,7 @@ export class M2STutorial extends M2SFight {
                                         this.activeStep = 'poison-sting-4';
                                     }, 1200);
                                     this.clock.after(() => {
-                                        this.activeStep = 'poison-sting-next';
+                                        this.activeStep = 'bee-sting';
                                     }, 6200);
                                     this.clock.after(() => {
                                         let player = this.collection.characters['player'];
@@ -242,12 +242,40 @@ export class M2STutorial extends M2SFight {
                                 }
                             });
                         });
-                    };
+                    } else if (mechanic?.item?.name === 'm2s-bee-sting') {
+                        mechanic.item.once('start-execute', () => {
+                            this.clock.after(() => {
+                                this.activeStep = 'bee-sting';
+                            }, 200);
+                            this.clock.after(() => {
+                                this.activeStep = 'bee-sting';
+                                let player = this.collection.characters['player'];
+                                showTutorialStep(4);
+                                canContinueTutorial.value = false;
+                                this.once('in-position', () => {
+                                    canContinueTutorial.value = true;
+                                    if (this.clock.isPaused) {
+                                        this.clock.once('start', () => {
+                                            this.indicator?.dispose();
+                                        });
+                                    } else {
+                                        this.indicator?.dispose();
+                                    }
+                                });
+                                this.indicator = new Indicator({
+                                    size: 1.75,
+                                    position: player?.tags?.has('dps') ? '0.095,-0.095' : '-0.095,0.095',
+                                    positionType: 'arena',
+                                }, this.collection);
+                            }, 2200);
+                        });
+                    }
                 });
             }
         });
 
         this.on('start-execute', () => {
+            (window as any).__m2s = this;
 
             const roles = shuffleArray([
                 'tank',
@@ -378,8 +406,21 @@ export class M2STutorial extends M2SFight {
                                 ), { priority: 1.0, threshold: 1.0 });
                             }
                         }
-                    }
-                    else {
+                    } else if (this.activeStep === ('bee-sting')) {
+                        if (npc.tags.has('support')) {
+                            npc.steering.seekWithArrive(getPosition(
+                                '-0.095,0.095',
+                                'arena',
+                                this.collection
+                            ), { priority: 1.0, threshold: 0.2 });
+                        } else {
+                            npc.steering.seekWithArrive(getPosition(
+                                '0.095,-0.095',
+                                'arena',
+                                this.collection
+                            ), { priority: 1.0, threshold: 0.2 });
+                        }
+                    } else {
                         npc.steering.idle()
                     }
 
@@ -500,6 +541,7 @@ export class M2STutorial extends M2SFight {
                 this.indicator?.dispose();
             });
         });
+
     }
 
     isInPosition(player: Character | undefined, position: Bab.Vector3, radius = 1.5) {

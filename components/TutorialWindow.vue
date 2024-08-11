@@ -39,7 +39,7 @@ function next() {
 </script>
 
 <template>
-    <div class="tutorial-window__container">
+    <div v-show="isTutorialModeOn && isTutorialVisible && tutorialStep" class="tutorial-window__container">
         <ContentList :query="query" v-slot="{ list }">
 
             <div v-for="step in list" class="card bg-base-100/45 glass" :key="step._path">

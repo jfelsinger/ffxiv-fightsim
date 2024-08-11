@@ -83,6 +83,7 @@ export class DistributeEffect extends Effect {
 
             const len = this.items.length;
             for (let i = 0; i < len; i++) {
+                console.log('ITEM: ', this.items[i]);
                 const item = this.items[i];
                 if (!item) { continue; }
 

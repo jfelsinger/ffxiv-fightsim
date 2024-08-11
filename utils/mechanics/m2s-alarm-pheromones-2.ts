@@ -71,12 +71,12 @@ export class M2SAlarmPheromones2 extends Mechanic {
                 const rotation = startRotation + rotationIncrement * i;
                 this.rotations?.push(rotation);
                 effect.item.options.rotation = rotation;
-                effect.item.options.rotationDirection = rotationDirection;
+                effect.item.options.rotationDirection = direction;
             } else {
                 const rotation = startRotation - rotationIncrement * i;
                 this.rotations?.push(rotation);
                 effect.item.options.rotation = rotation;
-                effect.item.options.rotationDirection = rotationDirection;
+                effect.item.options.rotationDirection = direction;
             }
         });
 
