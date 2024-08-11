@@ -21,3 +21,9 @@ kinda works too. Just, if you want to restart the fight, you have to
 actually refresh the browser, some of the usual controls are bit busted.
 
 Despite the bugs, hope you like how the new content is working!
+
+#### Upcoming...
+* Adding the actual spread/stack mechanic for Drop/Splash of Poison
+* Turning off the tutorial in tutorial mode
+* Fixing/Improving the UI in tutorial mode
+* Code clean-up, lots of messiness with this new push
