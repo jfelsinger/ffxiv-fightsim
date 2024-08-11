@@ -17,7 +17,7 @@ export type M2SAlarmPheromones2Options = MechanicOptions & {
 export class M2SAlarmPheromones2 extends Mechanic {
     override name = 'm2s-alarm-pheromones-2';
     override options: M2SAlarmPheromones2Options;
-    rotationDirction?: 'cw' | 'ccw';
+    rotationDirection?: 'cw' | 'ccw';
     rotations?: number[];
     startRotation?: number;
 
@@ -63,7 +63,7 @@ export class M2SAlarmPheromones2 extends Mechanic {
         this.startRotation = startRotation;
 
         const direction = Math.round(Math.random()) ? 'cw' : 'ccw';
-        this.rotationDirction = direction;
+        this.rotationDirection = direction;
 
         this.rotations = [];
         allEffects.forEach((effect, i) => {
@@ -71,10 +71,12 @@ export class M2SAlarmPheromones2 extends Mechanic {
                 const rotation = startRotation + rotationIncrement * i;
                 this.rotations?.push(rotation);
                 effect.item.options.rotation = rotation;
+                effect.item.options.rotationDirection = rotationDirection;
             } else {
                 const rotation = startRotation - rotationIncrement * i;
                 this.rotations?.push(rotation);
                 effect.item.options.rotation = rotation;
+                effect.item.options.rotationDirection = rotationDirection;
             }
         });
 

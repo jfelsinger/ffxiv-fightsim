@@ -17,21 +17,21 @@ arena:
   floorType: m2s
   # floorType: m2s-2
 sections:
-  - label: Drop/Splash of Venom
-    startDelay: 500
-    endDelay: 2400
-    item:
-      name: m2s-x-of-venom
-      mechanics:
-        - label: Drop/Splash of Venom
-          item:
-            name: m2s-x-of-venom
-            castName: X of Venom
-            castTime: 4700
-            effects:
-              - item:
-                  name: cast-bar
-                  duration: 4700
+  # - label: Drop/Splash of Venom
+  #   startDelay: 500
+  #   endDelay: 2400
+  #   item:
+  #     name: m2s-x-of-venom
+  #     mechanics:
+  #       - label: Drop/Splash of Venom
+  #         item:
+  #           name: m2s-x-of-venom
+  #           castName: X of Venom
+  #           castTime: 4700
+  #           effects:
+  #             - item:
+  #                 name: cast-bar
+  #                 duration: 4700
 
   - label: Alarm Pheromones 2
     # startDelay: 500

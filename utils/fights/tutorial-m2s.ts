@@ -27,57 +27,6 @@ function r(a: number, x: number, y: number) {
     };
 }
 
-function getRotationPosition(startRotation: number, step: 1 | 2 | 3 | 4, isCW: boolean, isDps: boolean) {
-    let pos = isDps ? { x: 0.725, y: 0 } : { x: -0.725, y: 0 };
-
-    if (startRotation) {
-        if (isCW) {
-            if (startRotation % 67.5 === 0) {
-                pos = r(-67.5, pos.x, pos.y);
-            } else if (startRotation % 45 === 0) {
-                pos = r(-45, pos.x, pos.y);
-            } else if (startRotation % 22.5 === 0) {
-                pos = r(-22.5, pos.x, pos.y);
-            }
-        } else {
-            if (startRotation % 67.5 === 0) {
-                pos = r(67.5, pos.x, pos.y);
-            } else if (startRotation % 45 === 0) {
-                pos = r(45, pos.x, pos.y);
-            } else if (startRotation % 22.5 === 0) {
-                pos = r(22.5, pos.x, pos.y);
-            }
-        }
-    }
-
-    if (step > 1) {
-        // Do a 11.25 cw/ccw adjustment
-
-        // if (isCW) {
-        //     pos = r(11.25, pos.x, pos.y);
-        // } else {
-        //     pos = r(-11.25, pos.x, pos.y);
-        // }
-    }
-
-    console.log('getRotationPosition: ', isDps, isCW,
-        r(22.5 * (step - 1), pos.x, pos.y),
-        r(-22.5 * (step - 1), pos.x, pos.y)
-    );
-
-    if (isCW) {
-        pos = r(22.5 * (step - 1), pos.x, pos.y);
-    } else {
-        pos = r(-22.5 * (step - 1), pos.x, pos.y);
-        pos.y *= -1;
-    }
-
-    const result = `${pos.x},${pos.y}`;
-    console.log('getRotationPosition: ', startRotation, step, isCW, isDps, result);
-
-    return result;
-}
-
 
 export class M2STutorial extends M2SFight {
     options: M2STutorialOptions;
@@ -85,14 +34,47 @@ export class M2STutorial extends M2SFight {
     activeStep: string = 'none';
     pheromonesMechanic: any;
 
+    getRotationPosition(step: 1 | 2 | 3 | 4, isDps: boolean) {
+        let pos = isDps ? { x: 0.725, y: 0 } : { x: -0.725, y: 0 };
+        const startRotation = this.pheromonesMechanic.startRotation;
+        const isCW = this.pheromonesMechanic.rotationDirection === 'cw';
+
+        if (startRotation) {
+            if (isCW) {
+                if (startRotation % 67.5 === 0) {
+                    pos = r(-67.5, pos.x, pos.y);
+                } else if (startRotation % 45 === 0) {
+                    pos = r(-45, pos.x, pos.y);
+                } else if (startRotation % 22.5 === 0) {
+                    pos = r(-22.5, pos.x, pos.y);
+                }
+            } else {
+                if (startRotation % 67.5 === 0) {
+                    pos = r(67.5, pos.x, pos.y);
+                } else if (startRotation % 45 === 0) {
+                    pos = r(45, pos.x, pos.y);
+                } else if (startRotation % 22.5 === 0) {
+                    pos = r(22.5, pos.x, pos.y);
+                }
+            }
+        }
+
+        if (isCW) {
+            pos = r(-22.5 * (step - 1), pos.x, pos.y);
+        } else {
+            pos = r(22.5 * (step - 1), pos.x, pos.y);
+        }
+
+        const result = `${pos.x},${pos.y}`;
+        console.log('getRotationPosition: ', startRotation, step, isCW, isDps, result);
+
+        return result;
+    }
+
 
     constructor(options: M2STutorialOptions) {
         super(options);
         this.options = options;
-
-        const tutorialStep1Time = 500 + 1000; // drops/plash of venom
-        const tutorialStep2Time = (500 + 2400 + 4700) + 100; // 100ms into alarm pheromones cast
-        let tutorialStep3Time = (500 + 2400 + 4700) + 6150 + 100; // 100ms into poison sting cast
 
         const { isTutorial, showTutorialStep, canContinueTutorial } = useTutorialMode();
 
@@ -158,7 +140,7 @@ export class M2STutorial extends M2SFight {
                                         if (player?.tags?.has('support-1') || player?.tags?.has('dps-1')) {
                                             canContinueTutorial.value = false;
                                             this.indicator = new Indicator({
-                                                position: getRotationPosition(this.pheromonesMechanic.startRotation, 1, this.pheromonesMechanic.rotationDirection === 'cw', player?.tags?.has('dps')),
+                                                position: this.getRotationPosition(1, player?.tags?.has('dps')),
                                                 positionType: 'arena',
                                             }, this.collection);
                                             this.once('in-position', () => {
@@ -185,7 +167,7 @@ export class M2STutorial extends M2SFight {
                                             showTutorialStep(3);
                                             canContinueTutorial.value = false;
                                             this.indicator = new Indicator({
-                                                position: getRotationPosition(this.pheromonesMechanic.startRotation, 2, this.pheromonesMechanic.rotationDirection === 'cw', player?.tags?.has('dps')),
+                                                position: this.getRotationPosition(2, player?.tags?.has('dps')),
                                                 positionType: 'arena',
                                             }, this.collection);
                                             this.once('in-position', () => {
@@ -212,7 +194,7 @@ export class M2STutorial extends M2SFight {
                                             showTutorialStep(3);
                                             canContinueTutorial.value = false;
                                             this.indicator = new Indicator({
-                                                position: getRotationPosition(this.pheromonesMechanic.startRotation, 3, this.pheromonesMechanic.rotationDirection === 'cw', player?.tags?.has('dps')),
+                                                position: this.getRotationPosition(3, player?.tags?.has('dps')),
                                                 positionType: 'arena',
                                             }, this.collection);
                                             this.once('in-position', () => {
@@ -242,7 +224,7 @@ export class M2STutorial extends M2SFight {
                                             showTutorialStep(3);
                                             canContinueTutorial.value = false;
                                             this.indicator = new Indicator({
-                                                position: getRotationPosition(this.pheromonesMechanic.startRotation, 4, this.pheromonesMechanic.rotationDirection === 'cw', player?.tags?.has('dps')),
+                                                position: this.getRotationPosition(4, player?.tags?.has('dps')),
                                                 positionType: 'arena',
                                             }, this.collection);
                                             this.once('in-position', () => {
@@ -333,25 +315,25 @@ export class M2STutorial extends M2SFight {
 
                             if (this.activeStep === 'poison-sting-1' && npc.tags.has('support-1')) {
                                 npc.steering.seekWithArrive(getPosition(
-                                    getRotationPosition(this.pheromonesMechanic.startRotation, 1, this.pheromonesMechanic.rotationDirection === 'cw', false),
+                                    this.getRotationPosition(1, false),
                                     'arena',
                                     this.collection
                                 ), { priority: 10.0 });
                             } else if (this.activeStep === 'poison-sting-2' && npc.tags.has('support-2')) {
                                 npc.steering.seekWithArrive(getPosition(
-                                    getRotationPosition(this.pheromonesMechanic.startRotation, 2, this.pheromonesMechanic.rotationDirection === 'cw', false),
+                                    this.getRotationPosition(2, false),
                                     'arena',
                                     this.collection
                                 ), { priority: 10.0 });
                             } else if (this.activeStep === 'poison-sting-3' && npc.tags.has('support-3')) {
                                 npc.steering.seekWithArrive(getPosition(
-                                    getRotationPosition(this.pheromonesMechanic.startRotation, 3, this.pheromonesMechanic.rotationDirection === 'cw', false),
+                                    this.getRotationPosition(3, false),
                                     'arena',
                                     this.collection
                                 ), { priority: 10.0 });
                             } else if (this.activeStep === 'poison-sting-4' && npc.tags.has('support-4')) {
                                 npc.steering.seekWithArrive(getPosition(
-                                    getRotationPosition(this.pheromonesMechanic.startRotation, 4, this.pheromonesMechanic.rotationDirection === 'cw', false),
+                                    this.getRotationPosition(4, false),
                                     'arena',
                                     this.collection
                                 ), { priority: 10.0 });
@@ -366,25 +348,25 @@ export class M2STutorial extends M2SFight {
 
                             if (this.activeStep === 'poison-sting-1' && npc.tags.has('dps-1')) {
                                 npc.steering.seekWithArrive(getPosition(
-                                    getRotationPosition(this.pheromonesMechanic.startRotation, 1, this.pheromonesMechanic.rotationDirection === 'cw', true),
+                                    this.getRotationPosition(1, true),
                                     'arena',
                                     this.collection
                                 ), { priority: 10.0 });
                             } else if (this.activeStep === 'poison-sting-2' && npc.tags.has('dps-2')) {
                                 npc.steering.seekWithArrive(getPosition(
-                                    getRotationPosition(this.pheromonesMechanic.startRotation, 2, this.pheromonesMechanic.rotationDirection === 'cw', true),
+                                    this.getRotationPosition(2, true),
                                     'arena',
                                     this.collection
                                 ), { priority: 10.0 });
                             } else if (this.activeStep === 'poison-sting-3' && npc.tags.has('dps-3')) {
                                 npc.steering.seekWithArrive(getPosition(
-                                    getRotationPosition(this.pheromonesMechanic.startRotation, 3, this.pheromonesMechanic.rotationDirection === 'cw', true),
+                                    this.getRotationPosition(3, true),
                                     'arena',
                                     this.collection
                                 ), { priority: 10.0 });
                             } else if (this.activeStep === 'poison-sting-4' && npc.tags.has('dps-4')) {
                                 npc.steering.seekWithArrive(getPosition(
-                                    getRotationPosition(this.pheromonesMechanic.startRotation, 4, this.pheromonesMechanic.rotationDirection === 'cw', true),
+                                    this.getRotationPosition(4, true),
                                     'arena',
                                     this.collection
                                 ), { priority: 10.0 });
