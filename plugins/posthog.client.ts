@@ -2,7 +2,6 @@ import posthog from 'posthog-js';
 import * as Sentry from '@sentry/vue';
 
 export default defineNuxtPlugin((nuxtApp) => {
-    return {};
     const runtimeConfig = useRuntimeConfig();
     const posthogClient = posthog.init(runtimeConfig.public.posthogPublicKey as string, {
         api_host: (runtimeConfig.public.posthogHost || 'https://us.i.posthog.com') as string,
