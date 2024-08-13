@@ -33,7 +33,7 @@ export class KBTowerEffect extends AoeDiscEffect {
         mat.diffuseTexture = new Bab.Texture(`/images/kb-tower-${this.stacks}.png`);
         mat.diffuseTexture.hasAlpha = true;
         mat.useAlphaFromDiffuseTexture = true;
-        mat.emissiveColor = new Bab.Color3(0.85, 0.55, 0.55);
+        mat.emissiveColor = new Bab.Color3(0.125, 0.098, 0.078);
 
         const disc = Bab.MeshBuilder.CreateDisc('area', { radius }, this.scene);
         disc.rotation.x = Math.PI / 2;
@@ -42,6 +42,78 @@ export class KBTowerEffect extends AoeDiscEffect {
         disc.position = this.getPosition() || Bab.Vector3.Zero();
         disc.material = mat;
         disc.checkCollisions = true;
+        this.collection.addGlow(disc);
+
+        const poleMat = new Bab.StandardMaterial('kb-pole-mat', this.scene);
+        poleMat.diffuseColor = Bab.Color3.Yellow();
+        poleMat.specularColor = Bab.Color3.Yellow();
+        poleMat.emissiveColor = new Bab.Color3(0.961, 0.835, 0.569);
+
+        const height = 50;
+        const pole = Bab.MeshBuilder.CreateCylinder('kb-tower-pole', {
+            diameter: 0.175,
+            tessellation: 6,
+            height,
+        });
+        pole.position.y += height / 2;
+        pole.parent = disc;
+        pole.material = poleMat;
+        this.collection.addGlow(pole);
+        this.on('dispose', () => pole.dispose());
+
+        const ring = Bab.MeshBuilder.CreateTorus('kb-tower-ring', {
+            diameter: radius * 2,
+            tessellation: 32,
+            thickness: 0.045,
+        });
+        ring.position.y += 1;
+        ring.parent = disc;
+        ring.material = poleMat;
+        this.collection.addGlow(ring);
+        this.on('dispose', () => ring.dispose());
+
+        const ballMat = new Bab.StandardMaterial(`kb-tower-${this.stacks}`, this.scene);
+        ballMat.diffuseColor = Bab.Color3.FromHexString('#222222');
+        ballMat.specularColor = new Bab.Color3(0.125, 0.098, 0.078);
+
+        const positions = [
+            [radius, 0],
+            [-radius, 0],
+            [0, radius],
+            [0, -radius],
+            [radius * 0.7071, radius * 0.7071],
+            [radius * 0.7071, -radius * 0.7071],
+            [-radius * 0.7071, radius * 0.7071],
+            [-radius * 0.7071, -radius * 0.7071],
+        ]
+
+        for (let i = 0; i < this.stacks; i++) {
+            const ball = Bab.MeshBuilder.CreateSphere(`ball-${i + 1}`, {
+                segments: 16,
+                diameter: 0.5,
+            });
+            ball.position.x += positions[i][0];
+            ball.position.z += positions[i][1];
+            ball.parent = ring;
+            ball.material = ballMat;
+            this.on('dispose', () => ball.dispose());
+        }
+
+        const ballHeight = 16;
+        const triggerRadius = 1.25;
+        const ball = Bab.MeshBuilder.CreateSphere(`ball-trigger`, {
+            segments: 16,
+            diameter: triggerRadius * 2,
+        });
+        ball.position.y = ballHeight + triggerRadius;
+        ball.parent = disc;
+        ball.material = poleMat;
+        this.on('dispose', () => ball.dispose());
+
+        this.on('tick', ({ durationPercent }) => {
+            ring.rotation.y = (Math.PI * 4) * (durationPercent * 0.125);
+            ball.position.y = (ballHeight - ballHeight * durationPercent) + triggerRadius;
+        });
 
         return {
             disc
