@@ -7,6 +7,20 @@ export default defineNuxtPlugin((nuxtApp) => {
         api_host: (runtimeConfig.public.posthogHost || 'https://us.i.posthog.com') as string,
         person_profiles: 'identified_only',
         capture_pageview: false, // we add manual pageview capturing below
+        autocapture: {
+            css_selector_allowlist: [
+                'a',
+                'button',
+                'form',
+                'input',
+                'select',
+                'textarea',
+                'label',
+                '[autocapture]',
+                '[data-attr]',
+                '[data-custom-id]',
+            ],
+        },
         loaded: (posthog) => {
             if (import.meta.env.MODE === 'development') posthog.debug();
         }

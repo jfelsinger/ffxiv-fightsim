@@ -3,7 +3,7 @@
         <div class="fixed left-0 top-0 overflow-hidden w-full max-h-screen max-w-screen h-screen z-[-1]">
             <Babylon :skip-character="true" />
         </div>
-        <div class="p-6 relative">
+        <div class="p-6 relative min-h-[100vh]">
             <h1 class="text-5xl font-bold mb-6 absolute z-[-1]">
                 XIV FIGHTSIM
             </h1>
@@ -33,5 +33,7 @@
             </div>
 
         </div>
+
+        <Footer />
     </div>
 </template>

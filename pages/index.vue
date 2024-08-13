@@ -102,5 +102,6 @@
 
         </div>
 
+        <Footer />
     </div>
 </template>
