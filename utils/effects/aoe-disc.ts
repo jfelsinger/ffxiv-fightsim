@@ -15,7 +15,7 @@ export type AoeDiscEffectOptions = EffectOptions & {
 };
 
 export class AoeDiscEffect extends Effect {
-    name = 'aoe-disc';
+    override name = 'aoe-disc';
     yalms: number;
 
     constructor(options: AoeDiscEffectOptions) {
@@ -23,12 +23,12 @@ export class AoeDiscEffect extends Effect {
         this.yalms = parseNumber(options.yalms || 15);
     }
 
-    async startup() {
+    override async startup() {
         await super.startup();
         this.mesh = this.makeAoe().disc;
     }
 
-    checkMeshCollision(target: Bab.Mesh) {
+    override checkMeshCollision(target: Bab.Mesh) {
         const mesh = this.mesh;
         if (!mesh || !target) {
             return false;
@@ -42,7 +42,7 @@ export class AoeDiscEffect extends Effect {
         );
     }
 
-    async cleanup() {
+    override async cleanup() {
         this.mesh?.dispose()
         await super.cleanup();
     }

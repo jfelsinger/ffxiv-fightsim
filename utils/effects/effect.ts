@@ -253,7 +253,7 @@ export class Effect extends EventEmitter {
         }
     }
 
-    tickUpdate(time: number) {
+    tickUpdate(time: number, delta) {
         if (this.isActive) {
             const durationPercent = this.getDurationPercent();
             const adjustedTelegraph = this.adjustedTelegraph;
@@ -278,6 +278,7 @@ export class Effect extends EventEmitter {
             this.updatePosition(durationPercent);
             this.emit('tick', {
                 time,
+                delta,
                 durationPercent,
                 telegraph: adjustedTelegraph,
             });

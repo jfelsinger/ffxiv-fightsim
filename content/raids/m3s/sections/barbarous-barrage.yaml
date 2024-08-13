@@ -1,0 +1,100 @@
+name: m3s
+scheduling: sequential
+startPosition: 0,-0.45
+startPositionType: arena
+arena:
+  name: m3s-arena
+  shape: square
+  yalms: 45
+  floorType: m3s
+sections:
+  - item:
+      name: m3s-barbarous-barrage
+      scheduling: sequential
+      mechanics:
+        - item:
+            name: m3s-barbarous-barrage
+            scheduling: parallel
+            castName: Barbarous Barrage
+            castTime: 3700
+            effects:
+              # Middle, 4-stacks
+              - label: kb-tower-m1
+                startDelay: 3700 + 1750
+                item:
+                  name: kb-tower
+                  duration: 10000
+                  shiftSnapshot: 150
+                  yalms: 4
+                  stacks: 4
+                  power: 24.25
+                  position: 0.5,0
+                  positionType: arena
+              - label: kb-tower-m2
+                startDelay: 3700 + 1750
+                item:
+                  name: kb-tower
+                  duration: 10000
+                  shiftSnapshot: 150
+                  yalms: 4
+                  stacks: 4
+                  power: 24.25
+                  position: -0.5,0
+                  positionType: arena
+
+              # Corner, 2-stacks
+              - label: kb-tower-c1
+                startDelay: 3700 + 1750
+                item:
+                  name: kb-tower
+                  duration: 10000 + 3000
+                  shiftSnapshot: 150
+                  yalms: 4
+                  stacks: 2
+                  power: 20.5
+                  position: 0.5,0.5
+                  positionType: arena
+              - label: kb-tower-c2
+                startDelay: 3700 + 1750
+                item:
+                  name: kb-tower
+                  duration: 10000 + 3000
+                  shiftSnapshot: 150
+                  yalms: 4
+                  stacks: 2
+                  power: 20.5
+                  position: -0.5,0.5
+                  positionType: arena
+              - label: kb-tower-c3
+                startDelay: 3700 + 1750
+                item:
+                  name: kb-tower
+                  duration: 10000 + 3000
+                  shiftSnapshot: 150
+                  yalms: 4
+                  stacks: 2
+                  power: 20.5
+                  position: 0.5,-0.5
+                  positionType: arena
+              - label: kb-tower-c4
+                startDelay: 3700 + 1750
+                item:
+                  name: kb-tower
+                  duration: 10000 + 3000
+                  shiftSnapshot: 150
+                  yalms: 4
+                  stacks: 2
+                  power: 20.5
+                  position: -0.5,-0.5
+                  positionType: arena
+
+              # Center, 8-stack
+              - label: kb-tower-center
+                startDelay: 3700 + 1750 + 5750
+                item:
+                  name: kb-tower
+                  duration: 10250
+                  shiftSnapshot: 150
+                  yalms: 4
+                  stacks: 8
+                  power: 18.5

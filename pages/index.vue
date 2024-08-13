@@ -63,6 +63,18 @@
 
                         <div class="card bg-base-100/50 glass">
                             <div class="card-body">
+                                <h2 class="card-title">M3S Barbarous Rage</h2>
+                                <p>A quick sim of M3S' knock-back towers</p>
+                                <div class="card-actions justify-end">
+                                    <NuxtLink to="https://xivfightsim.com/raids/m3s/barbarous-rage" class="btn min-w-20">
+                                        Play
+                                    </NuxtLink>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-base-100/50 glass">
+                            <div class="card-body">
                                 <h2 class="card-title">M2S Centerstage/Outerstage Combos</h2>
                                 <p>Positioning for M2S Outerstage and Centerstage Combos.</p>
                                 <div class="card-actions justify-end">

@@ -128,7 +128,7 @@ export class Arena {
             }
         }
 
-        return false;
+        return true;
     }
 
     makeSquareFloor(mat: Bab.Material): { floor: Bab.Mesh, boundary?: Bab.Mesh } {
@@ -140,26 +140,45 @@ export class Arena {
 
         const boundaryMat = this.makeBoundaryMat();
         const height = size / 10;
-        const boundary = Bab.MeshBuilder.CreateBox(`${this.name}Bounds`, {
-            width: size,
-            depth: size,
+        // const boundary = Bab.MeshBuilder.CreateBox(`${this.name}Bounds`, {
+        //     width: size,
+        //     depth: size,
+        //     height,
+        //     sideOrientation: Bab.Mesh.DOUBLESIDE,
+        //     faceUV: [
+        //         new Bab.Vector4(0, 0, 1, 1),
+        //         new Bab.Vector4(0, 0, 1, 1),
+        //         new Bab.Vector4(0, 0, 1, 1),
+        //         new Bab.Vector4(0, 0, 1, 1),
+        //         new Bab.Vector4(1, 1, 1, 1),
+        //         new Bab.Vector4(1, 1, 1, 1),
+        //     ],
+        //     frontUVs: new Bab.Vector4(0, 0, 1, 1),
+        //     backUVs: new Bab.Vector4(0, 0, 1, 1),
+        //     wrap: true,
+        // }, this.scene);
+        // boundary.checkCollisions = false;
+        // boundary.position.y += height / 2;
+        // boundary.material = boundaryMat;
+        const boundary = Bab.MeshBuilder.CreateCylinder(`${this.name}Bounds`, {
+            tessellation: 4,
+            diameter: size * (Math.PI / 2),
             height,
             sideOrientation: Bab.Mesh.DOUBLESIDE,
             faceUV: [
-                new Bab.Vector4(0, 0, 1, 1),
-                new Bab.Vector4(0, 0, 1, 1),
-                new Bab.Vector4(0, 0, 1, 1),
-                new Bab.Vector4(0, 0, 1, 1),
                 new Bab.Vector4(1, 1, 1, 1),
+                new Bab.Vector4(0, 0, 1, 1),
                 new Bab.Vector4(1, 1, 1, 1),
             ],
             frontUVs: new Bab.Vector4(0, 0, 1, 1),
             backUVs: new Bab.Vector4(0, 0, 1, 1),
-            wrap: true,
         }, this.scene);
         boundary.checkCollisions = false;
         boundary.position.y += height / 2;
+        boundary.position.z += 0;
         boundary.material = boundaryMat;
+        boundary.alphaIndex = 2;
+        boundary.rotation.y = Math.PI / 4;
 
         return { floor, boundary };
     }

@@ -70,7 +70,7 @@ export class FightCollection {
     }
 
     getPartyCharacters() {
-        return this.filterCharacters((key) => key === 'player' || key.startsWith('party'));
+        return this.filterCharacters((key, char) => key === 'player' || key.startsWith('party') || char.tags.has('player'));
     }
 
     getCharactersWithTags(tags: string[] | string) {

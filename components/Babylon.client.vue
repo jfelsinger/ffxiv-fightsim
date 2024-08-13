@@ -178,6 +178,7 @@ function makeScene(game: Engine) {
     const character = new Character('player', {
         startPosition: fight?.getStartPosition(),
     }, scene, playerClock);
+    character.tags.add('player');
     collection.addCharacter(character);
 
     camera.setTarget(character.camMarker.position.clone());

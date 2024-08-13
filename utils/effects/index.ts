@@ -14,6 +14,7 @@ import { StageComboCastEffect } from './stage-combo-cast';
 import { M2SPoisonStingEffect } from './m2s-poison-sting';
 import { M2SAlarmPheromones2Effect } from './m2s-alarm-pheromones-2';
 import { PreyMarkerEffect } from './prey-marker';
+import { KBTowerEffect } from './kb-tower';
 
 export const effectsCollection = {
     'default': Effect,
@@ -34,6 +35,7 @@ export const effectsCollection = {
     'm2s-poison-sting': M2SPoisonStingEffect,
     'm2s-alarm-pheromones-2': M2SAlarmPheromones2Effect,
     'm2s-alarm-pheromones-2-bees': M2SAlarmPheromones2Effect,
+    'kb-tower': KBTowerEffect,
 } as const;
 
 export default effectsCollection;

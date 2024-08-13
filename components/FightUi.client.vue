@@ -232,7 +232,7 @@ function updateTime(val: number) {
                         <Icon name="solar:stopwatch-linear" />
                     </div>
                     <ul tabindex="0" class="dropdown-content z-[51] menu p-2 shadow bg-base-100 rounded-box text-xs">
-                        <li v-for="val in ['1.0', 0.75, 0.50]" :class="{ 'opacity-50': worldTimeScaling == val }">
+                        <li v-for="val in ['2.0', '1.0', 0.75, 0.50]" :class="{ 'opacity-50': worldTimeScaling == val }">
                             <a @click.stop.prevent="updateTime(+val)">{{ val }}</a>
                         </li>
                     </ul>
