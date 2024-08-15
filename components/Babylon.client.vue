@@ -102,6 +102,17 @@ function makeScene(game: Engine) {
         inputMap.value[evt.sourceEvent.key] = evt.sourceEvent.type === 'keydown';
     }));
 
+    scene.onPrePointerObservable.add((pointerInfo) => {
+        if (pointerInfo.event.type === 'pointerup') {
+            console.log('POINTER UP: ', pointerInfo.event.button, pointerInfo.event);
+            delete inputMap.value[`mb-${pointerInfo.event.button}`];
+            (window as any).pu = pointerInfo;
+        } else {
+            inputMap.value[`mb-1`] = !!(pointerInfo.event.buttons & 1);
+            inputMap.value[`mb-2`] = !!(pointerInfo.event.buttons & 2);
+        }
+    });
+
     const skydome = Bab.MeshBuilder.CreateBox('sky', { size: 5000, sideOrientation: Bab.Mesh.BACKSIDE }, scene);
     skydome.position.y = 100;
     skydome.isPickable = false;
@@ -200,7 +211,7 @@ function makeScene(game: Engine) {
             movement.addInPlace(direction.scaleInPlace(character.speed));
             keydown = true;
         } else {
-            if (inputMap.value['w']) {
+            if (inputMap.value['w'] || (inputMap.value['mb-1'] && inputMap.value['mb-2'])) {
                 const direction = camera.getDirection(new Bab.Vector3(0, 0, 1))
                 direction.y = 0;
                 movement.addInPlace(direction.scaleInPlace(character.speed));
@@ -301,10 +312,27 @@ function onBlur() {
     inputMap.value = {};
 }
 
+// TODO
+function onKeyDown(e: any) {
+    if (e?.key && !e?.target?.matches('input, textbox, select, textarea')) {
+        inputMap.value[e.key] = true;
+    }
+}
+
+function onKeyUp(e: any) {
+    if (e?.key && inputMap.value[e.key]) {
+        delete inputMap.value[e.key];
+    }
+}
+
 onMounted(async () => {
+    canvas.value?.addEventListener('blur', onBlur);
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
     window.addEventListener('resize', onResize);
     window.addEventListener('blur', onBlur);
     document.addEventListener('visibilitychange', onVisibilityChange);
+
     nextTick(() => {
         debug('mount: ', canvas.value);
         if (canvas.value) {
@@ -321,6 +349,9 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(async () => {
+    canvas.value?.removeEventListener('blur', onBlur);
+    window.removeEventListener('keydown', onKeyDown);
+    window.removeEventListener('keyup', onKeyUp);
     window.removeEventListener('resize', onResize);
     window.removeEventListener('blur', onBlur);
     document.removeEventListener('visibilitychange', onVisibilityChange);
