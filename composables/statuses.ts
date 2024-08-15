@@ -13,6 +13,8 @@ export function useStatuses(name = 'player') {
     // TODO: Remove this to somewhere else.
     if (!statuses.value?.length) {
         statuses.value = [{
+            name: 'hearts-1',
+        }, {
             name: 'm2s/beat-3-1',
             seconds: 23,
         }];

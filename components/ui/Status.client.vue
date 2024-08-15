@@ -23,16 +23,24 @@ const props = defineProps<{
     large?: boolean
 }>();
 
+const NameToSrcMappings: Partial<Record<string, string>> = {
+    'simp-1': 'm2s/simp-1',
+    'hearts-1': 'm2s/hearts-1-4',
+    'hearts-2': 'm2s/hearts-2-4',
+    'hearts-3': 'm2s/hearts-3-4',
+    'hearts-4': 'm2s/hearts-4-4',
+} as const;
+
 const name = computed(() => props.name || props.status.name);
 const seconds = computed(() => props.seconds || props.status?.seconds);
 const src = computed(() => props.src || props.status?.src);
 
-const source = computed(() => src.value || `/images/status/${name.value}.png`);
+const source = computed(() => src.value || `/images/status/${NameToSrcMappings[name.value] || name.value}.png`);
 
 </script>
 
 <template>
-    <div class="status-container flex flex-col justify-center items-center"
+    <div class="status-container flex flex-col justify-start items-center"
         :class="{ '--large': large }">
         <NuxtImg :src="source" class="status__image" :width="large ? 48 : 24" />
         <div v-if="seconds" class="status__time  font-light text-white relative"
