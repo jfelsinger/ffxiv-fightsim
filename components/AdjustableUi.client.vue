@@ -44,10 +44,9 @@ function toggleHidden() {
 
 <template>
     <div ref="el" :style="style" style="position: fixed" class="adjustable-ui-item fixed select-none cursor-move z-[45]"
-        :class="{ '--hidden': isHidden, '--edit-mode': isEditing, }"
-    >
+        :class="{ '--hidden': isHidden, '--edit-mode': isEditing, }">
         <div class="relative p-4">
-            <div class="adjustable-ui-item__content p-2" :style="{ transform: `scale(${scale/100})`, }">
+            <div class="adjustable-ui-item__content p-4 relative" :style="{ transform: `scale(${scale / 100})`, }">
                 <slot>
                     Hello.
                 </slot>
@@ -83,8 +82,10 @@ function toggleHidden() {
 <style lang="scss">
 .adjustable-ui-item {
     pointer-events: none;
+
     &.--hidden {
         opacity: 0;
+
         &.--edit-mode {
             .adjustable-ui-item__content {
                 opacity: 0.5;
@@ -115,10 +116,10 @@ function toggleHidden() {
     .adjustable-ui-item:active &,
     .adjustable-ui-item:focus &,
     .adjustable-ui-item:focus-within &,
-    .adjustable-ui-item:has(:hover,:active,:focus) &,
+    .adjustable-ui-item:has(:hover, :active, :focus) &,
     {
-        opacity: 1;
-    }
+    opacity: 1;
+}
 
 }
 </style>

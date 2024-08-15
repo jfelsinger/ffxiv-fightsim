@@ -63,6 +63,8 @@ watch(hits, (value: number, oldValue: number) => {
 const castState = useCastState();
 (window as any).castState = castState;
 
+const { statuses } = useStatuses();
+
 function onResize() {
     game?.resize();
 }
@@ -406,6 +408,8 @@ function onScaleTime(value: number) {
         </div>
 
         <UiCastBar v-if="castState?.name" />
+
+        <UiStatusGroup name="player" xstatuses="statuses" />
     </div>
 </template>
 
