@@ -36,12 +36,11 @@ const playerTime = useState<number>('playerTime', () => playerClock.time || 0);
 playerClock.on('tick', (time) => { playerTime.value = time });
 watch(playerTimeScaling, (scaling) => { playerClock.scaling = scaling });
 
-const worldTimeScaling = useState<number>('worldTimeScaling', () => 1.0);
-const worldClock = new Clock({ name: 'world', paused: true, scaling: worldTimeScaling.value });
-(window as any).__worldClock = worldClock;
-const worldTime = useState<number>('worldTime', () => worldClock.time || 0);
-worldClock.on('tick', (time) => { worldTime.value = time });
-watch(worldTimeScaling, (scaling) => { worldClock.scaling = scaling });
+const {
+    worldTime,
+    worldTimeScaling,
+    worldClock,
+} = useWorldClock();
 
 const canvas = ref<HTMLCanvasElement>();
 let game: Engine | undefined;

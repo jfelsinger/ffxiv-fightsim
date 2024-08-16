@@ -1,9 +1,25 @@
 import * as Bab from '@babylonjs/core';
 import { Steering } from './steering';
+import { EventEmitter } from 'eventemitter3';
 import { yalmsToM } from './conversions';
 import { clamp, lerp } from './interpolation';
 import createMarkerMat from '../materials/marker';
 import { Clock } from './clock';
+import {
+    type Status,
+    makeStatus,
+    addStatus,
+    removeStatus,
+    getStatus,
+    addStacks,
+    removeStacks,
+    clearStacks,
+} from './status';
+import {
+    useState,
+    useWorldClock,
+    type Ref,
+} from '#imports';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:character');
@@ -35,7 +51,7 @@ export const DefaultCharacterOptions: CharacterOptions = {
     startPosition: new Bab.Vector3(0, 0, -25),
 } as const
 
-export class Character {
+export class Character extends EventEmitter {
     name: string;
     role?: string;
     clock: Clock;
@@ -45,7 +61,7 @@ export class Character {
     diffuseColor: Bab.Color3;
     specularColor: Bab.Color3;
     tags: Set<string> = new Set();
-    stacks: Partial<Record<string, number>> = {};
+    statuses: Ref<Status[]>;
 
     camera?: Bab.ArcRotateCamera;
 
@@ -60,18 +76,57 @@ export class Character {
     steering: Steering;
     startPosition: Bab.Vector3;
 
+    getStatus(status: Parameters<typeof getStatus>[1]) {
+        return getStatus(this.statuses.value, status);
+    }
+
+    addStatus(statusToAdd: Parameters<typeof addStatus>[1]) {
+        const { status, list } = addStatus(this.statuses.value, statusToAdd);
+
+        this.statuses.value = list;
+        this.emit('status:add', { status, list });
+    }
+
+    removeStatus(statusToRemove: Parameters<typeof removeStatus>[1]) {
+        const { status, list } = removeStatus(this.statuses.value, statusToRemove);
+        this.statuses.value = list;
+        this.emit('status:remove', { status, list });
+    }
+
     addStacks(name: string, count = 1) {
-        this.stacks[name] = (this.stacks[name] || 0) + count;
-        return this.stacks[name];
+        const statuses = this.statuses.value;
+        const status = getStatus(statuses, name);
+        if (status) {
+            const prevStacks = status.stacks;
+            addStacks(status, count);
+            this.emit('stacks:add', { status, count, prevStacks });
+            this.statuses.value = statuses;
+            return status.stacks;
+        }
     }
 
     removeStacks(name: string, count = 1) {
-        this.stacks[name] = Math.max(0, (this.stacks[name] || 0) - count);
-        return this.stacks[name];
+        const statuses = this.statuses.value;
+        const status = getStatus(statuses, name);
+        if (status) {
+            const prevStacks = status.stacks;
+            removeStacks(status, count);
+            this.emit('stacks:remove', { status, count, prevStacks });
+            this.statuses.value = statuses;
+            return status.stacks;
+        }
     }
 
     clearStacks(name: string) {
-        this.stacks[name] = 0;
+        const statuses = this.statuses.value;
+        const status = getStatus(statuses, name);
+        if (status) {
+            const prevStacks = status.stacks;
+            clearStacks(status);
+            this.emit('stacks:clear', { status, count: 0, prevStacks });
+            this.statuses.value = statuses;
+            return status.stacks;
+        }
     }
 
     get position(): Bab.Vector3 {
@@ -99,11 +154,45 @@ export class Character {
     }
 
 
+    tickStatuses(delta: number) {
+        const finishedIds: string[] = [];
+
+        const statuses = this.statuses.value;
+        const len = statuses.length;
+        for (let i = 0; i < len; i++) {
+            if (statuses[i]) {
+                let timeout = statuses[i].timeout;
+                if (timeout !== undefined) {
+                    timeout -= delta;
+                    statuses[i].timeout = timeout;
+                    if (!timeout || timeout <= 0) {
+                        this.emit('status:done', { statuses, delta, status: statuses[i] });
+                        finishedIds.push(statuses[i].id);
+                    }
+                }
+            }
+        }
+
+        this.statuses.value = statuses;
+        this.emit('status:tick', { statuses, delta });
+
+        for (const id of finishedIds) {
+            this.removeStatus(id);
+        }
+    }
 
     constructor(name: string, options: Partial<CharacterOptions>, scene: Bab.Scene, clock: Clock) {
+        super();
         this.name = name;
         this.clock = clock;
         this.scene = scene;
+
+        this.statuses = useState<Status[]>(`statuses-${this.name}`, () => []);
+
+        const { worldClock } = useWorldClock();
+        worldClock?.on('tick', (_time: number, delta: number) => {
+            this.tickStatuses(delta);
+        });
 
         const opts: CharacterOptions = {
             ...DefaultCharacterOptions,

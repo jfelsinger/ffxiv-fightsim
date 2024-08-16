@@ -9,6 +9,7 @@ import type { PositionType, PositionOption } from '../positioning';
 import { getPosition, getInterpolatedPosition } from '../positioning';
 import type { ScheduledParent } from '../scheduled';
 import { useCastState } from '../../composables/castState';
+import { type PartialStatus } from '../status';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:effect');
@@ -52,6 +53,9 @@ export type EffectOptions = {
     // Whether or not the same random target can be selected more than once,
     // when randomly selecting from a group of targets
     repeatTarget?: boolean
+
+    startStatus?: PartialStatus
+    endStatus?: PartialStatus
 }
 
 const globalTelegraph = useState<number>('telegraph', () => 1.0);
@@ -335,6 +339,16 @@ export class Effect extends EventEmitter {
     }
 
     async execute() {
+        const status = this.options.startStatus;
+        if (status) {
+            const targets = this.getTargets();
+            targets.forEach(target => {
+                if ((target as any)?.addStatus) {
+                    (target as Character).addStatus(status);
+                }
+            })
+        }
+
         if (this.duration) {
             await this.clock.wait(this.duration - this.shiftSnapshot);
         }
@@ -362,6 +376,15 @@ export class Effect extends EventEmitter {
         if (!this.isActive) { return; }
         // else:
 
+        const status = this.options.endStatus;
+        if (status) {
+            const targets = this.getTargets();
+            targets.forEach(target => {
+                if ((target as any)?.addStatus) {
+                    (target as Character).addStatus(status);
+                }
+            })
+        }
         this.emit('snapshot', { mesh: this.mesh });
         this.checkCollisions();
     }

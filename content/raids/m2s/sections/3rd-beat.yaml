@@ -1,0 +1,136 @@
+name: m2s
+scheduling: sequential
+startPosition: 0,-0.525
+startPositionType: arena
+waymarks:
+  A: 0.0,0.33
+  B: 0.33,0.0
+  C: 0.0,-0.33
+  D: -0.33,0.0
+  One: -0.340, 0.340
+  Two: 0.340, 0.340
+  Three: 0.340,-0.340
+  Four: -0.340,-0.340
+waymarksPositionType: arena
+arena:
+  yalms: 53
+  floorType: m2s-2
+  # floorType: m2s
+sections:
+  - item:
+      name: beat-3
+      scheduling: sequential
+      mechanics:
+        - startDelay: 500
+          item:
+            name: beat-3-cast
+            castName: "Honey B. Live: 3rd Beat"
+            effects:
+              # TODO: Distribute debuffs at the end of cast!
+              - item:
+                  name: cast-bar
+                  duration: 8000
+                  target: tag-player
+                  endStatus:
+                    name: "m2s/beat-3-1"
+                    timeout: 24000
+
+        - startDelay: 2200
+          item:
+            name: spread-stack-love
+            castName: "Spread/Drop Love"
+            effects:
+              - item:
+                  name: cast-bar
+                  duration: 4700
+
+        - startDelay: 2500
+          endDelay: 1500
+          item:
+            name: m2s-stage-combo
+            telegraph: 0.5
+            duration: 4500
+            scheduling: sequential
+            castTime: 3500
+            effects:
+              - label: centerstage-cast
+                endDelay: 0
+                item:
+                  name: stage-combo-cast-bar
+                  castName: Centerstage Combo
+                  telegraphDirection: cardinals
+                  duration: 2000
+
+              - label: outerstage-cast
+                endDelay: 0
+                item:
+                  name: stage-combo-cast-bar
+                  castName: Outerstage Combo
+                  telegraphDirection: intercardinals
+                  duration: 2000
+
+              # Center Inercards
+              - label: center-intercards
+                item:
+                  name: aoe-group
+                  color: 199,42,45
+                  shiftSnapshot: 500
+                  outerRadius: 30
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  angle: 45.5
+                  positionType: arena
+                  aoes:
+                    - name: aoe-disc
+                      yalms: 6.5
+                    - name: aoe-ring
+                      direction: 45
+                    - name: aoe-ring
+                      direction: -45
+                    - name: aoe-ring
+                      direction: 135
+                    - name: aoe-ring
+                      direction: -135
+
+              # Cardinals Cross
+              - label: cross-cards
+                item:
+                  name: aoe-group
+                  color: 199,42,45
+                  shiftSnapshot: 500
+                  aoes:
+                    - name: aoe-square
+                      yalms: 15.5
+                      height: 62
+                    - name: aoe-square
+                      yalms: 15.5
+                      width: 62
+
+              # Outer Cards
+              - label: outer-cards
+                item:
+                  name: aoe-group
+                  color: 199,42,45
+                  shiftSnapshot: 500
+                  outerRadius: 30
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  positionType: arena
+                  aoes:
+                    - name: aoe-ring
+                      yalms: 14.325
+                      outerRadius: 30
+                      innerRadius: 6.5
+                      thetaLength: pi * 2
+                    - name: aoe-ring
+                      direction: -90
+                      angle: 45.5
+                    - name: aoe-ring
+                      direction: 0
+                      angle: 45.5
+                    - name: aoe-ring
+                      direction: 90
+                      angle: 45.5
+                    - name: aoe-ring
+                      direction: 180
+                      angle: 45.5
