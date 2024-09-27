@@ -6,12 +6,12 @@ export function useStatuses(name = 'player') {
     // const statusesLists = computed(() => Object.keys(statusDictionary.value));
 
     // TODO: Remove this to somewhere else.
-    if (!statuses.value?.length) {
-        statuses.value = [{
-            id: 'hearts-1',
-            name: 'hearts-1',
-        }];
-    }
+    // if (!statuses.value?.length) {
+    //     statuses.value = [{
+    //         id: 'hearts-1',
+    //         name: 'hearts-1',
+    //     }];
+    // }
 
     return {
         statuses,
