@@ -60,8 +60,8 @@ export type WaymarkOptions = {
     positionType?: PositionType
 }
 
-const SquareWaymarkRadius = 1.5;
-const RoundWaymarkRadius = 1.125;
+const SquareWaymarkRadius = 1.875;
+const RoundWaymarkRadius = 1.455;
 
 export class Waymark {
     name: WaymarkName;
@@ -191,7 +191,7 @@ export class Waymark {
             return isWithinRadius(
                 target.absolutePosition.x - mesh.absolutePosition.x,
                 target.absolutePosition.z - mesh.absolutePosition.z,
-                RoundWaymarkRadius // radius
+                SquareWaymarkRadius // radius
             );
         }
     }
