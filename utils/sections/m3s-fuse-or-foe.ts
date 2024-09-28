@@ -21,7 +21,7 @@ export class FuseOrFoeSection extends FightSection {
         const fuseOrFoe2 = this.mechanics.find((m) => m.label === 'm3s-fuse-or-foe-2-4');
         if (Math.round(Math.random())) {
             if (fuseOrFoe1) {
-                fuseOrFoe1.startDelay = 6050;
+                fuseOrFoe1.startDelay = 7350;
             }
             if (fuseOrFoe2) {
                 fuseOrFoe2.startDelay = 0;
@@ -31,7 +31,7 @@ export class FuseOrFoeSection extends FightSection {
                 fuseOrFoe1.startDelay = 0;
             }
             if (fuseOrFoe2) {
-                fuseOrFoe2.startDelay = 6050;
+                fuseOrFoe2.startDelay = 7350;
             }
         }
     }

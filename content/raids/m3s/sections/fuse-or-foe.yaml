@@ -40,10 +40,10 @@ sections:
             scheduling: parallel
             effects:
               - label: 1-3-circles
-                startDelay: 3700 + 3900
+                startDelay: 3700 + 3850
                 item:
                   name: aoe-group
-                  duration: 5000
+                  duration: 5700
                   shiftSnapshot: 300
                   outerRadius: 30
                   innerRadius: 0
@@ -57,10 +57,10 @@ sections:
                     - name: aoe-disc
                       position: -0.37,0.37
               - label: 1-3-mid-rings
-                startDelay: 3700 + 3900 + 5000 + 300
+                startDelay: 3700 + 3850 + 5700 + 300
                 item:
                   name: aoe-group
-                  duration: 2250
+                  duration: 3650
                   shiftSnapshot: 300
                   outerRadius: 19
                   innerRadius: 9.55
@@ -72,10 +72,10 @@ sections:
                     - name: aoe-ring
                       position: -0.37,0.37
               - label: 1-3-far-rings
-                startDelay: 3700 + 3900 + 5000 + 2250 + 600
+                startDelay: 3700 + 3850 + 5700 + 3650 + 600
                 item:
                   name: aoe-group
-                  duration: 2250
+                  duration: 3650
                   shiftSnapshot: 300
                   outerRadius: 29
                   innerRadius: 19
@@ -93,10 +93,10 @@ sections:
             scheduling: parallel
             effects:
               - label: 2-4-circles
-                startDelay: 3700 + 3900
+                startDelay: 3700 + 3850
                 item:
                   name: aoe-group
-                  duration: 5000
+                  duration: 5700
                   shiftSnapshot: 300
                   outerRadius: 30
                   innerRadius: 0
@@ -110,10 +110,10 @@ sections:
                     - name: aoe-disc
                       position: -0.37,-0.37
               - label: 2-4-mid-rings
-                startDelay: 3700 + 3900 + 5000 + 300
+                startDelay: 3700 + 3850 + 5700 + 300
                 item:
                   name: aoe-group
-                  duration: 2250
+                  duration: 3650
                   shiftSnapshot: 300
                   outerRadius: 19
                   innerRadius: 9.55
@@ -125,10 +125,10 @@ sections:
                     - name: aoe-ring
                       position: -0.37,-0.37
               - label: 2-4-far-rings
-                startDelay: 3700 + 3900 + 5000 + 2250 + 600
+                startDelay: 3700 + 3850 + 5700 + 3650 + 600
                 item:
                   name: aoe-group
-                  duration: 2250
+                  duration: 3650
                   shiftSnapshot: 300
                   outerRadius: 29
                   innerRadius: 19
@@ -139,6 +139,112 @@ sections:
                       position: 0.37,0.37
                     - name: aoe-ring
                       position: -0.37,-0.37
+        # # 1 and 3
+        # - label: m3s-fuse-or-foe-1-3
+        #   item:
+        #     name: m3s-fuse-or-foe-1-3
+        #     scheduling: parallel
+        #     effects:
+        #       - label: 1-3-circles
+        #         startDelay: 3700 + 3900
+        #         item:
+        #           name: aoe-group
+        #           duration: 5000
+        #           shiftSnapshot: 300
+        #           outerRadius: 30
+        #           innerRadius: 0
+        #           thetaLength: pi / 2
+        #           angle: 45.5
+        #           yalms: 9.5
+        #           positionType: arena
+        #           aoes:
+        #             - name: aoe-disc
+        #               position: 0.37,-0.37
+        #             - name: aoe-disc
+        #               position: -0.37,0.37
+        #       - label: 1-3-mid-rings
+        #         startDelay: 3700 + 3900 + 5000 + 300
+        #         item:
+        #           name: aoe-group
+        #           duration: 2250
+        #           shiftSnapshot: 300
+        #           outerRadius: 19
+        #           innerRadius: 9.55
+        #           positionType: arena
+        #           segments: 38
+        #           aoes:
+        #             - name: aoe-ring
+        #               position: 0.37,-0.37
+        #             - name: aoe-ring
+        #               position: -0.37,0.37
+        #       - label: 1-3-far-rings
+        #         startDelay: 3700 + 3900 + 5000 + 2250 + 600
+        #         item:
+        #           name: aoe-group
+        #           duration: 2250
+        #           shiftSnapshot: 300
+        #           outerRadius: 29
+        #           innerRadius: 19
+        #           positionType: arena
+        #           segments: 55
+        #           aoes:
+        #             - name: aoe-ring
+        #               position: 0.37,-0.37
+        #             - name: aoe-ring
+        #               position: -0.37,0.37
+        # # 2 and 4
+        # - label: m3s-fuse-or-foe-2-4
+        #   item:
+        #     name: m3s-fuse-or-foe-2-4
+        #     scheduling: parallel
+        #     effects:
+        #       - label: 2-4-circles
+        #         startDelay: 3700 + 3900
+        #         item:
+        #           name: aoe-group
+        #           duration: 5000
+        #           shiftSnapshot: 300
+        #           outerRadius: 30
+        #           innerRadius: 0
+        #           thetaLength: pi / 2
+        #           angle: 45.5
+        #           yalms: 9.5
+        #           positionType: arena
+        #           aoes:
+        #             - name: aoe-disc
+        #               position: 0.37,0.37
+        #             - name: aoe-disc
+        #               position: -0.37,-0.37
+        #       - label: 2-4-mid-rings
+        #         startDelay: 3700 + 3900 + 5000 + 300
+        #         item:
+        #           name: aoe-group
+        #           duration: 2250
+        #           shiftSnapshot: 300
+        #           outerRadius: 19
+        #           innerRadius: 9.55
+        #           positionType: arena
+        #           segments: 38
+        #           aoes:
+        #             - name: aoe-ring
+        #               position: 0.37,0.37
+        #             - name: aoe-ring
+        #               position: -0.37,-0.37
+        #       - label: 2-4-far-rings
+        #         startDelay: 3700 + 3900 + 5000 + 2250 + 600
+        #         item:
+        #           name: aoe-group
+        #           duration: 2250
+        #           shiftSnapshot: 300
+        #           outerRadius: 29
+        #           innerRadius: 19
+        #           positionType: arena
+        #           segments: 55
+        #           aoes:
+        #             - name: aoe-ring
+        #               position: 0.37,0.37
+        #             - name: aoe-ring
+        #               position: -0.37,-0.37
         - label: lariat
           startDelay: 28300
           item:
@@ -150,6 +256,11 @@ sections:
               - item:
                   name: cast-bar
                   duration: 6650
+              - label: lariat-circle
+                startDelay: 6650 - 350
+                item:
+                  name: aoe-ring
+                  duration: 350
         - label: infernal-spin
           startDelay: 7550
           item:
@@ -162,10 +273,10 @@ sections:
                   name: cast-bar
                   duration: 5700
               - label: spit-1
-                startDelay: 1000
+                startDelay: 300
                 item:
                   name: aoe-ring
-                  duration: 4700
+                  duration: 5400
                   segments: 38
                   thetaStart: pi / 3
                   thetaLength: pi / 3
