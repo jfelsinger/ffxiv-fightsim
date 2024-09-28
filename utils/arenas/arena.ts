@@ -14,6 +14,7 @@ export type ArenaOptions = {
     tessellation?: number
     globalFloor?: boolean
     floorType?: string
+    sizeAdjustment?: string
     collection: FightCollection
 }
 
@@ -34,6 +35,10 @@ export class Arena {
 
     get size() {
         return yalmsToM(this.yalms);
+    }
+
+    get adjustedSize() {
+        return this.size * (this.options?.sizeAdjustment || 1);
     }
 
     dispose() {

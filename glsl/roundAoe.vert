@@ -9,7 +9,10 @@ uniform float arenaRadius;
 varying vec2 vUV;
 varying vec3 vPos;
 varying float iid;
+
 varying float arenaDistance;
+varying float arenaXDistance;
+varying float arenaYDistance;
 
 #include<instancesDeclaration>
 
@@ -23,6 +26,8 @@ void main(void) {
     vPos = (viewProjection * finalWorld * vec4(position, 1.0)).xyz;
     gl_Position = viewProjection * finalWorld * vec4(position, 1.0);
     arenaDistance = length(finalWorld * vec4(position, 1.0)) / arenaRadius;
+    arenaXDistance = (finalWorld * vec4(position, 1.0)).x / arenaRadius;
+    arenaYDistance = (finalWorld * vec4(position, 1.0)).z / arenaRadius;
 
     vUV = uv;
 }

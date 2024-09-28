@@ -52,6 +52,7 @@ export class AoeDiscEffect extends Effect {
         discMat.alpha = 0.7;
         if (this.collection.arena) {
             discMat.setFloat('arenaRadius', this.collection.arena.size / 2);
+            discMat.setInt('arenaIsSquare', this.collection.arena.shape === 'square' ? 1 : 0);
         }
 
         discMat.setFloat('telegraph', this.adjustedTelegraph);

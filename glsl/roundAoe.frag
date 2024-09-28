@@ -5,7 +5,13 @@ uniform sampler2D textureSampler;
 uniform float elapsed;
 uniform float telegraph;
 uniform vec3 color;
+
 varying float arenaDistance;
+varying float arenaXDistance;
+varying float arenaYDistance;
+
+uniform float arenaRadius;
+uniform int arenaIsSquare;
 
 float cubicInOut(float t) {
     return t < 0.5
@@ -45,7 +51,19 @@ void main(void) {
     float g = clamp((color.g) - (adj * 0.25), 0.0, 1.0);
     float b = clamp((color.b) - (adj * 0.25), 0.0, 1.0);
     alpha = max(0.20, alpha);
-    alpha *= step(arenaDistance, 1.0);
+
+    if (arenaIsSquare == 1)
+    {
+        alpha *= step(arenaXDistance, 1.0);
+        alpha *= step(-arenaXDistance, 1.0);
+        alpha *= step(arenaYDistance, 1.0);
+        alpha *= step(-arenaYDistance, 1.0);
+    }
+    else
+    {
+        alpha *= step(arenaDistance, 1.0);
+    }
+
     alpha *= step(1.0 - elapsed, telegraph);
 
     gl_FragColor = vec4(r, g, b, alpha);

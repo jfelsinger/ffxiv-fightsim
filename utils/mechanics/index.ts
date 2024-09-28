@@ -8,6 +8,7 @@ import { M2SBeeSting } from './m2s-bee-sting';
 import { M2SAlarmPheromones2 } from './m2s-alarm-pheromones-2';
 import { M2SXOfVenom } from './m2s-x-of-venom';
 import { M3SBarbarousBarrage } from './m3s-barbarous-barrage';
+import { M3SInfernalSpin } from './m3s-infernal-spin';
 export const mechanicsCollection: Partial<Record<string, typeof Mechanic>> = {
     'default': Mechanic,
 
@@ -21,6 +22,7 @@ export const mechanicsCollection: Partial<Record<string, typeof Mechanic>> = {
     'm2s-alarm-pheromones-2': M2SAlarmPheromones2,
     'm2s-x-of-venom': M2SXOfVenom,
     'm3s-barbarous-barrage': M3SBarbarousBarrage,
+    'm3s-infernal-spin': M3SInfernalSpin,
 } as const;
 
 export default mechanicsCollection;

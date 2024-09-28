@@ -26,8 +26,7 @@ sections:
             name: m3s-barbarous-barrage
             scheduling: parallel
             castName: Barbarous Barrage
-            # castTime: 3700
-            castTime: 100
+            castTime: 3700
             effects:
               # Middle, 4-stacks
               - label: kb-tower-m1

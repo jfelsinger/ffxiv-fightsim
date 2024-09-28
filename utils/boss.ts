@@ -149,6 +149,7 @@ export class Boss {
         bodyMat.diffuseTexture.hasAlpha = true;
         bodyMat.emissiveColor = new Bab.Color3(0.65, 0.65, 0.65);
         bodyMat.useAlphaFromDiffuseTexture = true;
+        // bodyMat.forceDepthWrite = true;
 
         const width = yalmsToM(this.width);
         const height = yalmsToM(this.height);

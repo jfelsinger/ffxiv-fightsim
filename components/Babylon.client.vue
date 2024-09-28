@@ -70,6 +70,7 @@ function onResize() {
 
 function registerFight(fight: Fight) {
     currentFight.value = fight;
+    (window as any).__fight = fight;
     fight.on('effect-hit', ({ effect }) => {
         debug('hit by: ', effect.name, effect);
         hits.value++;

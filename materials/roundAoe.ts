@@ -38,6 +38,7 @@ export default function createShader(scene: Scene, color?: Color3, shaderName = 
     )
 
     material.setFloat('arenaRadius', 1000000);
+    material.setInt('arenaIsSquare', 0);
     material.setFloat('time', 0);
     material.setFloat('elapsed', 0);
     material.setFloat('telegraph', 0);

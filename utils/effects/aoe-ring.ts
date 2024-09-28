@@ -104,7 +104,8 @@ export class AoeRingEffect extends Effect {
         const ringMat = createAoeMat(this.scene, this.getColor(), 'ringMat');
         ringMat.alpha = 0.7;
         if (this.collection.arena) {
-            ringMat.setFloat('arenaRadius', this.collection.arena.size / 2);
+            ringMat.setFloat('arenaRadius', this.collection.arena.adjustedSize / 2);
+            ringMat.setInt('arenaIsSquare', this.collection.arena.shape === 'square' ? 1 : 0);
         }
 
         ringMat.setFloat('telegraph', this.adjustedTelegraph);
