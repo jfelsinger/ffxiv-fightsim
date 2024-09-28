@@ -209,6 +209,7 @@ function updateTime(val: number) {
 
 <template>
     <div class="fight-ui__container">
+        <ControllerSettings />
         <div class="fight-bot-center flex flex-col absolute bottom-12 z-50">
 
             <div class="flex p-2 bg-slate-100/45 rounded-box bg-blur min-w-96 gap-2 items-center">

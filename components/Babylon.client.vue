@@ -13,7 +13,7 @@ import { Fight } from '../utils/fights';
 import { FightSection, } from '../utils/sections';
 import { Mechanic, } from '../utils/mechanics';
 import { decodeFight } from '../utils/decode-fight';
-import { vectorAngle } from '../utils/vector-helpers';
+import { degToRads, vectorAngle } from '../utils/vector-helpers';
 import { getInterpolatedPosition } from '~/utils/positioning';
 
 import { Waymark } from '~/utils/waymark';
@@ -89,7 +89,16 @@ function getFight(collection: FightCollection) {
 const currentFight = ref<Fight | undefined>();
 
 const inputMap = ref<Record<string, boolean>>({});
-const leftStickVector = ref<Bab.Vector3>(Bab.Vector3.Zero());
+const {
+    leftStickVector,
+    rightStickVector,
+    leftStickInvertX,
+    leftStickInvertY,
+    rightStickInvertX,
+    rightStickInvertY,
+    rightStickSensitivityX,
+    rightStickSensitivityY,
+} = useController();
 
 function makeScene(game: Engine) {
     const scene = new Scene(game);
@@ -141,13 +150,16 @@ function makeScene(game: Engine) {
 
     const gamepadManager = new Bab.GamepadManager();
     gamepadManager.onGamepadConnectedObservable.add((gamepad, _state) => {
-        camera.inputs.addGamepad();
-        if ((camera as any).inputs?.attached?.gamepad?.gamepadRotationSensibility) {
-            (camera as any).inputs.attached.gamepad.gamepadRotationSensibility = 150;
-        }
+        (window as any).gamepad = gamepad;
+        (window as any).gamepadState = _state;
+        (window as any).gamepadManager = gamepadManager;
+        // camera.inputs.addGamepad();
+        // if ((camera as any).inputs?.attached?.gamepad?.gamepadRotationSensibility) {
+        //     (camera as any).inputs.attached.gamepad.gamepadRotationSensibility = 150;
+        // }
 
         gamepad.onleftstickchanged((values) => {
-            const vec = new Bab.Vector3(values.x, 0, -values.y);
+            const vec = new Bab.Vector3(values.x * (leftStickInvertX.value ? -1 : 1), 0, values.y * (leftStickInvertY.value ? 1 : -1));
             if (vec.length() >= 0.05) {
                 inputMap.value['left-stick'] = true;
                 leftStickVector.value = vec;
@@ -155,6 +167,23 @@ function makeScene(game: Engine) {
                 inputMap.value['left-stick'] = false;
                 leftStickVector.value = Bab.Vector3.Zero();
             }
+
+        });
+
+        gamepad.onrightstickchanged((values) => {
+            const vec = new Bab.Vector3(
+                values.x * rightStickSensitivityX.value * (rightStickInvertX.value ? -1 : 1),
+                0,
+                values.y * rightStickSensitivityY.value * (rightStickInvertY.value ? -1 : 1)
+            );
+            if (vec.length() >= 0.05) {
+                inputMap.value['right-stick'] = true;
+                rightStickVector.value = vec;
+            } else {
+                inputMap.value['right-stick'] = false;
+                rightStickVector.value = Bab.Vector3.Zero();
+            }
+
         });
 
     });
@@ -207,8 +236,15 @@ function makeScene(game: Engine) {
         playerClock.tick(delta);
         character.setMarkerHeight();
 
+        if (inputMap.value['right-stick']) {
+            camera.alpha += degToRads(rightStickVector.value.x);
+            camera.beta += degToRads(rightStickVector.value.z);
+        } else {
+        }
+
         if (inputMap.value['left-stick']) {
-            const direction = camera.getDirection(leftStickVector.value)
+            const stickVector = leftStickVector.value;
+            const direction = camera.getDirection(stickVector);
             direction.y = 0;
             movement.addInPlace(direction.scaleInPlace(character.speed));
             keydown = true;
