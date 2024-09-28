@@ -23,14 +23,22 @@ sections:
       name: m3s-fuse-or-foe
       scheduling: parallel
       mechanics:
+        - label: m3s-fuse-or-foe-cast
+          item:
+            name: m3s-fuse-or-foe-cast
+            scheduling: parallel
+            castName: Fuse or Foe
+            castTime: 3700
+            effects:
+              - item:
+                  name: cast-bar
+                  duration: 3700
+        # 1 and 3
         - label: m3s-fuse-or-foe-1-3
           item:
             name: m3s-fuse-or-foe-1-3
             scheduling: parallel
-            # castName: Fuse or Foe
-            # castTime: 3700
             effects:
-              # 1 and 3
               - label: 1-3-circles
                 startDelay: 3700 + 3900
                 item:
@@ -78,14 +86,12 @@ sections:
                       position: 0.37,-0.37
                     - name: aoe-ring
                       position: -0.37,0.37
+        # 2 and 4
         - label: m3s-fuse-or-foe-2-4
           item:
             name: m3s-fuse-or-foe-2-4
             scheduling: parallel
-            castName: Fuse or Foe
-            castTime: 3700
             effects:
-              # 2 and 4
               - label: 2-4-circles
                 startDelay: 3700 + 3900
                 item:
@@ -133,20 +139,19 @@ sections:
                       position: 0.37,0.37
                     - name: aoe-ring
                       position: -0.37,-0.37
-        - label: lariot
-          startDelay: 3700 + 3900 + 5850 + 5000 + 2250 + 600 + 1750
+        - label: lariat
+          startDelay: 28300
           item:
-            name: m3s-lariot
+            name: m3s-lariat
             scheduling: parallel
-            castName: Octuple Lariot
+            castName: Octuple Lariat
             castTime: 6650
             effects:
               - item:
                   name: cast-bar
                   duration: 6650
         - label: infernal-spin
-          # startDelay: 3700 + 4000
-          startDelay: 6900
+          startDelay: 7550
           item:
             name: m3s-infernal-spin
             scheduling: parallel
@@ -168,10 +173,10 @@ sections:
                   innerRadius: 0
                   outerRadius: 50
               - label: spit-2
-                startDelay: 4500 + 1200 * 1
+                startDelay: 4500 + 1000 * 1
                 item:
                   name: aoe-ring
-                  duration: 1200
+                  duration: 1000
                   segments: 38
                   thetaStart: pi / 3
                   thetaLength: pi / 3
@@ -179,10 +184,10 @@ sections:
                   innerRadius: 0
                   outerRadius: 50
               - label: spit-3
-                startDelay: 4500 + 1200 * 2
+                startDelay: 4500 + 1000 * 2
                 item:
                   name: aoe-ring
-                  duration: 1200
+                  duration: 1000
                   segments: 38
                   thetaStart: pi / 3
                   thetaLength: pi / 3
@@ -190,10 +195,10 @@ sections:
                   innerRadius: 0
                   outerRadius: 50
               - label: spit-4
-                startDelay: 4500 + 1200 * 3
+                startDelay: 4500 + 1000 * 3
                 item:
                   name: aoe-ring
-                  duration: 1200
+                  duration: 1000
                   segments: 38
                   thetaStart: pi / 3
                   thetaLength: pi / 3
@@ -201,10 +206,10 @@ sections:
                   innerRadius: 0
                   outerRadius: 50
               - label: spit-5
-                startDelay: 4500 + 1200 * 4
+                startDelay: 4500 + 1000 * 4
                 item:
                   name: aoe-ring
-                  duration: 1200
+                  duration: 1000
                   segments: 38
                   thetaStart: pi / 3
                   thetaLength: pi / 3
@@ -212,10 +217,10 @@ sections:
                   innerRadius: 0
                   outerRadius: 50
               - label: spit-6
-                startDelay: 4500 + 1200 * 5
+                startDelay: 4500 + 1000 * 5
                 item:
                   name: aoe-ring
-                  duration: 1200
+                  duration: 1000
                   segments: 38
                   thetaStart: pi / 3
                   thetaLength: pi / 3
@@ -223,10 +228,10 @@ sections:
                   innerRadius: 0
                   outerRadius: 50
               - label: spit-7
-                startDelay: 4500 + 1200 * 6
+                startDelay: 4500 + 1000 * 6
                 item:
                   name: aoe-ring
-                  duration: 1200
+                  duration: 1000
                   segments: 38
                   thetaStart: pi / 3
                   thetaLength: pi / 3
@@ -234,10 +239,10 @@ sections:
                   innerRadius: 0
                   outerRadius: 50
               - label: spit-8
-                startDelay: 4500 + 1200 * 7
+                startDelay: 4500 + 1000 * 7
                 item:
                   name: aoe-ring
-                  duration: 1200
+                  duration: 1000
                   segments: 38
                   thetaStart: pi / 3
                   thetaLength: pi / 3
@@ -245,10 +250,10 @@ sections:
                   innerRadius: 0
                   outerRadius: 50
               - label: spit-9
-                startDelay: 4500 + 1200 * 8
+                startDelay: 4500 + 1000 * 8
                 item:
                   name: aoe-ring
-                  duration: 1200
+                  duration: 1000
                   segments: 38
                   thetaStart: pi / 3
                   thetaLength: pi / 3
