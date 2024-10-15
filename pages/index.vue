@@ -43,14 +43,13 @@
                 <div class="p-2 xl:w-2/3">
                     <h2 class="text-2xl my-2 text-base-300 font-thin">Available Encounters</h2>
                     <p class="text-base-300 font-thin my-2 mb-4">
-                        Sorry, there's only a couple right now. More to come!
+                        There's only a few right now. More to come!
                     </p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-wrap justify-center">
 
                         <div class="card bg-base-100/50 glass">
                             <div class="card-body">
-                                <div class="badge badge-neutral">New! Tutorial</div>
                                 <h2 class="card-title">M2S Alarm Pheromones, Second Casting</h2>
                                 <p>A tutorial for M2S's Second Alarm Pheromones cast</p>
                                 <div class="card-actions justify-end">
@@ -91,6 +90,21 @@
                                 <div class="card-actions justify-end">
                                     <NuxtLink to="https://xivfightsim.com/raids/e12s/primal-combinations"
                                         class="btn min-w-20">Play
+                                    </NuxtLink>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-base-100/50 glass">
+                            <div class="card-body">
+                                <div class="badge badge-neutral">WIP, Under Construction</div>
+                                <h2 class="card-title">M3S Fuse or Foe, WIP</h2>
+                                <p>A sim of Fuse or Foe from M3s</p>
+                                <p>This is just the crazy aoe variations. todo: The lariat at the end, and the bomb
+                                    positioning</p>
+                                <div class="card-actions justify-end">
+                                    <NuxtLink to="https://xivfightsim.com/raids/m3s/fuse-or-foe" class="btn min-w-20">
+                                        Play
                                     </NuxtLink>
                                 </div>
                             </div>
