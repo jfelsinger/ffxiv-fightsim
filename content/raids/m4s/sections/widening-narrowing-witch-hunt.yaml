@@ -1,0 +1,45 @@
+name: m4s
+scheduling: sequential
+startPosition: 0,-0.45
+startPositionType: arena
+arena:
+  name: m4s-arena
+  shape: square
+  yalms: 52
+  floorType: m4s
+waymarksPositionType: arena
+waymarks:
+  # A: 0.0,0.385
+  # B: 0.385,0.0
+  # C: 0.0,-0.385
+  # D: -0.385,0.0
+  One: -0.2625, 0.2625
+  Two: 0.2625, 0.2625
+  Three: 0.2625,-0.2625
+  Four: -0.2625,-0.2625
+  A: 0.3585,-0.3585
+sections:
+  - item:
+      name: m4s-widening-narrowing-witch-hunt
+      scheduling: parallel
+      mechanics:
+        - item:
+            name: m4s-widening-narrowing-witch-hunt-cast
+            scheduling: parallel
+            castName: Witch Hunt
+            castTime: 14700
+            effects:
+              - item:
+                  name: cast-bar
+                  duration: 14700
+
+        - label: m4s-widening-narrowing-witch-hunt-1
+          item:
+            name: m4s-widening-narrowing-witch-hunt
+            scheduling: parallel
+            effects:
+              - label: in-out-aoe
+                startDelay: 14700
+                item:
+                  name: aoe-ring
+                  duration: 300
