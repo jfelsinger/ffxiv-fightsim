@@ -3,6 +3,7 @@ import { yalmsToM } from '../conversions';
 import createMarkerMat from '../../materials/enemy-marker';
 import { Boss } from '../boss';
 import { getPosition } from '../positioning';
+import { addTag } from '../meta-helpers';
 
 import {
     Fight,
@@ -21,19 +22,39 @@ export class M4SFight extends Fight {
         this.options = options;
 
         this.on('start-execute', () => {
-            const bossSize = yalmsToM(5.25);
+            const bossSize = yalmsToM(5.5);
             const height = bossSize * 2.525;
             const width = height * 0.879433;
 
             const boss = new Boss('Wicked Thunder', {
-                size: 6.65,
+                size: 6.6725,
                 width,
                 height,
                 image: '/images/fights/m4s/boss.png',
             }, this.collection);
-            boss.body.position.y = bossSize * 1.12;
-            // boss.position.z = 12;
+            boss.body.position.y = bossSize * 1.0;
             this.boss = boss;
+            const characters = this.collection.getPartyCharacters();
+
+
+            function updateNearFarTags() {
+                const characterDistances = characters.map((character) => ({
+                    character,
+                    distance: Bab.Vector3.Distance(character.position, boss.position),
+                }));
+
+                const nearest = characterDistances.sort((a, b) => a.distance - b.distance);
+                const len = nearest.length;
+                for (let i = 0; i < len; i++) {
+                    addTag(nearest[i].character, `near-${i + 1}`);
+                    addTag(nearest[i].character, `far-${len - (i)}`);
+                }
+
+            }
+            this.collection.worldClock.on('tick', updateNearFarTags);
+            this.on('dispose', () => {
+                this.collection.worldClock.off('tick', updateNearFarTags);
+            });
         });
     }
 

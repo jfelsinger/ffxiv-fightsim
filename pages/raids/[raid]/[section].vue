@@ -26,7 +26,7 @@ watch(showInfo, (newValue, oldValue) => {
                 :checked="showInfo" />
             <div v-if="infoExists" class="drawer-content">
                 <label for="info-drawer"
-                    class="drawer-button font-bold text-lg btn btn-ghost btn-sm absolute top-1 right-4">
+                    class="drawer-button font-bold text-lg btn btn-ghost btn-sm absolute top-1 right-1">
                     <Icon name="solar:info-circle-broken" />
                 </label>
             </div>

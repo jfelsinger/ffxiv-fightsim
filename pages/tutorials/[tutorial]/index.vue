@@ -20,7 +20,7 @@ if (route.query.info) {
             <input id="info-drawer" type="checkbox" class="drawer-toggle" :checked="showInfo" />
             <div class="drawer-content">
                 <label for="info-drawer"
-                    class="drawer-button font-bold text-lg btn btn-ghost btn-sm absolute top-1 right-4">
+                    class="drawer-button font-bold text-lg btn btn-ghost btn-sm absolute top-1 right-2">
                     <Icon name="solar:info-circle-broken" />
                 </label>
             </div>

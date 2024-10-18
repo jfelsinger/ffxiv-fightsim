@@ -15,6 +15,7 @@ import { M2SPoisonStingEffect } from './m2s-poison-sting';
 import { M2SAlarmPheromones2Effect } from './m2s-alarm-pheromones-2';
 import { PreyMarkerEffect } from './prey-marker';
 import { KBTowerEffect } from './kb-tower';
+import { M4SNearFarIndicatorEffect } from './m4s-near-far-indicator';
 
 export const effectsCollection = {
     'default': Effect,
@@ -36,6 +37,8 @@ export const effectsCollection = {
     'm2s-alarm-pheromones-2': M2SAlarmPheromones2Effect,
     'm2s-alarm-pheromones-2-bees': M2SAlarmPheromones2Effect,
     'kb-tower': KBTowerEffect,
+
+    'm4s-near-far-indicator': M4SNearFarIndicatorEffect,
 } as const;
 
 export default effectsCollection;

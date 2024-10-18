@@ -284,52 +284,39 @@ export class M2STutorial extends M2SFight {
         this.on('start-execute', () => {
             (window as any).__m2s = this;
 
-            const roles = shuffleArray([
-                'tank',
-                'tank',
-                'healer',
-                'healer',
-                'dps',
-                'dps',
-                'dps',
-                'dps',
-            ]);
-
             let dpsCount = 1;
             let supportCount = 1;
-            const makeNpc = (name: string, position: string, role: string) => {
-                let color = Bab.Color3.FromHexString('#e9c8aa');
-                let specular = Bab.Color3.FromHexString('#e9c8aa');
 
-                if (role === 'tank') {
-                    color = Bab.Color3.FromHexString('#889aef');
-                    specular = Bab.Color3.FromHexString('#465ece');
-                } else if (role === 'healer') {
-                    color = Bab.Color3.FromHexString('#a2cc96');
-                    specular = Bab.Color3.FromHexString('477938');
-                } else if (role === 'dps') {
-                    color = Bab.Color3.FromHexString('#de9899');
-                    specular = Bab.Color3.FromHexString('#7b3839');
+            let player = this.collection.characters['player'];
+
+            const getRandPosition = () => {
+                let x = 0 + (Math.random() - 0.5) * 0.54;
+                x = Math.round(x * 1500) / 1000;
+                if (x > 0) {
+                    x + 0.35;
+                } else {
+                    x - 0.35;
                 }
 
-                const npc = new Character(name, {
-                    role: role as any,
-                    diffuseColor: color,
-                    specularColor: specular,
-                    startPosition: getPosition(
-                        position,
-                        'arena',
-                        this.collection
-                    ),
-                }, this.collection.scene, this.collection.worldClock);
-                npc.tags.clear();
-                npc.tags.add(role);
-                if (role === 'tank' || role === 'healer') {
-                    npc.tags.add('support');
+                let y = (Math.random() - 0.5) * 0.54;
+                y = Math.round(y * 1200) / 1000;
+                if (y > -0.85) {
+                    y + 0.25;
+                } else {
+                    y - 0.25;
                 }
 
-                this.collection.addCharacter(npc);
+                return `${x},${y}`;
+            };
 
+            const { npcs } = this.collection.setupStandardParty();
+
+            npcs.forEach((npc) => {
+                npc.position = getPosition(
+                    getRandPosition(),
+                    'arena',
+                    this.collection
+                );
                 const onTick = () => {
                     if (this.activeStep === 'alarm-pheromones') {
                         if (npc.tags.has('support')) {
@@ -441,59 +428,7 @@ export class M2STutorial extends M2SFight {
                     this.collection.worldClock.off('tick', onTick);
                     npc.dispose();
                 });
-                return npc;
-            };
-
-            let player = this.collection.characters['player'];
-            if (player) {
-                const role = roles[0];
-                player.role = role;
-                player.tags.add(role);
-                if (role === 'tank' || role === 'healer') {
-                    player.tags.add('support');
-                }
-
-                if (role === 'tank') {
-                    (player.body.material as Bab.StandardMaterial).diffuseColor = Bab.Color3.FromHexString('#465ece');
-                    (player.body.material as Bab.StandardMaterial).specularColor = Bab.Color3.FromHexString('#889aef');
-                } else if (role === 'healer') {
-                    (player.body.material as Bab.StandardMaterial).diffuseColor = Bab.Color3.FromHexString('#477938');
-                    (player.body.material as Bab.StandardMaterial).specularColor = Bab.Color3.FromHexString('#a2cc96');
-                } else if (role === 'dps') {
-                    (player.body.material as Bab.StandardMaterial).diffuseColor = Bab.Color3.FromHexString('#7b3839');
-                    (player.body.material as Bab.StandardMaterial).specularColor = Bab.Color3.FromHexString('#de9899');
-                }
-            }
-
-            const getRandPosition = () => {
-                let x = 0 + (Math.random() - 0.5) * 0.54;
-                x = Math.round(x * 1500) / 1000;
-                if (x > 0) {
-                    x + 0.35;
-                } else {
-                    x - 0.35;
-                }
-
-                let y = (Math.random() - 0.5) * 0.54;
-                y = Math.round(y * 1200) / 1000;
-                if (y > -0.85) {
-                    y + 0.25;
-                } else {
-                    y - 0.25;
-                }
-
-                return `${x},${y}`;
-            };
-
-            const npcs = [
-                makeNpc('npc-1', getRandPosition(), roles[1]),
-                makeNpc('npc-2', getRandPosition(), roles[2]),
-                makeNpc('npc-3', getRandPosition(), roles[3]),
-                makeNpc('npc-4', getRandPosition(), roles[4]),
-                makeNpc('npc-5', getRandPosition(), roles[5]),
-                makeNpc('npc-6', getRandPosition(), roles[6]),
-                makeNpc('npc-7', getRandPosition(), roles[7]),
-            ] as const;
+            })
 
             const characters = shuffleArray([
                 player,
@@ -516,11 +451,6 @@ export class M2STutorial extends M2SFight {
 
             (window as any).characters = characters;
 
-            // (window as any).step = 1;
-            // const getStep = () => (window as any).step;
-
-            this.collection.worldClock.on('tick', () => {
-            });
 
             let isInPosition = false;
             let key: any;

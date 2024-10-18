@@ -18,6 +18,12 @@ $c-tank: #465ece;
 $c-healer: #477938;
 $c-dps: #7b3839;
 
+[for='info-drawer'].drawer-button {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.menu,
 .prose {
     .dps, .tank, .healer {
         &::before {

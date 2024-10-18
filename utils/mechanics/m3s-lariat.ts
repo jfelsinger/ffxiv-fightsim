@@ -19,7 +19,6 @@ export type LariatPosition = 'inner' | 'outer';
 export type M3SLariatOptions = MechanicOptions & {
     lariatType?: LariatType
     lariatPosition?: LariatPosition
-
 };
 
 export class M3SLariat extends Mechanic {

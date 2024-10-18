@@ -444,6 +444,7 @@ function onScaleTime(value: number) {
         </div>
 
         <UiCastBar v-if="castState?.name" />
+        <UiRolePicker />
 
         <UiStatusGroup name="player" xstatuses="statuses" />
     </div>

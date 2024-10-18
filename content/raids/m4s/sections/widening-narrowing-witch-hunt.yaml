@@ -1,6 +1,6 @@
 name: m4s
 scheduling: sequential
-startPosition: 0,-0.45
+startPosition: 0,-0.625
 startPositionType: arena
 arena:
   name: m4s-arena
@@ -17,29 +17,69 @@ waymarks:
   Two: 0.2625, 0.2625
   Three: 0.2625,-0.2625
   Four: -0.2625,-0.2625
-  A: 0.3585,-0.3585
+  # A: 0.3585,-0.3585
 sections:
   - item:
       name: m4s-widening-narrowing-witch-hunt
       scheduling: parallel
       mechanics:
-        - item:
-            name: m4s-widening-narrowing-witch-hunt-cast
+        - label: m4s-witch-hunt-baits
+          item:
+            name: m4s-witch-hunt-baits
             scheduling: parallel
-            castName: Witch Hunt
-            castTime: 14700
             effects:
-              - item:
-                  name: cast-bar
-                  duration: 14700
+              - label: bait-indicator
+                item:
+                  name: m4s-near-far-indicator
+                  duration: 13500
+              #- label: bait-1
+              #  # startDelay: 14700
+              #  item:
+              #    name: aoe-disc
+              #    duration: 300
+              #- label: bait-2
+              #  startDelay: 14700
+              #  item:
+              #    name: aoe-disc
+              #    duration: 300
+              #- label: bait-3
+              #  startDelay: 14700
+              #  item:
+              #    name: aoe-disc
+              #    duration: 300
+              #- label: bait-4
+              #  startDelay: 14700
+              #  item:
+              #    name: aoe-disc
+              #    duration: 300
 
-        - label: m4s-widening-narrowing-witch-hunt-1
+        - label: m4s-widening-narrowing-witch-hunt
           item:
             name: m4s-widening-narrowing-witch-hunt
             scheduling: parallel
+            castTime: 14700
             effects:
-              - label: in-out-aoe
-                startDelay: 14700
+              - label: inner-outer-1
+                startDelay: 14700 - 850 + 300
                 item:
                   name: aoe-ring
-                  duration: 300
+                  duration: 850
+                  segments: 60
+              - label: inner-outer-2
+                startDelay: (14700 - 850 + 300) + 2750
+                item:
+                  name: aoe-ring
+                  duration: 850
+                  segments: 60
+              - label: inner-outer-3
+                startDelay: (14700 - 850 + 300) + (2750*2)
+                item:
+                  name: aoe-ring
+                  duration: 850
+                  segments: 60
+              - label: inner-outer-4
+                startDelay: (14700 - 850 + 300) + (2750*3)
+                item:
+                  name: aoe-ring
+                  duration: 850
+                  segments: 60
