@@ -7,6 +7,7 @@ import { M3SFight } from './m3s';
 import { M4SFight } from './m4s';
 import { ClockSpotsTutorial } from './tutorial-clock-spots';
 import { M2STutorial } from './tutorial-m2s';
+import { M4STutorialFight } from './tutorial-m4s-widening-narrowing-witch-hunt';
 
 export const fightsCollection = {
     'default': Fight,
@@ -19,6 +20,7 @@ export const fightsCollection = {
     'clock-spots-tutorial': ClockSpotsTutorial,
     'tutorial-clock-spots': ClockSpotsTutorial,
     'tutorial-m2s': M2STutorial,
+    'tutorial-m4s': M4STutorialFight,
 } as const;
 
 export default fightsCollection;

@@ -22,6 +22,7 @@ export class M4SFight extends Fight {
         this.options = options;
 
         this.on('start-execute', () => {
+            (window as any).__m4s = this;
             const bossSize = yalmsToM(5.5);
             const height = bossSize * 2.525;
             const width = height * 0.879433;
