@@ -1,14 +1,20 @@
 <script setup lang="ts">
 const { role: playerRole, roleType } = useRole();
 
+
+const emit = defineEmits<{
+    (e: 'select', value: string): void,
+}>();
+
 function selectRole(role: string) {
     playerRole.value = role;
+    emit('select', role);
 }
 </script>
 
 <template>
     <div class="z-[50] fixed top-1 right-8">
-        <div class="role-picker-container dropdown dropdown-hover dropdown-end" :class="[`--${playerRole}`]">
+        <div class="role-picker-container font-normal dropdown dropdown-hover dropdown-end" :class="[`--${playerRole}`]">
             <div tabindex="0" role="button" class="btn btn-sm btn-ghost mb-1 uppercase" :class="[roleType]">
                 {{ playerRole }}
             </div>
@@ -32,7 +38,6 @@ function selectRole(role: string) {
 </template>
 
 <style lang="scss">
-
 $c-tank: #465ece;
 $c-healer: #477938;
 $c-dps: #7b3839;
@@ -42,10 +47,10 @@ $c-dps: #7b3839;
         padding-left: 0.5rem;
         padding-right: 0.5rem;
     }
+
     .btn.tank {
         // color: $c-tank;
         opacity: 0.85;
     }
 }
-
 </style>

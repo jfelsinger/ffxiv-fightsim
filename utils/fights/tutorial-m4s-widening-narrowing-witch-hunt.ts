@@ -19,6 +19,48 @@ import {
 export type M4STutorialFightOptions = M4SFightOptions & {
 };
 
+const positions = {
+    inner: [{
+        m1: '-.2625,0',
+        m2: '.2625,0',
+        mt: '0,.1925',
+        ot: '0,-.1925',
+        h1: '-.337,-.337',
+        h2: '.337,-.337',
+        r1: '-.312,.312',
+        r2: '.312,.312',
+    }, {
+        m1: '-.1925,0',
+        m2: '.1925,0',
+        mt: '0,.2625',
+        ot: '0,-.2625',
+        h1: '-.312,-.312',
+        h2: '.312,-.312',
+        r1: '-.337,.337',
+        r2: '.337,.337',
+    }],
+
+    outer: [{
+        m1: '-.615,0',
+        m2: '.615,0',
+        mt: '0,.53',
+        ot: '0,-.53',
+        h1: '-.5,-.5',
+        h2: '.5,-.5',
+        r1: '-.476,.476',
+        r2: '.476,.476',
+    }, {
+        m1: '-.53,0',
+        m2: '.53,0',
+        mt: '0,.615',
+        ot: '0,-.615',
+        h1: '-.476,-.476',
+        h2: '.476,-.476',
+        r1: '-.5,.5',
+        r2: '.5,.5',
+    }],
+} as const;
+
 export class M4STutorialFight extends M4SFight {
     override options: M4STutorialFightOptions;
     indicator?: Indicator;
@@ -35,16 +77,17 @@ export class M4STutorialFight extends M4SFight {
 
         this.on('start-execute', () => {
             let player = this.collection.characters['player'];
+            const { role: playerRole } = useRole();
             const { npcs } = this.collection.setupStandardParty();
             npcs.forEach((npc) => this.setupNpc(npc));
             if (player) {
                 this.setupPositionCheck(player);
             }
 
-            const size = 0.7;
+            const size = 0.5;
 
             const mi = (position: string, isRed?: boolean) => {
-                return new Indicator({
+                const indicator = new Indicator({
                     size,
                     ...(isRed ? {
                         color: Bab.Color3.Red(),
@@ -52,48 +95,21 @@ export class M4STutorialFight extends M4SFight {
                     position,
                     positionType: 'arena',
                 }, this.collection);
+                this.on('dispose', () => indicator.dispose());
+                return indicator;
             };
 
             // DN positions
-            const m1Inner1 = mi('-.2625,0');
-            const m1Inner2 = mi('-.1925,0', true);
-            const m1Outer1 = mi('-.615,0');
-            const m1Outer2 = mi('-.53,0', true);
-
-            const m2Inner1 = mi('.2625,0');
-            const m2Inner2 = mi('.1925,0', true);
-            const m2Outer1 = mi('.615,0');
-            const m2Outer2 = mi('.53,0', true);
-
-            const mtInner1 = mi('0,.1925');
-            const mtInner2 = mi('0,.2625', true);
-            const mtOuter1 = mi('0,.53');
-            const mtOuter2 = mi('0,.615', true);
-
-            const otInner1 = mi('0,-.1925');
-            const otInner2 = mi('0,-.2625', true);
-            const otOuter1 = mi('0,-.53');
-            const otOuter2 = mi('0,-.615', true);
-
-            const h1Inner1 = mi('-.337,-.337');
-            const h1Inner2 = mi('-.312,-.312', true);
-            const h1Outer1 = mi('-.5,-.5');
-            const h1Outer2 = mi('-.476,-.476', true);
-
-            const h2Inner1 = mi('.337,-.337');
-            const h2Inner2 = mi('.312,-.312', true);
-            const h2Outer1 = mi('.5,-.5');
-            const h2Outer2 = mi('.476,-.476', true);
-
-            const r1Inner1 = mi('-.337,.337', true);
-            const r1Inner2 = mi('-.312,.312');
-            const r1Outer1 = mi('-.5,.5', true);
-            const r1Outer2 = mi('-.476,.476');
-
-            const r2Inner1 = mi('.337,.337', true);
-            const r2Inner2 = mi('.312,.312');
-            const r2Outer1 = mi('.5,.5', true);
-            const r2Outer2 = mi('.476,.476');
+            for (const prop in positions) {
+                positions[prop].forEach((el, i) => {
+                    console.log('els: ', el, i);
+                    for (const role in el) {
+                        if (role === playerRole.value) {
+                            mi(el[role], i === 1);
+                        }
+                    }
+                });
+            }
         });
     }
 

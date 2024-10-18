@@ -363,6 +363,7 @@ function updateTime(val: number) {
             </div>
         </div>
 
+        <UiRolePicker @select="reset()" />
         <TutorialWindow :fight="fight" />
     </div>
 </template>
