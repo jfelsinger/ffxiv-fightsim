@@ -152,6 +152,7 @@ function reset() {
     open('');
     if (props.fight) {
         const fight = props.fight;
+        fight.clock.pause();
         emit('update', fight.clone());
         fight.dispose();
     }

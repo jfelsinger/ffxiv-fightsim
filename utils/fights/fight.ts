@@ -44,6 +44,7 @@ export type FightOptions = {
 export class Fight extends EventEmitter {
     name: string;
     description?: string;
+    isDisposed?: boolean;
 
     scheduling: ScheduleMode;
     sections: Scheduled<FightSection>[];
@@ -169,17 +170,26 @@ export class Fight extends EventEmitter {
         }
 
         this.isActive = false;
-        this.emit('end-execute');
+        if (!this.isDisposed) {
+            this.emit('end-execute');
+        }
     }
 
     async executeSection(section: Scheduled<FightSection>) {
         this.emit('start-section', { section });
-        if (section?.preStartDelay) { await this.clock.wait(section.preStartDelay); }
-        await executeScheduled(section, (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)), this.clock)
-        this.emit('end-section', { section });
+        if (!this.isDisposed) {
+            if (section?.preStartDelay) { await this.clock.wait(section.preStartDelay); }
+        }
+        if (!this.isDisposed) {
+            await executeScheduled(section, (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)), this.clock)
+        }
+        if (!this.isDisposed) {
+            this.emit('end-section', { section });
+        }
     }
 
     async dispose() {
+        this.isDisposed = true;
         this.isActive = false;
         this.emit('dispose');
         const len = this.sections.length;

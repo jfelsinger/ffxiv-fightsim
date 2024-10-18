@@ -33,6 +33,7 @@ export class M4SFight extends Fight {
                 height,
                 image: '/images/fights/m4s/boss.png',
             }, this.collection);
+            boss.marker.rotation.y += 180 * (Math.PI / 180);
             boss.body.position.y = bossSize * 1.0;
             this.boss = boss;
             const characters = this.collection.getPartyCharacters();

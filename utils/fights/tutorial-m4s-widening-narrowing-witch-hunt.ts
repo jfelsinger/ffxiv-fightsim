@@ -72,44 +72,185 @@ export class M4STutorialFight extends M4SFight {
 
         const { isTutorial, showTutorialStep, canContinueTutorial } = useTutorialMode();
 
-        this.on('start-section', () => {
+        const size = 0.5;
+
+        const mi = (position: string, isRed?: boolean) => {
+            const indicator = new Indicator({
+                size,
+                ...(isRed ? {
+                    color: new Bab.Color3(0.1450980392156863, 0.8196078431372549, 0.9450980392156862),
+                } : {
+                    color: new Bab.Color3(1, 1, 0.09803921568627451),
+                }),
+                position,
+                positionType: 'arena',
+            }, this.collection);
+            this.on('dispose', () => indicator.dispose());
+            return indicator;
+        };
+
+        const { role: playerRole } = useRole();
+        const { hits, hitsRecord, recordHits } = useHits();
+
+        this.on('end-execute', () => {
+            if (hits.value === 0) {
+                recordHits();
+            }
+
+            console.log('HITS: ', hitsRecord.value);
         });
 
         this.on('start-execute', () => {
             let player = this.collection.characters['player'];
-            const { role: playerRole } = useRole();
             const { npcs } = this.collection.setupStandardParty();
             npcs.forEach((npc) => this.setupNpc(npc));
             if (player) {
                 this.setupPositionCheck(player);
             }
 
-            const size = 0.5;
-
-            const mi = (position: string, isRed?: boolean) => {
-                const indicator = new Indicator({
-                    size,
-                    ...(isRed ? {
-                        color: Bab.Color3.Red(),
-                    } : {}),
-                    position,
-                    positionType: 'arena',
-                }, this.collection);
-                this.on('dispose', () => indicator.dispose());
-                return indicator;
-            };
-
             // DN positions
-            for (const prop in positions) {
-                positions[prop].forEach((el, i) => {
-                    console.log('els: ', el, i);
-                    for (const role in el) {
-                        if (role === playerRole.value) {
-                            mi(el[role], i === 1);
-                        }
+            // for (const prop in positions) {
+            //     positions[prop].forEach((el, i) => {
+            //         console.log('els: ', el, i);
+            //         for (const role in el) {
+            //             if (role === playerRole.value) {
+            //                 mi(el[role], i === 1);
+            //             }
+            //         }
+            //     });
+            // }
+        });
+
+        this.on('start-section', ({ section }) => {
+
+            section.item.on('start-mechanic', ({ mechanic }) => {
+
+                mechanic.item.on('start-effect', ({ effect }) => {
+                    let player = this.collection.characters['player'];
+                    const huntType = useState<WitchHuntType>('m4s-wnwh-type', () => Math.round(Math.random()) ? 'widening' : 'narrowing');
+                    if (effect.label === 'inner-outer-1') {
+                        effect.item.on('start', () => {
+                            if (huntType.value === 'widening') {
+                                this.activeStep = 'outer-1';
+                                const position = positions.outer[0][playerRole.value];
+                                const stepIndicator = mi(position, false);
+                                this.indicator = stepIndicator;
+                                effect.item.on('snapshot', () => {
+                                    if (!stepIndicator?.playerIsInPosition(player)) {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Red();
+                                        hits.value++;
+                                    } else {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Green();
+                                    }
+                                })
+                            } else {
+                                this.activeStep = 'inner-1';
+                                const position = positions.inner[0][playerRole.value];
+                                const stepIndicator = mi(position, false);
+                                this.indicator = stepIndicator;
+                                effect.item.on('snapshot', () => {
+                                    if (!stepIndicator?.playerIsInPosition(player)) {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Red();
+                                        hits.value++;
+                                    } else {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Green();
+                                    }
+                                })
+                            }
+                        });
+                    } else if (effect.label === 'inner-outer-2') {
+                        effect.item.on('start', () => {
+                            if (huntType.value === 'widening') {
+                                this.activeStep = 'inner-1';
+                                const position = positions.inner[0][playerRole.value];
+                                const stepIndicator = mi(position, false);
+                                this.indicator = stepIndicator;
+                                effect.item.on('snapshot', () => {
+                                    if (!stepIndicator?.playerIsInPosition(player)) {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Red();
+                                        hits.value++;
+                                    } else {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Green();
+                                    }
+                                })
+                            } else {
+                                this.activeStep = 'outer-1';
+                                const position = positions.outer[0][playerRole.value];
+                                const stepIndicator = mi(position, false);
+                                this.indicator = stepIndicator;
+                                effect.item.on('snapshot', () => {
+                                    if (!stepIndicator?.playerIsInPosition(player)) {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Red();
+                                        hits.value++;
+                                    } else {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Green();
+                                    }
+                                })
+                            }
+                        });
+                    } else if (effect.label === 'inner-outer-3') {
+                        effect.item.on('start', () => {
+                            if (huntType.value === 'widening') {
+                                this.activeStep = 'outer-2';
+                                const position = positions.outer[1][playerRole.value];
+                                const stepIndicator = mi(position, true);
+                                this.indicator = stepIndicator;
+                                effect.item.on('snapshot', () => {
+                                    if (!stepIndicator?.playerIsInPosition(player)) {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Red();
+                                        hits.value++;
+                                    } else {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Green();
+                                    }
+                                })
+                            } else {
+                                this.activeStep = 'inner-2';
+                                const position = positions.inner[1][playerRole.value];
+                                const stepIndicator = mi(position, true);
+                                this.indicator = stepIndicator;
+                                effect.item.on('snapshot', () => {
+                                    if (!stepIndicator?.playerIsInPosition(player)) {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Red();
+                                        hits.value++;
+                                    } else {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Green();
+                                    }
+                                })
+                            }
+                        });
+                    } else if (effect.label === 'inner-outer-4') {
+                        effect.item.on('start', () => {
+                            if (huntType.value === 'widening') {
+                                this.activeStep = 'inner-2';
+                                const position = positions.inner[1][playerRole.value];
+                                const stepIndicator = mi(position, true);
+                                this.indicator = stepIndicator;
+                                effect.item.on('snapshot', () => {
+                                    if (!stepIndicator?.playerIsInPosition(player)) {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Red();
+                                        hits.value++;
+                                    } else {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Green();
+                                    }
+                                })
+                            } else {
+                                this.activeStep = 'outer-2';
+                                const position = positions.outer[1][playerRole.value];
+                                const stepIndicator = mi(position, true);
+                                this.indicator = stepIndicator;
+                                effect.item.on('snapshot', () => {
+                                    if (!stepIndicator?.playerIsInPosition(player)) {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Red();
+                                        hits.value++;
+                                    } else {
+                                        stepIndicator.material.diffuseColor = Bab.Color3.Green();
+                                    }
+                                })
+                            }
+                        });
                     }
                 });
-            }
+            });
         });
     }
 

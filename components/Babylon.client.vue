@@ -48,16 +48,7 @@ const cameraDirection = useState<number>('cameraDirection', () => 0);
 const characterDirection = useState<number>('characterDirection', () => 0);
 
 const { isTutorial } = useTutorialMode();
-const isHit = useState<boolean>('isHit', () => false);
-const hits = useState<number>('hits', () => 0);
-let hitTimeoutKey: ReturnType<typeof setTimeout> | undefined;
-watch(hits, (value: number, oldValue: number) => {
-    if (value > oldValue) {
-        isHit.value = true;
-        clearTimeout(hitTimeoutKey);
-        hitTimeoutKey = setTimeout(() => isHit.value = false, 725);
-    }
-});
+const { hits, isHit } = useHits();
 
 const castState = useCastState();
 (window as any).castState = castState;
@@ -427,14 +418,9 @@ function onScaleTime(value: number) {
 
         <Minimap v-if="showUi" />
 
-        <div v-if="showUi && !isTutorial"
+        <div v-if="showUi"
             class="ui-extras absolute top-6 flex justify-center items-center p-2 px-4 bg-blur rounded bg-slate-100/50">
-            <p>
-                Hits:
-                <span class="countdown font-mono">
-                    <span :style="{ '--value': hits }"></span>
-                </span>
-            </p>
+            <HitsRecord />
         </div>
 
         <div class="absolute top-0 left-0 z-10">
