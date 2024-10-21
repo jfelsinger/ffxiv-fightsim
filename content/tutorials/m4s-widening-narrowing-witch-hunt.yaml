@@ -9,10 +9,10 @@ arena:
   floorType: m4s
 waymarksPositionType: arena
 waymarks:
-  A: 0.0,0.5
-  B: 0.5,0.0
-  C: 0.0,-0.5
-  D: -0.5,0.0
+  # A: 0.0,0.5
+  # B: 0.5,0.0
+  # C: 0.0,-0.5
+  # D: -0.5,0.0
 
   # Half in/out
   # One: 0.35, 0.35
@@ -21,10 +21,15 @@ waymarks:
   # Four: -0.35, 0.35
 
   # kinda middle
-  One: 0.25, 0.25
-  Two: 0.25,-0.25
-  Three: -0.25,-0.25
-  Four: -0.25, 0.25
+  # One: 0.25, 0.25
+  # Two: 0.25,-0.25
+  # Three: -0.25,-0.25
+  # Four: -0.25, 0.25
+
+  A: 0.25, 0.25
+  B: 0.25,-0.25
+  C: -0.25,-0.25
+  D: -0.25, 0.25
 
   # A: 0.3585,-0.3585
 sections:

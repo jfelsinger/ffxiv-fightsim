@@ -50,6 +50,19 @@
 
                         <div class="card bg-base-100/50 glass">
                             <div class="card-body">
+                                <div class="badge badge-neutral">WIP, Under Construction</div>
+                                <h2 class="card-title">M4S Widening/Narrowing Witch Hunt, DN Strat</h2>
+                                <p>A tutorial for solving Witch Hunt using DN strat</p>
+                                <div class="card-actions justify-end">
+                                    <NuxtLink to="https://xivfightsim.com/tutorials/m4s-widening-narrowing-witch-hunt"
+                                        class="btn min-w-20">Play
+                                    </NuxtLink>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-base-100/50 glass">
+                            <div class="card-body">
                                 <h2 class="card-title">M2S Alarm Pheromones, Second Casting</h2>
                                 <p>A tutorial for M2S's Second Alarm Pheromones cast</p>
                                 <div class="card-actions justify-end">
