@@ -4,7 +4,7 @@ startPosition: 0,-0.35
 startPositionType: arena
 arena:
   name: m2s-arena
-  yalms: 58
+  yalms: 50
   floorType: m2s
 sections:
   - item:

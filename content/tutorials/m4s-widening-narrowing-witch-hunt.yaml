@@ -5,7 +5,7 @@ startPositionType: arena
 arena:
   name: m4s-arena
   shape: square
-  yalms: 52
+  yalms: 40
   floorType: m4s
 waymarksPositionType: arena
 waymarks:

@@ -13,7 +13,7 @@ waymarks:
   Four: -0.340,-0.340
 waymarksPositionType: arena
 arena:
-  yalms: 53
+  yalms: 50
   floorType: m2s
   # floorType: m2s-2
 sections:

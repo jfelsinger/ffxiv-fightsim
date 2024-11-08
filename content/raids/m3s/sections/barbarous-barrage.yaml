@@ -5,7 +5,7 @@ startPositionType: arena
 arena:
   name: m3s-arena
   shape: square
-  yalms: 45
+  yalms: 37.85
   floorType: m3s
 waymarksPositionType: arena
 waymarks:
