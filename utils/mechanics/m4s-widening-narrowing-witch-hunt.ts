@@ -10,8 +10,6 @@ import {
     Mechanic,
     type MechanicOptions,
 } from './';
-import { moveEmitHelpers } from 'typescript';
-import { Babylon } from '#build/components';
 
 export type WitchHuntType = 'narrowing' | 'widening';
 
