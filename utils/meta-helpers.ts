@@ -16,93 +16,100 @@ function isMeshMeta(v: unknown): v is MeshMeta {
     return typeof v === 'object' && v != null && 'metadata' in v;
 }
 
-export function addStacks(target: Character | MeshMeta | Meta, name: string, count = 1) {
-    if (isMeshMeta(target)) {
-        if (target?.metadata?.character) {
-            addStacks(target.metadata.character, name, count);
-        } else {
-            if (!target?.metadata?.stacks) {
-                target.metadata = {
-                    ...target.metadata,
-                    stacks: {},
-                }
-            }
-            addStacks(target.metadata, name, count);
-        }
-    } else {
-        if (!target?.stacks) {
-            target.stacks = {};
-        }
-
-        target.stacks[name] = (target.stacks[name] || 0) + count;
-    }
-}
-
-export function getStacks(target: Character | MeshMeta | Meta, name: string) {
-    if (isMeshMeta(target)) {
-        if (target?.metadata?.character) {
-            return getStacks(target.metadata.character, name);
-        } else {
-            if (!target?.metadata?.stacks) {
-                target.metadata = {
-                    ...target.metadata,
-                    stacks: {},
-                }
-            }
-            return getStacks(target.metadata, name);
-        }
-    } else {
-        if (!target?.stacks) {
-            target.stacks = {};
-        }
-
-        return target.stacks[name];
-    }
-}
-
-export function clearStacks(target: Character | MeshMeta | Meta, name: string) {
-    if (isMeshMeta(target)) {
-        if (target?.metadata?.character) {
-            clearStacks(target.metadata.character, name);
-        } else {
-            if (!target?.metadata?.stacks) {
-                target.metadata = {
-                    ...target.metadata,
-                    stacks: {},
-                }
-            }
-            clearStacks(target.metadata, name);
-        }
-    } else {
-        if (!target?.stacks) {
-            target.stacks = {};
-        }
-
-        target.stacks[name] = 0;
-    }
-}
-
-export function removeStacks(target: Character | MeshMeta | Meta, name: string, count = 1) {
-    if (isMeshMeta(target)) {
-        if (target?.metadata?.character) {
-            removeStacks(target.metadata.character, name, count);
-        } else {
-            if (!target?.metadata?.stacks) {
-                target.metadata = {
-                    ...target.metadata,
-                    stacks: {},
-                }
-            }
-            removeStacks(target.metadata, name, count);
-        }
-    } else {
-        if (!target?.stacks) {
-            target.stacks = {};
-        }
-
-        target.stacks[name] = Math.max(0, (target.stacks[name] || 0) - count);
-    }
-}
+// export {
+//     addStacks as addStacksMeta,
+//     clearStacks as clearStacksMeta,
+//     removeStacks as removeStacksMeta,
+//     getStacks as getStacksMeta,
+// };
+//
+// function addStacks(target: Character | MeshMeta | Meta, name: string, count = 1) {
+//     if (isMeshMeta(target)) {
+//         if (target?.metadata?.character) {
+//             addStacks(target.metadata.character, name, count);
+//         } else {
+//             if (!target?.metadata?.stacks) {
+//                 target.metadata = {
+//                     ...target.metadata,
+//                     stacks: {},
+//                 }
+//             }
+//             addStacks(target.metadata, name, count);
+//         }
+//     } else {
+//         if (!target?.stacks) {
+//             target.stacks = {};
+//         }
+//
+//         target.stacks[name] = (target.stacks[name] || 0) + count;
+//     }
+// }
+//
+// function getStacks(target: Character | MeshMeta | Meta, name: string) {
+//     if (isMeshMeta(target)) {
+//         if (target?.metadata?.character) {
+//             return getStacks(target.metadata.character, name);
+//         } else {
+//             if (!target?.metadata?.stacks) {
+//                 target.metadata = {
+//                     ...target.metadata,
+//                     stacks: {},
+//                 }
+//             }
+//             return getStacks(target.metadata, name);
+//         }
+//     } else {
+//         if (!target?.stacks) {
+//             target.stacks = {};
+//         }
+//
+//         return target.stacks[name];
+//     }
+// }
+//
+// function clearStacks(target: Character | MeshMeta | Meta, name: string) {
+//     if (isMeshMeta(target)) {
+//         if (target?.metadata?.character) {
+//             clearStacks(target.metadata.character, name);
+//         } else {
+//             if (!target?.metadata?.stacks) {
+//                 target.metadata = {
+//                     ...target.metadata,
+//                     stacks: {},
+//                 }
+//             }
+//             clearStacks(target.metadata, name);
+//         }
+//     } else {
+//         if (!target?.stacks) {
+//             target.stacks = {};
+//         }
+//
+//         target.stacks[name] = 0;
+//     }
+// }
+//
+// function removeStacks(target: Character | MeshMeta | Meta, name: string, count = 1) {
+//     if (isMeshMeta(target)) {
+//         if (target?.metadata?.character) {
+//             removeStacks(target.metadata.character, name, count);
+//         } else {
+//             if (!target?.metadata?.stacks) {
+//                 target.metadata = {
+//                     ...target.metadata,
+//                     stacks: {},
+//                 }
+//             }
+//             removeStacks(target.metadata, name, count);
+//         }
+//     } else {
+//         if (!target?.stacks) {
+//             target.stacks = {};
+//         }
+//
+//         target.stacks[name] = Math.max(0, (target.stacks[name] || 0) - count);
+//     }
+// }
 
 export function addTag(target: Character | MeshMeta | Meta, tag: string) {
     if (isMeshMeta(target)) {

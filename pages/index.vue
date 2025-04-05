@@ -54,8 +54,8 @@
                                 <h2 class="card-title">M4S Widening/Narrowing Witch Hunt, DN Strat</h2>
                                 <p>A tutorial for solving Witch Hunt using DN strat</p>
                                 <div class="card-actions justify-end">
-                                    <NuxtLink to="https://xivfightsim.com/tutorials/m4s-widening-narrowing-witch-hunt"
-                                        class="btn min-w-20">Play
+                                    <NuxtLink to="/tutorials/m4s-widening-narrowing-witch-hunt" class="btn min-w-20">
+                                        Play
                                     </NuxtLink>
                                 </div>
                             </div>
@@ -66,8 +66,7 @@
                                 <h2 class="card-title">M2S Alarm Pheromones, Second Casting</h2>
                                 <p>A tutorial for M2S's Second Alarm Pheromones cast</p>
                                 <div class="card-actions justify-end">
-                                    <NuxtLink to="https://xivfightsim.com/tutorials/m2s-alarm-pheromones-2"
-                                        class="btn min-w-20">Play
+                                    <NuxtLink to="/tutorials/m2s-alarm-pheromones-2" class="btn min-w-20">Play
                                     </NuxtLink>
                                 </div>
                             </div>
@@ -78,7 +77,7 @@
                                 <h2 class="card-title">M3S Barbarous Barrage</h2>
                                 <p>A quick sim of M3S' knock-back towers</p>
                                 <div class="card-actions justify-end">
-                                    <NuxtLink to="https://xivfightsim.com/raids/m3s/barbarous-barrage" class="btn min-w-20">
+                                    <NuxtLink to="/raids/m3s/barbarous-barrage" class="btn min-w-20">
                                         Play
                                     </NuxtLink>
                                 </div>
@@ -90,7 +89,7 @@
                                 <h2 class="card-title">M2S Centerstage/Outerstage Combos</h2>
                                 <p>Positioning for M2S Outerstage and Centerstage Combos.</p>
                                 <div class="card-actions justify-end">
-                                    <NuxtLink to="https://xivfightsim.com/raids/m2s/stage-combo" class="btn min-w-20">Play
+                                    <NuxtLink to="/raids/m2s/stage-combo" class="btn min-w-20">Play
                                     </NuxtLink>
                                 </div>
                             </div>
@@ -99,10 +98,10 @@
                         <div class="card bg-base-100/50 glass">
                             <div class="card-body">
                                 <h2 class="card-title">E12S Primal Unions</h2>
-                                <p>Positioning for the primal combination AOEs in Eden's Promise: Eternity (E12 / E12S)</p>
+                                <p>Positioning for the primal combination AOEs in Eden's Promise: Eternity (E12 / E12S)
+                                </p>
                                 <div class="card-actions justify-end">
-                                    <NuxtLink to="https://xivfightsim.com/raids/e12s/primal-combinations"
-                                        class="btn min-w-20">Play
+                                    <NuxtLink to="/raids/e12s/primal-combinations" class="btn min-w-20">Play
                                     </NuxtLink>
                                 </div>
                             </div>
@@ -116,7 +115,7 @@
                                 <p>This is just the crazy aoe variations. todo: The lariat at the end, and the bomb
                                     positioning</p>
                                 <div class="card-actions justify-end">
-                                    <NuxtLink to="https://xivfightsim.com/raids/m3s/fuse-or-foe" class="btn min-w-20">
+                                    <NuxtLink to="/raids/m3s/fuse-or-foe" class="btn min-w-20">
                                         Play
                                     </NuxtLink>
                                 </div>

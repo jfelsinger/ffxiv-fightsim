@@ -3,20 +3,6 @@ import '@babylonjs/core/Debug/debugLayer';
 import '@babylonjs/inspector';
 import { Engine, Scene, Vector3 } from '@babylonjs/core';
 import * as Bab from '@babylonjs/core';
-import { yalmsToM } from '../utils/conversions';
-import { Character } from '../utils/character';
-import { Clock } from '../utils/clock';
-import { FightCollection } from '../utils/fight-collection';
-import { effectsCollection } from '../utils/effects';
-import { createRingMesh } from '#imports';
-import { Fight } from '../utils/fights';
-import { FightSection, } from '../utils/sections';
-import { Mechanic, } from '../utils/mechanics';
-import { decodeFight } from '../utils/decode-fight';
-import { degToRads, vectorAngle } from '../utils/vector-helpers';
-import { getInterpolatedPosition } from '~/utils/positioning';
-
-import { Waymark } from '~/utils/waymark';
 
 (window as any).Bab = Bab;
 
@@ -49,11 +35,11 @@ const characterDirection = useState<number>('characterDirection', () => 0);
 
 const { isTutorial } = useTutorialMode();
 const { hits, isHit } = useHits();
+const { statuses } = useStatuses();
 
 const castState = useCastState();
 (window as any).castState = castState;
 
-const { statuses } = useStatuses();
 
 function onResize() {
     game?.resize();
@@ -415,7 +401,6 @@ function onScaleTime(value: number) {
         :class="{ '--is-hit': isHit }">
         <FightUi @scale-time="onScaleTime" @reset-position="onResetPosition" @update="onFightUpdate" :info="infoData"
             v-if="showUi && currentFight" :fight="currentFight" />
-
         <Minimap v-if="showUi" />
 
         <div v-if="showUi"

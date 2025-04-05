@@ -36,44 +36,46 @@ function next() {
         tutorialStep.value++;
     });
 }
+
+const { data: list } = await useAsyncData(route.path, () => {
+    return queryCollection('content').where('path', 'LIKE', `/tutorials/${tutorial}-steps%`)
+        .order('step', 'ASC')
+        .select('title', 'description', 'path', 'datetime')
+        .all();
+});
+
 </script>
 
 <template>
     <div v-show="isTutorialModeOn && isTutorialVisible && tutorialStep" class="tutorial-window__container">
-        <ContentList :query="query" v-slot="{ list }">
+        <div v-for="step in list" class="card bg-base-100/45 glass" :key="step._path">
+            <div v-if="isTutorialModeOn && isTutorialVisible && tutorialStep === step.step" class="card-body">
+                <h2 class="card-title">
+                    {{ step.title }}
+                </h2>
 
-            <div v-for="step in list" class="card bg-base-100/45 glass" :key="step._path">
-                <div v-if="isTutorialModeOn && isTutorialVisible && tutorialStep === step.step" class="card-body">
-                    <h2 class="card-title">
-                        {{ step.title }}
-                    </h2>
+                <div class="prose text-sm">
+                    <ContentRenderer v-if="step" :value="step" />
+                </div>
 
-                    <div class="prose text-sm">
-                        <ContentRenderer :value="step">
-                            <ContentRendererMarkdown :value="step" />
-                        </ContentRenderer>
-                    </div>
-
-                    <div v-if="!canContinueTutorial">
-                        <hr />
-                        <div class="my-4 mb-2 text-center">
-                            Waiting to get into position&hellip;
-                        </div>
-                    </div>
-
-                    <div class="card-actions justify-end items-end">
-                        <button @click.stop.prevent="hide" class="btn btn-ghost min-w-20">
-                            Hide
-                        </button>
-                        <button :disabled="!canContinueTutorial" @click.stop.prevent="next" class="btn min-w-20">
-                            <Icon class="swap-on" name="solar:play-circle-linear" />
-                            Continue
-                        </button>
+                <div v-if="!canContinueTutorial">
+                    <hr />
+                    <div class="my-4 mb-2 text-center">
+                        Waiting to get into position&hellip;
                     </div>
                 </div>
-            </div>
 
-        </ContentList>
+                <div class="card-actions justify-end items-end">
+                    <button @click.stop.prevent="hide" class="btn btn-ghost min-w-20">
+                        Hide
+                    </button>
+                    <button :disabled="!canContinueTutorial" @click.stop.prevent="next" class="btn min-w-20">
+                        <Icon class="swap-on" name="solar:play-circle-linear" />
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 

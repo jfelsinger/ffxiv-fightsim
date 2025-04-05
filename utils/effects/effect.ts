@@ -1,15 +1,6 @@
 import * as Bab from '@babylonjs/core';
 import { EventEmitter } from 'eventemitter3';
-import { Clock } from '../clock';
-import { FightCollection } from '../fight-collection';
-import { Character } from '../character';
-import { parseNumber } from '../parse-number';
-import { getBasicValues } from '../decode-fight';
-import type { PositionType, PositionOption } from '../positioning';
-import { getPosition, getInterpolatedPosition } from '../positioning';
-import type { ScheduledParent } from '../scheduled';
 import { useCastState } from '../../composables/castState';
-import { type PartialStatus } from '../status';
 
 import Debug from 'debug';
 const debug = Debug('game:utils:effect');

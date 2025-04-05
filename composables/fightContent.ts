@@ -26,8 +26,8 @@ export function useFightContent(fightParams?: Array<string>) {
     if (section) { path += `/sections/${section}`; }
 
     return useAsyncData(path, async () => {
-        const fightPromise = queryContent(path).only(fightParams).findOne();
-        const infoPromise = queryContent(path + '.info').findOne().catch((err) => {
+        const fightPromise = queryCollection('data').path(path).select(...fightParams as any).first();
+        const infoPromise = queryCollection('content').path(path + '.info').first().catch((err) => {
             console.error('info error: ', err);
         });
 

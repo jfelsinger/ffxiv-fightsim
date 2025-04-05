@@ -1,11 +1,4 @@
 import * as Bab from '@babylonjs/core';
-import { Clock } from './clock';
-import { Character } from './character';
-import { Arena } from '../utils/arenas/arena';
-import { Effect } from './effects';
-import { hasTags } from './meta-helpers';
-import { shuffleArray } from './array-shuffle';
-import { type Role, getRoleType, isSupportRole, getOtherRoles } from './roles';
 
 export type CharacterName =
     | 'player'

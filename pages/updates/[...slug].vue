@@ -1,3 +1,16 @@
+<script setup lang="ts">
+useHead({
+    title: 'Updates | XIV FIGHTSIM',
+    meta: [
+        { name: 'description', content: 'Recent announcements, changelogs, and other updates about XIV FIGHTSIM', },
+    ],
+});
+
+const route = useRoute();
+const { data: doc } = await useAsyncData(route.path, () => {
+    return queryCollection('content').path(route.path).first();
+});
+</script>
 <template>
     <div>
         <div class="fixed left-0 top-0 overflow-hidden w-full max-h-screen max-w-screen h-screen z-[-1]">
@@ -11,24 +24,22 @@
 
             <div class="flex justify-center items-center">
                 <article class="p-2 md:w-2/3 flex flex-col justify-center">
-                    <ContentDoc v-slot="{ doc }">
-                        <h1 class="text-3xl my-2 text-base-300 ">{{ doc.title }}</h1>
-                        <p class="text-base-300 font-thin my-2 mb-4">
-                            {{ doc.description }}
-                        </p>
-                        <p class="text-base-300 font-thin m-1 text-right">
-                            <NuxtLink to="/updates" class="opacity-65 hover:opacity-100">
-                                Back to updates.
-                            </NuxtLink>
-                        </p>
+                    <h1 class="text-3xl my-2 text-base-300 ">{{ doc.title }}</h1>
+                    <p class="text-base-300 font-thin my-2 mb-4">
+                        {{ doc.description }}
+                    </p>
+                    <p class="text-base-300 font-thin m-1 text-right">
+                        <NuxtLink to="/updates" class="opacity-65 hover:opacity-100">
+                            Back to updates.
+                        </NuxtLink>
+                    </p>
 
-                        <div class="min-w-full prose bg-base-200 rounded-box p-4 py-1">
-                            <ContentRenderer :value="doc" />
-                            <p class="text-sm m-4 text-right opacity-75">
-                                posted: {{ doc.datetime }}
-                            </p>
-                        </div>
-                    </ContentDoc>
+                    <div class="min-w-full prose bg-base-200 rounded-box p-4 py-1">
+                        <ContentRenderer :value="doc" />
+                        <p class="text-sm m-4 text-right opacity-75">
+                            posted: {{ doc.datetime }}
+                        </p>
+                    </div>
                 </article>
             </div>
 

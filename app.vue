@@ -9,7 +9,7 @@ import '~/assets/styles/app.css';
 </template>
 
 <style lang="scss">
-@import '~/assets/styles/main.scss';
+@use '~/assets/styles/main.scss';
 
 html,
 body {

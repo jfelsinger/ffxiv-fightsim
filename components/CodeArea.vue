@@ -3,7 +3,7 @@ import * as YAML from 'yaml';
 
 import { yaml as langYaml } from '@codemirror/lang-yaml';
 import { json as langJson } from '@codemirror/lang-json';
-
+import type { Extension } from '@codemirror/state';
 import CodeMirror from 'vue-codemirror6';
 
 const props = withDefaults(defineProps<{
@@ -63,6 +63,8 @@ watch(language, (newValue: string, oldValue: string) => {
         }
     }
 });
+
+const test = ref('');
 </script>
 
 <template>
@@ -74,8 +76,11 @@ watch(language, (newValue: string, oldValue: string) => {
             </select>
             <button ref="saveButton" class="btn btn-sm" @click.stop.prevent="save">save</button>
         </div>
-        <div class="overflow-y-scroll">
+        <div class="overflow-y-scroll" :key="lang">
+            <CodeMirror :extensions="[cmLanguage]" tab wrap :tab-size="2" :dark="false" v-model="code" />
+            <!--
             <CodeMirror tab wrap basic :tab-size="2" :dark="false" v-model="code" :lang="cmLanguage" />
+            -->
         </div>
     </div>
 </template>

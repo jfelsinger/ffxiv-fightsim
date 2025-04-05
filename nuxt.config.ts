@@ -44,6 +44,9 @@ export default defineNuxtConfig({
             'stores',
             'materials',
             'glsl',
+            'utils',
+            'utils/arenas',
+            'utils/effects',
         ],
     },
 
@@ -59,11 +62,14 @@ export default defineNuxtConfig({
                         `
 @use 'sass:math';
 @use 'sass:color';
-@import '~/assets/styles/vars.scss';
 `,
                 },
             },
         },
+    },
+
+    dayjs: {
+        plugins: ['duration', 'calendar'],
     },
 
     modules: [
@@ -78,7 +84,7 @@ export default defineNuxtConfig({
         // '@pinia-plugin-persistedstate/nuxt',
         '@vueuse/nuxt',
         [
-            'nuxt-icon',
+            '@nuxt/icon',
             {
                 class: 'nx-icon',
                 // customCollections: [
@@ -101,12 +107,7 @@ export default defineNuxtConfig({
                 // ],
             },
         ],
-        [
-            'dayjs-nuxt',
-            {
-                plugins: ['duration'],
-            }
-        ],
+        'dayjs-nuxt',
         [
             '@nuxt/content',
             {

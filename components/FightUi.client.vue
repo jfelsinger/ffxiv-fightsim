@@ -1,11 +1,5 @@
 <script setup lang="ts">
 import * as YAML from 'yaml';
-import {
-    type Scheduled,
-} from '../utils/scheduled';
-import { Fight, } from '../utils/fights';
-import { FightSection } from '../utils/sections';
-import { decodeFight } from '../utils/decode-fight';
 
 const emit = defineEmits<{
     (e: 'update', value: Fight): void,
@@ -230,17 +224,20 @@ function updateTime(val: number) {
                     </span>
                 </div>
                 <div class="dropdown dropdown-hover dropdown-top tooltip tooltip-bottom" data-tip="Game Speed">
-                    <div tabindex="0" role="button" class="btn btn-sm bg-transparent border-transparent shadow-none px-2">
+                    <div tabindex="0" role="button"
+                        class="btn btn-sm bg-transparent border-transparent shadow-none px-2">
                         <Icon name="solar:stopwatch-linear" />
                     </div>
                     <ul tabindex="0" class="dropdown-content z-[51] menu p-2 shadow bg-base-100 rounded-box text-xs">
-                        <li v-for="val in ['2.0', '1.0', 0.75, 0.50]" :class="{ 'opacity-50': worldTimeScaling == val }">
+                        <li v-for="val in ['2.0', '1.0', 0.75, 0.50]"
+                            :class="{ 'opacity-50': worldTimeScaling == val }">
                             <a @click.stop.prevent="updateTime(+val)">{{ val }}</a>
                         </li>
                     </ul>
                 </div>
                 <div class="dropdown dropdown-hover dropdown-top tooltip tooltip-bottom" data-tip="Attack Telegraphing">
-                    <div tabindex="0" role="button" class="btn btn-sm bg-transparent border-transparent shadow-none px-2">
+                    <div tabindex="0" role="button"
+                        class="btn btn-sm bg-transparent border-transparent shadow-none px-2">
                         <label @click="toggleTelegraph" class="swap" :class="{ 'swap-active': telegraph > 50 }">
                             <Icon class="swap-on" name="solar:eye-broken" />
                             <Icon class="swap-off" name="solar:eye-closed-bold-duotone" />
@@ -424,5 +421,4 @@ function updateTime(val: number) {
 //     // flex-direction: column;
 //     // margin-top: 1rem;
 //     // gap: 1rem;
-// }
-</style>
+// }</style>

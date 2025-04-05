@@ -1,11 +1,6 @@
 import * as Bab from '@babylonjs/core';
 import { GridMaterial } from '@babylonjs/materials';
 import getArenaBoundsMat from '../../materials/arenaBounds';
-import { FightCollection } from '../fight-collection';
-import { arenaMats } from './mats';
-import { getBasicValues } from '../decode-fight';
-
-import { yalmsToM } from '../conversions';
 
 export type ArenaShape = 'round' | 'ring' | 'square';
 export type ArenaOptions = {
@@ -38,7 +33,7 @@ export class Arena {
     }
 
     get adjustedSize() {
-        return this.size * (this.options?.sizeAdjustment || 1);
+        return this.size * (+(this.options?.sizeAdjustment || 1));
     }
 
     dispose() {
