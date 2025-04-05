@@ -10,8 +10,6 @@ import {
     Mechanic,
     type MechanicOptions,
 } from './';
-import { moveEmitHelpers } from 'typescript';
-import { Babylon } from '#build/components';
 
 export type LariatType = 'octuple' | 'quadruple';
 export type LariatPosition = 'inner' | 'outer';

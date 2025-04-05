@@ -10,8 +10,6 @@ import {
     Mechanic,
     type MechanicOptions,
 } from './';
-import { moveEmitHelpers } from 'typescript';
-import { Babylon } from '#build/components';
 
 export type BaitType = 'near' | 'far';
 export type BaitList = [BaitType, BaitType, BaitType, BaitType];

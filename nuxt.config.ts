@@ -66,14 +66,14 @@ export default defineNuxtConfig({
 
     modules: [
         '@nuxtjs/tailwindcss',
-        [
-            '@pinia/nuxt',
-            {
-                storesDirs: ['./stores/**'],
-                autoImports: ['usePinia', 'defineStore', 'acceptHMRUpdate'],
-            }
-        ],
-        '@pinia-plugin-persistedstate/nuxt',
+        // [
+        //     '@pinia/nuxt',
+        //     {
+        //         storesDirs: ['./stores/**'],
+        //         autoImports: ['usePinia', 'defineStore', 'acceptHMRUpdate'],
+        //     }
+        // ],
+        // '@pinia-plugin-persistedstate/nuxt',
         '@vueuse/nuxt',
         [
             'nuxt-icon',
