@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import '~/assets/styles/app.css';
+</script>
+
 <template>
     <NuxtLayout>
         <NuxtPage />
@@ -20,4 +24,5 @@ body {
     textarea {
         color: #333;
     }
-}</style>
+}
+</style>

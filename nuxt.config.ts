@@ -1,4 +1,5 @@
 import glsl from 'vite-plugin-glsl';
+import tailwindcss from '@tailwindcss/vite';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -49,6 +50,7 @@ export default defineNuxtConfig({
     vite: {
         plugins: [
             glsl(),
+            tailwindcss()
         ],
         css: {
             preprocessorOptions: {
@@ -65,7 +67,7 @@ export default defineNuxtConfig({
     },
 
     modules: [
-        '@nuxtjs/tailwindcss',
+        // '@nuxtjs/tailwindcss',
         // [
         //     '@pinia/nuxt',
         //     {
