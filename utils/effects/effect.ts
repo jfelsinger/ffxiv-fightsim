@@ -14,7 +14,7 @@ export type EffectTarget =
 
 export type EffectPositionType = PositionType;
 
-export type EffectOptions = {
+export type EffectOptions<TExtras = {}> = {
     label?: string
     color?: string
     duration: number | string
@@ -42,7 +42,7 @@ export type EffectOptions = {
 
     startStatus?: PartialStatus
     endStatus?: PartialStatus
-}
+} & TExtras;
 
 const globalTelegraph = useState<number>('telegraph', () => 1.0);
 

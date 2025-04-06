@@ -13,8 +13,8 @@ export type AoeRingEffectOptions = EffectOptions & {
 };
 
 export class AoeRingEffect extends Effect {
-    options: AoeRingEffectOptions;
-    name = 'aoe-ring';
+    override options: AoeRingEffectOptions;
+    override name = 'aoe-ring';
     innerRadius: number
     outerRadius: number
 
@@ -45,7 +45,7 @@ export class AoeRingEffect extends Effect {
         this.segments = Math.max(Math.floor(this.thetaLength / Math.PI + 1), this.segments);
     }
 
-    async startup() {
+    override async startup() {
         await super.startup();
         this.mesh = this.makeAoe().ring;
     }
@@ -83,7 +83,7 @@ export class AoeRingEffect extends Effect {
         );
     }
 
-    async cleanup() {
+    override async cleanup() {
         this.mesh?.dispose()
         await super.cleanup();
     }

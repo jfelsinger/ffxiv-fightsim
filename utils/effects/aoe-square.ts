@@ -7,7 +7,7 @@ export type AoeSquareEffectOptions = EffectOptions & {
 };
 
 export class AoeSquareEffect extends Effect {
-    name = 'aoe-square';
+    override name = 'aoe-square';
     yalms: number;
     width: number;
     height: number;
@@ -19,12 +19,12 @@ export class AoeSquareEffect extends Effect {
         this.height = parseNumber(options.height || options.yalms || 15);
     }
 
-    async startup() {
+    override async startup() {
         await super.startup();
         this.mesh = this.makeAoe().square;
     }
 
-    async cleanup() {
+    override async cleanup() {
         this.mesh?.dispose()
         await super.cleanup();
     }

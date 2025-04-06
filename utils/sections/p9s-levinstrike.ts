@@ -7,7 +7,7 @@ export type P9SSectionOptions = SectionOptions & {
 }
 
 export class P9SSection extends FightSection {
-    options: P9SSectionOptions;
+    override options: P9SSectionOptions;
     orbs: Bab.Mesh[] = [];
 
     constructor(options: P9SSectionOptions) {
@@ -76,7 +76,7 @@ export class P9SSection extends FightSection {
         });
     }
 
-    async dispose() {
+    override async dispose() {
         this.orbs.forEach(o => o?.dispose());
         await super.dispose();
     }

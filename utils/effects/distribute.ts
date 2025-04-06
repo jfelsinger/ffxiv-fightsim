@@ -18,8 +18,8 @@ export type DistributeEffectOptions = EffectOptions & {
 };
 
 export class DistributeEffect extends Effect {
-    options: DistributeEffectOptions;
-    name = 'distribute';
+    override options: DistributeEffectOptions;
+    override name = 'distribute';
     effects: Effect[] = [];
     items: DistributionItem[] = [];
 
@@ -123,7 +123,7 @@ export class DistributeEffect extends Effect {
         return effect;
     }
 
-    async execute() {
+    override async execute() {
         const len = this.effects.length;
         const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
@@ -137,7 +137,7 @@ export class DistributeEffect extends Effect {
         }
     }
 
-    async startup() {
+    override async startup() {
         await super.startup();
         const len = this.effects.length;
         const promises: Promise<void>[] = [];
@@ -151,7 +151,7 @@ export class DistributeEffect extends Effect {
         await Promise.all(promises);
     }
 
-    setDuration(duration: number | string) {
+    override setDuration(duration: number | string) {
         super.setDuration(duration);
         this.duration = parseNumber(duration);
         const len = this.effects.length;
@@ -160,7 +160,7 @@ export class DistributeEffect extends Effect {
         }
     }
 
-    setTelegraph(telegraph: number | string) {
+    override setTelegraph(telegraph: number | string) {
         super.setTelegraph(telegraph);
         const len = this.effects.length;
         for (let i = 0; i < len; i++) {
@@ -168,7 +168,7 @@ export class DistributeEffect extends Effect {
         }
     }
 
-    async cleanup() {
+    override async cleanup() {
         const len = this.effects.length;
         const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
@@ -183,7 +183,7 @@ export class DistributeEffect extends Effect {
         await super.cleanup();
     }
 
-    toJSON() {
+    override toJSON() {
         return {
             ...super.toJSON(),
             effect: this.options.effect,

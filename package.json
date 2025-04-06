@@ -48,7 +48,6 @@
         "daisyui": "^5.0.12",
         "dayjs-nuxt": "^2.1.11",
         "debug": "^4.4.0",
-        "eventemitter3": "^5.0.1",
         "math-expression-evaluator": "^2.0.6",
         "posthog-js": "^1.234.9",
         "sass": "^1.86.3",

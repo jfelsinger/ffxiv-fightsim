@@ -3,8 +3,8 @@ export type StageCastEffectOptions = AoeGroupEffectOptions & {
 };
 
 export class StageCastEffect extends AoeGroupEffect {
-    name = 'stage-cast';
-    telegraph: StageCastEffectOptions['telegraph'];
+    override name = 'stage-cast';
+    override telegraph: StageCastEffectOptions['telegraph'];
 
     constructor(options: StageCastEffectOptions) {
         super(options);
@@ -12,7 +12,7 @@ export class StageCastEffect extends AoeGroupEffect {
         this.telegraph = options.telegraph || 'cardinals';
     }
 
-    async execute() {
+    override async execute() {
         const len = this.aoes.length;
         const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
@@ -25,7 +25,7 @@ export class StageCastEffect extends AoeGroupEffect {
         }
     }
 
-    async startup() {
+    override async startup() {
         await super.startup();
         this.mesh = this.makeAoe().mesh;
         const len = this.aoes.length;
@@ -43,11 +43,11 @@ export class StageCastEffect extends AoeGroupEffect {
         await Promise.all(promises);
     }
 
-    async cleanup() {
+    override async cleanup() {
         await super.cleanup();
     }
 
-    toJSON() {
+    override toJSON() {
         return {
             ...super.toJSON(),
             aoes: this.options.aoes,

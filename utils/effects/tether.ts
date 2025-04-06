@@ -4,7 +4,7 @@ export type TetherEffectOptions = EffectOptions & {
 };
 
 export class TetherEffect extends Effect {
-    name = 'tether';
+    override name = 'tether';
     from: string;
     to?: string;
 
@@ -16,13 +16,13 @@ export class TetherEffect extends Effect {
         this.to = options.to;
     }
 
-    async startup() {
+    override async startup() {
         await super.startup();
         this.makeAoe();
         this.particles?.start();
     }
 
-    async cleanup() {
+    override async cleanup() {
         this.mesh?.dispose()
         this.particles?.stop();
         this.particles?.dispose();

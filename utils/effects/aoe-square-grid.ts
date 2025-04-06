@@ -27,7 +27,7 @@ export type AoeSquareGridEffectOptions = AoeSquareEffectOptions & {
 };
 
 export class AoeSquareGridEffect extends AoeSquareEffect {
-    name = 'aoe-square-grid';
+    override name = 'aoe-square-grid';
     orientation: GridOrientation;
     pattern: GridPattern;
     gap: number;
@@ -46,15 +46,7 @@ export class AoeSquareGridEffect extends AoeSquareEffect {
         this.cols = parseNumber(options.cols || options.size || 4);
     }
 
-    async startup() {
-        await super.startup();
-    }
-
-    async cleanup() {
-        await super.cleanup();
-    }
-
-    toJSON() {
+    override toJSON() {
         return {
             ...super.toJSON(),
             orientation: this.orientation,
@@ -145,7 +137,7 @@ export class AoeSquareGridEffect extends AoeSquareEffect {
         return true;
     }
 
-    checkMeshCollision(target: Bab.Mesh) {
+    override checkMeshCollision(target: Bab.Mesh) {
         const mesh = this.mesh;
         if (!mesh || !target) {
             return false;
@@ -166,7 +158,7 @@ export class AoeSquareGridEffect extends AoeSquareEffect {
         });
     }
 
-    makeAoe() {
+    override makeAoe() {
         const squareMat = createAoeMat(this.scene, this.getColor(), 'squareMat');
         squareMat.alpha = 0.7;
 

@@ -7,7 +7,7 @@ export type E12SFightOptions = FightOptions & {
 };
 
 export class E12SFight extends Fight {
-    options: E12SFightOptions;
+    override options: E12SFightOptions;
     boss: Bab.Mesh;
     ifrit: Bab.Mesh;
     garuda: Bab.Mesh;
@@ -89,7 +89,7 @@ export class E12SFight extends Fight {
         this.leviathan = leviathan;
     }
 
-    async dispose() {
+    override async dispose() {
         this.boss?.dispose();
         await super.dispose();
     }

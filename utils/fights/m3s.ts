@@ -7,8 +7,8 @@ export type M3SFightOptions = FightOptions & {
 };
 
 export class M3SFight extends Fight {
-    options: M3SFightOptions;
-    boss: Boss;
+    override options: M3SFightOptions;
+    boss!: Boss;
 
     constructor(options: M3SFightOptions) {
         super(options);
@@ -30,7 +30,7 @@ export class M3SFight extends Fight {
         });
     }
 
-    async dispose() {
+    override async dispose() {
         this.boss?.dispose();
         await super.dispose();
     }

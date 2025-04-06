@@ -7,8 +7,8 @@ export type M2SFightOptions = FightOptions & {
 };
 
 export class M2SFight extends Fight {
-    options: M2SFightOptions;
-    boss: Boss;
+    override options: M2SFightOptions;
+    boss!: Boss;
 
     constructor(options: M2SFightOptions) {
         super(options);
@@ -26,7 +26,7 @@ export class M2SFight extends Fight {
         boss.body.position.y = bossSize / 1.25;
     }
 
-    async dispose() {
+    override async dispose() {
         this.boss?.dispose();
         await super.dispose();
     }

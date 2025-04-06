@@ -20,8 +20,8 @@ const primalPairs: Record<PrimalName, PrimalName[]> = {
 } as const;
 
 export class E12SPrimalCombination extends Mechanic {
-    name = 'primal-combination';
-    options: E12SPrimalCombinationOptions;
+    override name = 'primal-combination';
+    override options: E12SPrimalCombinationOptions;
 
     constructor(options: E12SPrimalCombinationOptions) {
         super(options);
@@ -29,7 +29,7 @@ export class E12SPrimalCombination extends Mechanic {
         this.scheduling = options.scheduling || 'parallel';
     }
 
-    getEffects(): Scheduled<Effect>[] {
+    override getEffects(): Scheduled<Effect>[] {
         const allEffects = this.effects;
         const primalEffects: Record<PrimalName, Scheduled<Effect> | undefined> = {
             ifrit: allEffects.find(e => e.label?.toLowerCase() === 'ifrit'),

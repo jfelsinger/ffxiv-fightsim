@@ -34,7 +34,7 @@ function getPrevWaymark(name: string) {
 }
 
 export class ClockSpotsTutorial extends Fight {
-    options: ClockSpotsTutorialOptions;
+    override options: ClockSpotsTutorialOptions;
 
     constructor(options: ClockSpotsTutorialOptions) {
         super(options);
@@ -219,7 +219,7 @@ export class ClockSpotsTutorial extends Fight {
         });
     }
 
-    async dispose() {
+    override async dispose() {
         await super.dispose();
     }
 }

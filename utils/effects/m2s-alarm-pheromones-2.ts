@@ -1,4 +1,9 @@
-export type M2SAlarmPheromones2Options = AoeGroupEffectOptions & {
+export type M2SAlarmPheromones2Options = AoeGroupEffectOptions<{
+    name?: string
+    yalms?: number
+    width?: number
+    height?: number
+}> & {
     rotation: number
 };
 

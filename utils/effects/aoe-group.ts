@@ -3,8 +3,8 @@ import {
     type EffectOptions,
 } from './';
 
-export type AoeGroupEffectOptions = EffectOptions & {
-    aoes?: EffectOptions[],
+export type AoeGroupEffectOptions<TAOES = {}> = EffectOptions & {
+    aoes?: (Partial<EffectOptions> & TAOES)[],
     rotation: number,
 };
 

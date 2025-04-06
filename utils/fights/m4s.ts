@@ -7,8 +7,8 @@ export type M4SFightOptions = FightOptions & {
 };
 
 export class M4SFight extends Fight {
-    options: M4SFightOptions;
-    boss: Boss;
+    override options: M4SFightOptions;
+    boss!: Boss;
 
     constructor(options: M4SFightOptions) {
         super(options);
@@ -53,7 +53,7 @@ export class M4SFight extends Fight {
         });
     }
 
-    async dispose() {
+    override async dispose() {
         this.boss?.dispose();
         await super.dispose();
     }

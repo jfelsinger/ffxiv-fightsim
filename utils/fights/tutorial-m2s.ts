@@ -18,7 +18,7 @@ function r(a: number, x: number, y: number) {
 
 
 export class M2STutorial extends M2SFight {
-    options: M2STutorialOptions;
+    override options: M2STutorialOptions;
     indicator?: Indicator;
     activeStep: string = 'none';
     pheromonesMechanic: any;

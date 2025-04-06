@@ -3,25 +3,22 @@ export type StageComboCastEffectOptions = CastBarEffectOptions & {
 };
 
 export class StageComboCastEffect extends CastBarEffect {
-    name = 'stage-combo-cast-bar';
+    override name = 'stage-combo-cast-bar';
     telegraphDirection: StageCastEffectOptions['telegraph'];
     meshes: Bab.Mesh[] = [];
 
     constructor(options: StageComboCastEffectOptions) {
         super(options);
         this.telegraphDirection = options.telegraphDirection || 'cardinals';
-        console.log('CONSTRUCTOR!');
     }
 
 
-    async startup() {
-        console.log('HEY!');
+    override async startup() {
         this.makeMeshes();
         await super.startup();
     }
 
-    async cleanup() {
-        console.log('CLEANUP!');
+    override async cleanup() {
         for (const mesh of this.meshes) {
             mesh?.dispose()
         }
