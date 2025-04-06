@@ -90,7 +90,6 @@ function makeScene(game: Engine) {
 
     scene.onPrePointerObservable.add((pointerInfo) => {
         if (pointerInfo.event.type === 'pointerup') {
-            console.log('POINTER UP: ', pointerInfo.event.button, pointerInfo.event);
             delete inputMap.value[`mb-${pointerInfo.event.button}`];
             (window as any).pu = pointerInfo;
         } else {
@@ -371,7 +370,6 @@ onBeforeUnmount(async () => {
 });
 
 async function onFightUpdate(updatedFight: Fight) {
-    console.log('UPDATE FIGHT!');
     await currentFight.value?.dispose();
 
     currentFight.value = updatedFight;

@@ -60,7 +60,8 @@ export default defineNuxtConfig({
                 ],
             },
             {
-                from: 'eventemitter3',
+                // from: 'eventemitter3',
+                from: 'tseep',
                 imports: ['EventEmitter'],
             },
             {
@@ -106,6 +107,7 @@ export default defineNuxtConfig({
         [
             '@nuxt/icon',
             {
+                size: '1.2rem',
                 class: 'nx-icon',
                 // customCollections: [
                 //     {

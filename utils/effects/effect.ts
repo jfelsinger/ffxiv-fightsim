@@ -110,20 +110,20 @@ export class Effect extends EventEmitter {
         this.positionSteps = options.positionSteps;
         this.easing = options.easing;
 
-        const onTickUpdate = (time: number) => {
-            this.tickUpdate(time);
+        const onTickUpdate = (time: number, delta: number) => {
+            this.tickUpdate(time, delta);
         };
 
         this.usePlayerTick = options.usePlayerTick || false;
         if (this.usePlayerTick) {
-            this.collection.playerClock.on('tick', onTickUpdate);
+            this.collection.playerClock.on('time-change', onTickUpdate);
             this.on('dispose', () => {
-                this.collection.playerClock.off('tick', onTickUpdate);
+                this.collection.playerClock.off('time-change', onTickUpdate);
             });
         } else {
-            this.clock.on('tick', onTickUpdate);
+            this.clock.on('time-change', onTickUpdate);
             this.on('dispose', () => {
-                this.clock.off('tick', onTickUpdate);
+                this.clock.off('time-change', onTickUpdate);
             });
         }
     }
@@ -243,7 +243,7 @@ export class Effect extends EventEmitter {
         }
     }
 
-    tickUpdate(time: number, delta) {
+    tickUpdate(time: number, delta: number) {
         if (this.isActive) {
             const durationPercent = this.getDurationPercent();
             const adjustedTelegraph = this.adjustedTelegraph;
@@ -260,6 +260,15 @@ export class Effect extends EventEmitter {
                 this.telegraphShown = true;
                 this.emit('show-telegraph', {
                     time,
+                    delta,
+                    durationPercent,
+                    telegraph: adjustedTelegraph,
+                });
+            } else if (delta < 0) {
+                this.telegraphShown = false;
+                this.emit('unshow-telegraph', {
+                    time,
+                    delta,
                     durationPercent,
                     telegraph: adjustedTelegraph,
                 });
@@ -298,7 +307,6 @@ export class Effect extends EventEmitter {
         this.n = n;
         this.scheduledParent = parent;
         this.telegraphShown = false;
-        // console.log('EFFECT: ', n, parent, parent?.scheduled?.item, parent?.scheduled?.item?.position, parent?.scheduled?.item?.getPosition());
 
         // TODO: Implement this somewhere else.
         // TODO: if tutorial mode
@@ -311,7 +319,6 @@ export class Effect extends EventEmitter {
         // });
 
         this.startTime = this.clock.time;
-        // console.log('EFFECT START: ', this.name, this.startTime, this);
         this.emit('start');
         await this.startup();
 

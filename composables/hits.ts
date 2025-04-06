@@ -47,8 +47,6 @@ export function useHits() {
     function recordHits(val?: number) {
         if (val === undefined) val = hits.value;
         hitsRecord.value.push(val);
-
-        console.log('==== recordHits() ==== ==== | ', hitsRecord.value, currentStreak.value, longestStreak.value);
     }
 
     function resetRecord() {

@@ -62,7 +62,6 @@ export class M2STutorial extends M2SFight {
         }
 
         const result = `${pos.x},${pos.y}`;
-        console.log('getRotationPosition: ', startRotation, step, isCW, isDps, result);
 
         return result;
     }
@@ -85,7 +84,6 @@ export class M2STutorial extends M2SFight {
                 (window as any).__section = section;
                 const pheromonesMechanic = section.item.mechanics.find((sm) => sm?.item?.name === 'm2s-alarm-pheromones-2')?.item;
                 this.pheromonesMechanic = pheromonesMechanic;
-                console.log('PHERO MECH: ', pheromonesMechanic);
 
                 this.activeStep = 'alarm-pheromones';
                 this.clock.after(() => {
@@ -118,10 +116,8 @@ export class M2STutorial extends M2SFight {
                 }, 1000);
 
                 section.item.on('start-mechanic', ({ mechanic }) => {
-                    console.log('=======> start-mechanic: ', mechanic?.item);
                     if (mechanic?.item?.name === 'm2s-poison-sting') {
                         mechanic.item.once('start-execute', () => {
-                            console.log('Start poision sting!', mechanic);
                             this.activeStep = 'poison-sting';
                         });
 

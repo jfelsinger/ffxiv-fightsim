@@ -126,7 +126,6 @@ export function getInterpolatedPosition(options: {
     }
 
     if (!positions || positions?.length <= 1) {
-        console.log('Nothing to interpolate, return default positioning');
         return getPosition(
             positions && positions[0],
             (positionTypes ? positionTypes[0] : positionType) || positionType,
@@ -149,19 +148,16 @@ export function getInterpolatedPosition(options: {
     let currentStepIndex = steps.findIndex((v) => v >= value);
     if (currentStepIndex === -1) currentStepIndex = steps.length - 1;
     if (currentStepIndex === 0) currentStepIndex = 1;
-    // console.log('steps: ', steps, currentStepIndex);
 
     const startValue = steps[currentStepIndex - 1] || 0;
     const startPosition = positions[currentStepIndex - 1];
     const startPositionType = (positionTypes ? positionTypes[currentStepIndex - 1] : positionType) || positionType;
     const start = getPosition(startPosition, startPositionType, collection, target)
-    // console.log('start: ', startPosition, startPositionType);
 
     const endValue = steps[currentStepIndex];
     const endPosition = positions[currentStepIndex];
     const endPositionType = (positionTypes ? positionTypes[currentStepIndex] : positionType) || positionType;
     const end = getPosition(endPosition, endPositionType, collection, target)
-    // console.log('end: ', endPosition, endPositionType);
 
     // console.log(`interpolate: from ${startValue} to ${endValue}: `, startValue, value);
     // console.log(`interpolate: x ${start.x} to ${end.x}`);

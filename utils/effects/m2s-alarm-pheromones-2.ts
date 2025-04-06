@@ -42,8 +42,6 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
             yRotation = -(this.options.rotation * (Math.PI / 180));
         }
 
-        console.log('CENTER Y ROTATION: ', yRotation);
-
         const hoverHeight = 3;
         const offset1 = '0.385';
 

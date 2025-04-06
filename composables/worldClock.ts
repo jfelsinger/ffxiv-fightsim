@@ -11,7 +11,7 @@ export function useWorldClock() {
     const worldTime = useState<number>('worldTime', () => worldClock.time || 0);
 
     if (!windowClockSet) {
-        worldClock.on('tick', (time) => { worldTime.value = time });
+        worldClock.on('time-change', (time) => { worldTime.value = time });
         watch(worldTimeScaling, (scaling) => { worldClock.scaling = scaling });
     }
 

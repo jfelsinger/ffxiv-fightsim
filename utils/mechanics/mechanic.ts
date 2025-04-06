@@ -71,20 +71,20 @@ export class Mechanic extends EventEmitter {
         this.collection = options.collection;
         this.clock = options.clock || this.collection.worldClock;
 
-        const onTickUpdate = (time: number) => {
-            this.tickUpdate(time);
+        const onTickUpdate = (time: number, delta: number) => {
+            this.tickUpdate(time, delta);
         };
 
         this.usePlayerTick = options.usePlayerTick || false;
         if (this.usePlayerTick) {
-            this.collection.playerClock.on('tick', onTickUpdate);
+            this.collection.playerClock.on('time-change', onTickUpdate);
             this.on('dispose', () => {
-                this.collection.playerClock.off('tick', onTickUpdate);
+                this.collection.playerClock.off('time-change', onTickUpdate);
             });
         } else {
-            this.clock.on('tick', onTickUpdate);
+            this.clock.on('time-change', onTickUpdate);
             this.on('dispose', () => {
-                this.clock.off('tick', onTickUpdate);
+                this.clock.off('time-change', onTickUpdate);
             });
         }
 
@@ -160,7 +160,7 @@ export class Mechanic extends EventEmitter {
         this.emit('end-execute');
     }
 
-    tickUpdate(time: number) {
+    tickUpdate(time: number, delta: number) {
         if (this.isActive) {
             const durationPercent = this.getDurationPercent();
             if (this.options.castName) {
@@ -177,6 +177,7 @@ export class Mechanic extends EventEmitter {
 
             this.emit('tick', {
                 time,
+                delta,
                 durationPercent,
             });
         }

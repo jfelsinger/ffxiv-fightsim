@@ -126,7 +126,6 @@ export function decodeMechanic(data: any, options: FightDecodeOptions) {
 
     const effects = data?.effects?.map((effect: any) => decodeScheduledEffect(effect, options)) || [];
 
-    console.log('DATA: ', data);
     return new mechanicClass({
         ...options,
         ...data,
@@ -174,9 +173,6 @@ export function decodeFight(data: any, options: FightDecodeOptions) {
     }
 
     const sections = data?.sections?.map((section: any) => decodeScheduledFightSection(section, options)) || [];
-
-    console.log('FIGHT: OPTS - ', options);
-    console.log('FIGHT: DATA - ', data);
 
     return new fightClass({
         ...options,

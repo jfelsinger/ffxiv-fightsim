@@ -20,11 +20,11 @@ export class M2SAlarmPheromones2 extends Mechanic {
         this.scheduling = options.scheduling || 'parallel';
 
         const effectShowTelegraph = (effect: Scheduled<Effect>) => {
-            console.log('alarm pheromones, bee - telegraph: ', effect);
+            // console.log('alarm pheromones, bee - telegraph: ', effect);
         };
 
         const effectPreSnapshot = (effect: Scheduled<Effect>) => {
-            console.log('alarm pheromones, bee - snapshot: ', effect);
+            // console.log('alarm pheromones, bee - snapshot: ', effect);
         };
 
         this.on('start-execute', () => {
@@ -32,7 +32,6 @@ export class M2SAlarmPheromones2 extends Mechanic {
 
         this.on('start-effect', ({ effect }) => {
             effect.item.on('start', () => {
-                console.log('START PHERE: ', effect);
                 (window as any).pheromones = effect;
             });
             effect.item.on('show-telegraph', effectShowTelegraph);
