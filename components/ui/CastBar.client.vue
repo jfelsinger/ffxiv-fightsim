@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 const props = defineProps<{
     percent?: number,
     name?: string,

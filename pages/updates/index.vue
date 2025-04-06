@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import dayjs from 'dayjs';
 useHead({
     title: 'Updates | XIV FIGHTSIM',
     meta: [
@@ -13,10 +12,6 @@ const { data: list } = await useAsyncData(() => {
         .select('title', 'description', 'path', 'datetime')
         .all();
 });
-
-function calendarTime(datetime: string | Date) {
-    return dayjs(datetime).calendar();
-}
 </script>
 
 <template>

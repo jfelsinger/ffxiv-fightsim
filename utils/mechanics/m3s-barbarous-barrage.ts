@@ -1,18 +1,9 @@
-import { getPosition } from '../positioning';
-
-import * as Bab from '@babylonjs/core';
-import {
-    type Scheduled,
-} from '../scheduled';
-import { Effect } from '../effects';
-
-export const DefaultMechanicSchedulingMode = 'parallel';
-
 import {
     Mechanic,
     type MechanicOptions,
 } from './';
 
+export const DefaultMechanicSchedulingMode = 'parallel';
 export type M3SBarbarousBarrageOptions = MechanicOptions & {
 };
 

@@ -1,12 +1,5 @@
-import * as Bab from '@babylonjs/core';
-import { Steering } from './steering';
-import { clamp, lerp } from './interpolation';
-import { getPosition } from './positioning';
-import { yalmsToM } from './conversions';
 import createMarkerMat from '../materials/enemy-marker';
-import { FightCollection } from './fight-collection';
 
-import Debug from 'debug';
 const debug = Debug('game:utils:boss');
 
 export type BossOptions = {

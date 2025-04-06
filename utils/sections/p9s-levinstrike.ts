@@ -1,7 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { getPosition } from '../positioning';
-import { addTag } from '../meta-helpers';
-
 import {
     FightSection,
     type SectionOptions,

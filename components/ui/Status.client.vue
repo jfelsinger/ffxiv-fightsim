@@ -1,10 +1,4 @@
 <script setup lang="ts">
-import {
-    type Status,
-    getStatusSeconds,
-} from '../../utils/status';
-
-
 const props = defineProps<{
     status: Status
     name?: string

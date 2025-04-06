@@ -1,4 +1,3 @@
-import { Clock } from '../utils/clock';
 export function useWorldClock() {
 
     const worldTimeScaling = useState<number>('worldTimeScaling', () => 1.0);

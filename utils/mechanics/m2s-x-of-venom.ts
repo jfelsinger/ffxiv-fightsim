@@ -1,17 +1,9 @@
-import * as Bab from '@babylonjs/core';
-import {
-    type Scheduled,
-} from '../scheduled';
-import { Effect } from '../effects';
-import { useState } from '#imports';
-
-export const DefaultMechanicSchedulingMode = 'parallel';
-
 import {
     Mechanic,
     type MechanicOptions,
 } from './';
 
+export const DefaultMechanicSchedulingMode = 'parallel';
 export type M2SXOfVenomOptions = MechanicOptions & {
 };
 

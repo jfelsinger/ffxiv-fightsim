@@ -1,12 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { parseNumber } from '../parse-number';
-import { decodeEffect } from '../decode-fight';
-
-import {
-    AoeGroupEffect,
-    type AoeGroupEffectOptions,
-} from './aoe-group';
-
 export type StageCastEffectOptions = AoeGroupEffectOptions & {
     telegraph: 'cardinals' | 'intercardinals'
 };

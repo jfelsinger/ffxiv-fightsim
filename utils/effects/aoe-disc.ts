@@ -1,4 +1,3 @@
-import * as Bab from '@babylonjs/core';
 import createAoeMat from '../../materials/roundAoe';
 
 import {

@@ -1,20 +1,9 @@
-import { getPosition } from '../positioning';
-import { useState } from '#imports';
-
-import * as Bab from '@babylonjs/core';
-import {
-    type Scheduled,
-} from '../scheduled';
-import { Effect } from '../effects';
-import { degToRads } from '../vector-helpers';
-
-export const DefaultMechanicSchedulingMode = 'parallel';
-
 import {
     Mechanic,
     type MechanicOptions,
 } from './';
 
+export const DefaultMechanicSchedulingMode = 'parallel';
 export type M3SInfernalSpinOptions = MechanicOptions & {
 };
 

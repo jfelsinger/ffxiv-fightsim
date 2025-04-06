@@ -1,16 +1,4 @@
 import { Mechanic } from '../mechanics';
-import { EventEmitter } from 'eventemitter3';
-import { Clock } from '../clock';
-import { FightCollection } from '../fight-collection';
-import { getBasicValues } from '../decode-fight';
-import type { ScheduledParent } from '../scheduled';
-
-import {
-    type ScheduleMode,
-    type Scheduled,
-    getScheduledDuration,
-    executeScheduled,
-} from '../scheduled';
 
 export const DefaultFightSectionSchedulingMode = 'sequential';
 

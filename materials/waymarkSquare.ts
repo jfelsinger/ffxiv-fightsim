@@ -5,12 +5,12 @@ import {
     Effect,
     ShaderMaterial,
     Scene,
-    Color3,
 } from '@babylonjs/core';
 
 Effect.ShadersStore['waymarkSquareVertexShader'] = vertShader;
 Effect.ShadersStore['waymarkSquareFragmentShader'] = fragShader;
 
+export { createShader as squareWaymarkMaterial };
 export default function createShader(scene: Scene, color?: Color3, shaderName = 'waymarkSquareShader') {
     let material = new ShaderMaterial(
         shaderName, scene,

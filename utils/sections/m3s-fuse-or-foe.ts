@@ -1,5 +1,3 @@
-import * as Bab from '@babylonjs/core';
-
 import {
     FightSection,
     type SectionOptions,

@@ -1,5 +1,3 @@
-import * as Bab from '@babylonjs/core';
-
 export function degToRads(deg: number) {
     return deg * (Math.PI / 180);
 }

@@ -1,15 +1,4 @@
-import { useState } from '#imports';
-import { createRingMesh } from '../ring';
 import createAoeMat from '../../materials/roundAoe';
-import { degToRads, isWithinRadius, getVectorThetaLength } from '../vector-helpers';
-import { yalmsToM } from '../conversions';
-import * as Bab from '@babylonjs/core';
-import { parseNumber } from '../parse-number';
-
-import {
-    Effect,
-    type EffectOptions,
-} from './';
 
 export type AoeRingEffectOptions = EffectOptions & {
     innerRadius?: number | string

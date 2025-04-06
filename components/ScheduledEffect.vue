@@ -1,14 +1,5 @@
 <script setup lang="ts">
 import * as YAML from 'yaml';
-import { decodeScheduledEffect } from '../utils/decode-fight';
-import {
-    type Scheduled,
-    getScheduledDuration,
-} from '../utils/scheduled';
-import { Fight, } from '../utils/fights';
-import { FightSection, } from '../utils/sections';
-import { Mechanic } from '../utils/mechanics';
-import { Effect, } from '../utils/effects';
 
 const props = defineProps<{
     fight: Fight,
@@ -114,7 +105,8 @@ function onSave() {
                 <progress class="progress" :value="elapsedPercent" max="100"></progress>
             </div>
             <CodeButton @open="() => resetEncoded(true)" class=" dropdown-right float-right relative z-30">
-                <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language" v-model="encoded" />
+                <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language"
+                    v-model="encoded" />
             </CodeButton>
         </div>
     </div>

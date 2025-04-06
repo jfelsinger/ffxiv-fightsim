@@ -1,6 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { yalmsToM } from '../conversions';
-
 import {
     Fight,
     type FightOptions,

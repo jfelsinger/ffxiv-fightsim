@@ -48,6 +48,26 @@ export default defineNuxtConfig({
             'utils/arenas',
             'utils/effects',
         ],
+        presets: [
+            {
+                from: '@babylonjs/core',
+                imports: [
+                    'Vector2',
+                    'Vector3',
+                    'Vector4',
+                    'Color3',
+                    { name: '*', as: 'Bab' },
+                ],
+            },
+            {
+                from: 'eventemitter3',
+                imports: ['EventEmitter'],
+            },
+            {
+                from: 'debug',
+                imports: [{ name: 'default', as: 'Debug' }],
+            },
+        ],
     },
 
     vite: {

@@ -1,27 +1,4 @@
-import * as Bab from '@babylonjs/core';
-import { Steering } from './steering';
-import { EventEmitter } from 'eventemitter3';
-import { yalmsToM } from './conversions';
-import { clamp, lerp } from './interpolation';
 import createMarkerMat from '../materials/marker';
-import { Clock } from './clock';
-import {
-    type Status,
-    makeStatus,
-    addStatus,
-    removeStatus,
-    getStatus,
-    addStacks,
-    removeStacks,
-    clearStacks,
-} from './status';
-import {
-    useState,
-    useWorldClock,
-    type Ref,
-} from '#imports';
-
-import Debug from 'debug';
 const debug = Debug('game:utils:character');
 
 export type CharacterOptions = {

@@ -1,18 +1,3 @@
-import { EventEmitter } from 'eventemitter3';
-import { Clock } from '../clock';
-import type { ScheduledParent } from '../scheduled';
-
-import {
-    type ScheduleMode,
-    type Scheduled,
-    getScheduledDuration,
-    executeScheduled,
-} from '../scheduled';
-import { Effect } from '../effects';
-import { FightCollection } from '../fight-collection';
-import { getBasicValues } from '../decode-fight';
-import { useCastState } from '../../composables/castState';
-
 export const DefaultMechanicSchedulingMode = 'parallel';
 
 const castState = useCastState();

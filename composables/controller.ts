@@ -1,5 +1,3 @@
-import * as Bab from '@babylonjs/core';
-
 export function useController() {
     const leftStickVector = useState<Bab.Vector3>('left-stick-vector', () => Bab.Vector3.Zero());
     const rightStickVector = useState<Bab.Vector3>('right-stick-vector', () => Bab.Vector3.Zero());

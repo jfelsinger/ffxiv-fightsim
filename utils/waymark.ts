@@ -1,10 +1,6 @@
-import * as Bab from '@babylonjs/core';
-import type { PositionType, PositionOption } from './positioning';
-import { getPosition } from './positioning';
 import getWaymarkSquareMat from '~/materials/waymarkSquare';
 import getWaymarkRoundMat from '~/materials/waymarkRound';
 import { Fight } from './fights';
-import { isWithinRadius } from './vector-helpers';
 
 export type WaymarkName =
     | 'One'

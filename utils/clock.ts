@@ -1,8 +1,4 @@
-import { EventEmitter } from 'eventemitter3';
-
-import Debug from 'debug';
 const debug = Debug('game:utils:clock');
-
 
 type ClockTimeoutFunc = (time: number, clock: Clock) => void;
 type ClockTimeoutEntry = {

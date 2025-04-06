@@ -1,14 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { Character } from '../character';
-import { getPosition } from '../positioning';
-import { shuffleArray } from '../array-shuffle';
-import { rotateArray } from '../array-rotate';
-import { isWithinRadius } from '../vector-helpers';
-import { yalmsToM } from '../conversions';
-import { Indicator } from '../indicator';
-
-import { useTutorialMode } from '../../composables/tutorialMode';
-
 import {
     M2SFight,
     type M2SFightOptions,

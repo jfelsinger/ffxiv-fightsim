@@ -1,8 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import type { PositionType, PositionOption } from './positioning';
-import { getPosition } from './positioning';
-import { Fight } from './fights';
-
 export type MarkerOptions = {
     name?: string
     label: string

@@ -5,12 +5,12 @@ import {
     Effect,
     ShaderMaterial,
     Scene,
-    Color3,
 } from '@babylonjs/core';
 
 Effect.ShadersStore['arenaBoundsVertexShader'] = vertShader;
 Effect.ShadersStore['arenaBoundsFragmentShader'] = fragShader;
 
+export { createShader as arenaBoundsMaterial };
 export default function createShader(scene: Scene, color?: Color3, shaderName = 'arenaBoundsShader') {
     let material = new ShaderMaterial(
         shaderName, scene,

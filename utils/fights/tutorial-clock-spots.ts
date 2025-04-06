@@ -1,9 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { Character } from '../character';
-import { getPosition } from '../positioning';
-import { shuffleArray } from '../array-shuffle';
-import { yalmsToM } from '../conversions';
-
 import {
     Fight,
     type FightOptions,

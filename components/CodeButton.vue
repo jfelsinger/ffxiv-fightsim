@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 const dropdown = ref<HTMLElement | undefined>();
 const button = ref<HTMLElement | undefined>();
 const isOpen = ref(false);

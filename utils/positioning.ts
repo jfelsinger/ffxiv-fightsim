@@ -1,9 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { FightCollection } from './fight-collection';
-import { parseNumber } from './parse-number';
-import { rangex1 } from './interpolation';
-import { easingFunctions } from './easing';
-
 export type PositionType =
     | 'arena'
     | 'global'

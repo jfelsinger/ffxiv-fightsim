@@ -5,12 +5,12 @@ import {
     Effect,
     ShaderMaterial,
     Scene,
-    Color3,
 } from '@babylonjs/core';
 
 Effect.ShadersStore['p9sVertexShader'] = vertShader;
 Effect.ShadersStore['p9sFragmentShader'] = fragShader;
 
+export { createShader as mapMaterialP9S };
 export default function createShader(scene: Scene, color?: Color3, shaderName = 'p9sShader') {
     let material = new ShaderMaterial(
         shaderName, scene,

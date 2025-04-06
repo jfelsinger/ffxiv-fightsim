@@ -1,12 +1,3 @@
-import { yalmsToM } from '../conversions';
-import * as Bab from '@babylonjs/core';
-import { parseNumber } from '../parse-number';
-
-import {
-    Effect,
-    type EffectOptions,
-} from './';
-
 export type CastBarEffectOptions = EffectOptions & {
 };
 

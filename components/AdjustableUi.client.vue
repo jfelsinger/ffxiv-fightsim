@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { UseDraggable as Draggable } from '@vueuse/components';
 import { useStorage } from '@vueuse/core';
 
 const props = defineProps<{

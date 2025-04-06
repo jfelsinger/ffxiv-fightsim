@@ -1,6 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { rotateArray } from '../array-rotate';
-
 import {
     FightSection,
     type SectionOptions,

@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import * as YAML from 'yaml';
-
 import { yaml as langYaml } from '@codemirror/lang-yaml';
 import { json as langJson } from '@codemirror/lang-json';
-import type { Extension } from '@codemirror/state';
 import CodeMirror from 'vue-codemirror6';
 
 const props = withDefaults(defineProps<{
@@ -64,7 +62,6 @@ watch(language, (newValue: string, oldValue: string) => {
     }
 });
 
-const test = ref('');
 </script>
 
 <template>
@@ -78,9 +75,6 @@ const test = ref('');
         </div>
         <div class="overflow-y-scroll" :key="lang">
             <CodeMirror tab wrap basic :extensions="[cmLanguage]" :tab-size="2" :dark="false" v-model="code" />
-            <!--
-            <CodeMirror tab wrap basic :tab-size="2" :dark="false" v-model="code" :lang="cmLanguage" />
-            -->
         </div>
     </div>
 </template>

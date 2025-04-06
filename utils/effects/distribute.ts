@@ -1,16 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { parseNumber } from '../parse-number';
-import { decodeEffect } from '../decode-fight';
-import { addTag } from '../meta-helpers';
-import type { Character } from '../character';
-import { shuffleArray } from '../array-shuffle';
-import { rotateArray } from '../array-rotate';
-
-import {
-    Effect,
-    type EffectOptions,
-} from './';
-
 export type DistributionType =
     | 'ordered'
     | 'random'

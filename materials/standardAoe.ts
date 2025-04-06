@@ -5,12 +5,12 @@ import {
     Effect,
     ShaderMaterial,
     Scene,
-    Color3,
 } from '@babylonjs/core';
 
 Effect.ShadersStore['standardAoeVertexShader'] = vertShader;
 Effect.ShadersStore['standardAoeFragmentShader'] = fragShader;
 
+export { createShader as standardAoeMaterial };
 export default function createShader(scene: Scene, color?: Color3, shaderName = 'standardAoeShader') {
     let material = new ShaderMaterial(
         shaderName, scene,

@@ -1,13 +1,4 @@
 import * as YAML from 'yaml';
-import * as Bab from '@babylonjs/core';
-import { Clock } from './clock';
-import { FightCollection } from './fight-collection';
-import { parseNumber } from './parse-number';
-
-import {
-    type Scheduled,
-    isScheduled,
-} from './scheduled';
 
 import {
     Fight,

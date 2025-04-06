@@ -1,4 +1,3 @@
-import { Clock } from './clock';
 export type ScheduleMode = 'sequential' | 'parallel';
 export type Scheduled<T> = {
     item: T

@@ -1,10 +1,3 @@
-import { FightCollection } from './fight-collection';
-import * as Bab from '@babylonjs/core';
-import { Character } from './character';
-import type { PositionType, PositionOption } from './positioning';
-import { getPosition, getInterpolatedPosition } from './positioning';
-import { isWithinRadius } from './vector-helpers';
-
 export type IndicatorOptions = {
     size?: number
     label?: string

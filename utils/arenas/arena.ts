@@ -1,4 +1,3 @@
-import * as Bab from '@babylonjs/core';
 import { GridMaterial } from '@babylonjs/materials';
 import getArenaBoundsMat from '../../materials/arenaBounds';
 

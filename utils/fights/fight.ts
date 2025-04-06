@@ -1,23 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { Arena, type ArenaOptions } from '../arenas';
-import { arenasCollection } from '../arenas';
-import { EventEmitter } from 'eventemitter3';
-import { Clock } from '../clock';
-import { FightCollection } from '../fight-collection';
-import { decodeFight, getBasicValues } from '../decode-fight';
-import { FightSection } from '../sections';
-import type { PositionType, PositionOption } from '../positioning';
-import { getPosition } from '../positioning';
-import { type WaymarkName, Waymark } from '../waymark';
-
-import {
-    type ScheduleMode,
-    type Scheduled,
-    getScheduledDuration,
-    executeScheduled,
-} from '../scheduled';
-
-import Debug from 'debug';
 const debug = Debug('game:utils:fight');
 
 export const DefaultFightSchedulingMode = 'sequential';

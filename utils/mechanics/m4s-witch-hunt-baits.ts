@@ -1,16 +1,9 @@
-import * as Bab from '@babylonjs/core';
-import {
-    type Scheduled,
-} from '../scheduled';
-import { Effect } from '../effects';
-
-export const DefaultMechanicSchedulingMode = 'parallel';
-
 import {
     Mechanic,
     type MechanicOptions,
 } from './';
 
+export const DefaultMechanicSchedulingMode = 'parallel';
 export type BaitType = 'near' | 'far';
 export type BaitList = [BaitType, BaitType, BaitType, BaitType];
 export type M4SWitchHuntBaitsOptions = MechanicOptions & {

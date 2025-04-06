@@ -1,8 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { EventEmitter } from 'eventemitter3';
-import { useCastState } from '../../composables/castState';
-
-import Debug from 'debug';
 const debug = Debug('game:utils:effect');
 
 const castState = useCastState();

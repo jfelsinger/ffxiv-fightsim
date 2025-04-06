@@ -1,6 +1,3 @@
-import { type Status } from '../utils/status';
-
-type StatusDictionary = Record<string, Status[]>;
 export function useStatuses(name = 'player') {
     const statuses = useState<Status[] | undefined>(`statuses-${name}`, () => []);
     // const statusesLists = computed(() => Object.keys(statusDictionary.value));

@@ -1,9 +1,4 @@
-import * as Bab from '@babylonjs/core';
-import { Clock } from './clock';
-
-import Debug from 'debug';
 const debug = Debug('game:utils:steering');
-
 
 export type Force = {
     name: string

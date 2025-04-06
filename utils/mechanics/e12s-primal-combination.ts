@@ -1,20 +1,9 @@
 import {
-    type ScheduleMode,
-    type Scheduled,
-    getScheduledDuration,
-    executeScheduled,
-} from '../scheduled';
-import { Effect } from '../effects';
-import { FightCollection } from '../fight-collection';
-import { getBasicValues } from '../decode-fight';
-
-export const DefaultMechanicSchedulingMode = 'parallel';
-
-import {
     Mechanic,
     type MechanicOptions,
 } from './';
 
+export const DefaultMechanicSchedulingMode = 'parallel';
 export type E12SPrimalCombinationOptions = MechanicOptions & {
 };
 

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { lerp, rangex1 } from '../utils/interpolation';
 const {
     leftStickInvertX,
     leftStickInvertY,

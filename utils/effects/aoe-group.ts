@@ -1,7 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { parseNumber } from '../parse-number';
-import { decodeEffect } from '../decode-fight';
-
 import {
     Effect,
     type EffectOptions,

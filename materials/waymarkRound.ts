@@ -5,13 +5,12 @@ import {
     Effect,
     ShaderMaterial,
     Scene,
-    Color3,
 } from '@babylonjs/core';
-import * as Bab from '@babylonjs/core';
 
 Effect.ShadersStore['waymarkRoundVertexShader'] = vertShader;
 Effect.ShadersStore['waymarkRoundFragmentShader'] = fragShader;
 
+export { createShader as roundWaymarkMaterial };
 export default function createShader(scene: Scene, color?: Color3, shaderName = 'waymarkRoundShader') {
     let material = new ShaderMaterial(
         shaderName, scene,

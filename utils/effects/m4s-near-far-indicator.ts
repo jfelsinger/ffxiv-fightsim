@@ -1,12 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { parseNumber } from '../parse-number';
-import { rangex1 } from '../interpolation';
-
-import {
-    Effect,
-    type EffectOptions,
-} from './';
-
 export type M4SNearFarIndicatorEffectOptions = EffectOptions & {
 };
 

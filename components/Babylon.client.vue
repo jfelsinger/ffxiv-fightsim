@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import '@babylonjs/core/Debug/debugLayer';
 import '@babylonjs/inspector';
-import { Engine, Scene, Vector3 } from '@babylonjs/core';
-import * as Bab from '@babylonjs/core';
+import { Engine, Scene } from '@babylonjs/core';
 
 (window as any).Bab = Bab;
 
@@ -13,7 +12,6 @@ const props = defineProps<{
     skipCharacter?: boolean,
 }>();
 
-import Debug from 'debug';
 const debug = Debug('game');
 
 const playerTimeScaling = ref(1.0);

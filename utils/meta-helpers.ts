@@ -1,4 +1,3 @@
-import { Character } from './character';
 export type Tags = Set<string>;
 export type Stacks = Partial<Record<string, number>>;
 

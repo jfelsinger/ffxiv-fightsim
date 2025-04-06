@@ -5,12 +5,12 @@ import {
     Effect,
     ShaderMaterial,
     Scene,
-    Color3,
 } from '@babylonjs/core';
 
 Effect.ShadersStore['enemyMarkerVertexShader'] = vertShader;
 Effect.ShadersStore['enemyMarkerFragmentShader'] = fragShader;
 
+export { createShader as enemyMarkerMaterial };
 export default function createShader(scene: Scene, color?: Color3, shaderName = 'enemyMarkerShader') {
     let material = new ShaderMaterial(
         shaderName, scene,

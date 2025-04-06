@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { QueryBuilderParams } from '@nuxt/content/types';
-import { Fight } from '../utils/fights';
 
 const route = useRoute();
 const tutorial = route.params.tutorial;

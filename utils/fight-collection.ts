@@ -1,5 +1,3 @@
-import * as Bab from '@babylonjs/core';
-
 export type CharacterName =
     | 'player'
     | `party.${number}`

@@ -1,13 +1,5 @@
 <script setup lang="ts">
 import * as YAML from 'yaml';
-import { decodeScheduledMechanic } from '../utils/decode-fight';
-import {
-    type Scheduled,
-    getScheduledDuration,
-} from '../utils/scheduled';
-import { Fight, } from '../utils/fights';
-import { FightSection, } from '../utils/sections';
-import { Mechanic } from '../utils/mechanics';
 
 const props = defineProps<{
     fight: Fight,
@@ -119,7 +111,8 @@ function updateEffect(effect: Scheduled<Effect>, i: number) {
             <h3 class="min-w-fit">Mechanic {{ index + 1 }}.</h3>
             <progress class="progress flex-shrink" :value="elapsedPercent" max="100"></progress>
             <CodeButton @open="() => resetEncoded(true)" class=" dropdown-right float-right relative z-30">
-                <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language" v-model="encoded" />
+                <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language"
+                    v-model="encoded" />
             </CodeButton>
         </div>
 

@@ -1,6 +1,4 @@
-import * as Bab from '@babylonjs/core';
 import { GridMaterial } from '@babylonjs/materials';
-import { yalmsToM } from '../conversions';
 import { default as createPolarGrid } from '../../materials/polarGrid';
 import { default as createP9SGrid } from '../../materials/p9s';
 

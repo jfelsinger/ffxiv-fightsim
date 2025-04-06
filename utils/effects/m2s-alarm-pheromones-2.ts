@@ -1,13 +1,3 @@
-import * as Bab from '@babylonjs/core';
-import { parseNumber } from '../parse-number';
-import { decodeEffect } from '../decode-fight';
-import { getPosition } from '../positioning';
-
-import {
-    AoeGroupEffect,
-    type AoeGroupEffectOptions,
-} from './aoe-group';
-
 export type M2SAlarmPheromones2Options = AoeGroupEffectOptions & {
     rotation: number
 };

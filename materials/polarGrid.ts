@@ -5,12 +5,12 @@ import {
     Effect,
     ShaderMaterial,
     Scene,
-    Color3,
 } from '@babylonjs/core';
 
 Effect.ShadersStore['polarGridVertexShader'] = vertShader;
 Effect.ShadersStore['polarGridFragmentShader'] = fragShader;
 
+export { createShader as polarGridMaterial };
 export default function createShader(scene: Scene, color?: Color3, shaderName = 'polarGridShader') {
     let material = new ShaderMaterial(
         shaderName, scene,

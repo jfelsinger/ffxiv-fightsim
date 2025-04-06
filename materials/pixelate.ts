@@ -5,7 +5,6 @@ import {
     Effect,
     ShaderMaterial,
     Scene,
-    Vector4,
 } from '@babylonjs/core';
 
 export { vertexShader as vert, fragmentShader as frag };
