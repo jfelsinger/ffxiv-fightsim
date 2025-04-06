@@ -70,14 +70,14 @@ const test = ref('');
 <template>
     <div class="codemirror-container bg-slate-200 max-h-[480px] flex flex-column">
         <div class="p-1 border-b-[1px] border-b-slate-300 gap-2 flex items-center justify-between">
-            <select class="select select-bordered select-xs w-20 z-20 xabsolute top-1 right-5" v-model="language">
+            <select class="select select-bordered select-xs w-20 z-20" v-model="language">
                 <option>yaml</option>
                 <option>json</option>
             </select>
             <button ref="saveButton" class="btn btn-sm" @click.stop.prevent="save">save</button>
         </div>
         <div class="overflow-y-scroll" :key="lang">
-            <CodeMirror :extensions="[cmLanguage]" tab wrap :tab-size="2" :dark="false" v-model="code" />
+            <CodeMirror tab wrap basic :extensions="[cmLanguage]" :tab-size="2" :dark="false" v-model="code" />
             <!--
             <CodeMirror tab wrap basic :tab-size="2" :dark="false" v-model="code" :lang="cmLanguage" />
             -->
