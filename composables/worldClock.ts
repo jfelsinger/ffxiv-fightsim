@@ -6,6 +6,7 @@ export function useWorldClock() {
     const windowClock: Clock | undefined = (window as any).__worldClock;
     const windowClockSet = !!windowClock;
     const worldClock = windowClock || new Clock({ name: 'world', paused: true, scaling: worldTimeScaling.value });
+
     (window as any).__worldClock = worldClock;
 
     const worldTime = useState<number>('worldTime', () => worldClock.time || 0);
