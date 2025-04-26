@@ -175,7 +175,7 @@ onBeforeUnmount(() => {
 <template>
     <div class="fight-ui__container">
         <ControllerSettings />
-        <TimeBar :fight="fight" @reset="reset" />
+        <TimeBar :fight="fight" @reset="reset" @scale-time="(val) => emit('scale-time', val)" />
 
         <div class="fight__sidebar z-50">
             <div class="fight__sidebar-content p-2 z-70">

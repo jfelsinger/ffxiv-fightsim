@@ -7,10 +7,19 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps<{
-    fight: Fight,
+    clock?: Clock,
+    fight?: Fight,
+    overrideDuration?: number,
 }>();
 
-const isPaused = ref(true);
+const { worldClock, worldTime } = useWorldClock();
+const clock = computed(() => props.clock || props.fight?.clock || worldClock);
+const time = ref(clock.value?.time || 0);
+const isPaused = ref<boolean>(clock.value?.isPaused ?? true);
+
+clock.value?.on('start', () => { isPaused.value = false });
+clock.value?.on('pause', () => { isPaused.value = true });
+clock.value?.on('time-change', (newTime: number) => { time.value = newTime });
 
 const globalTelegraph = useState<number>('telegraph', () => 1.0);
 const telegraph = computed({
@@ -24,14 +33,12 @@ const telegraph = computed({
 });
 
 function togglePause() {
-    if (isPaused.value) {
-        if (props.fight?.clock) {
-            props.fight.clock.start();
+    if (clock.value) {
+        if (clock.value.isPaused) {
+            clock.value.start();
             emit('start');
-        }
-    } else {
-        if (props.fight?.clock) {
-            props.fight.clock.pause();
+        } else {
+            clock.value.pause();
             emit('pause');
         }
     }
@@ -45,18 +52,20 @@ function toggleTelegraph() {
     }
 }
 
-const { worldClock, worldTime } = useWorldClock();
 const currentMinutes = computed(() => ('00' + (Math.floor(worldTime.value / 1000 / 60) % 99)).slice(-2));
 const currentSeconds = computed(() => ('00' + (Math.floor(worldTime.value / 1000) % 60)).slice(-2));
 const {
     duration,
     elapsedPercent
 } = useFightDuration(props.fight);
+if (props.overrideDuration) {
+    duration.value = props.overrideDuration;
+}
 
 const inputElapsedPercent = computed({
     get() { return elapsedPercent.value; },
     set(value: number) {
-        worldClock.setTime(duration.value * (value / 100))
+        clock.value.setTime(duration.value * (value / 100))
     }
 });
 

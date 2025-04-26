@@ -104,11 +104,13 @@ export class Fight extends EventEmitter {
         const len = this.sections.length;
         for (let i = 0; i < len; i++) {
             const section = this.sections[i];
-            section.item.on('effect-hit', (data) => {
-                this.emit('effect-hit', {
-                    ...data,
+            if (section) {
+                section.item.on('effect-hit', (data: any) => {
+                    this.emit('effect-hit', {
+                        ...data,
+                    });
                 });
-            });
+            }
         }
 
         this.name = options.name || options.title || 'fight';
