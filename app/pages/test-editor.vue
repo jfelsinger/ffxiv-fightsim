@@ -91,6 +91,6 @@ const fightData = ref({
 
 <template>
     <div class="p-4">
-        <FightEditor v-model="fightData" />
+        <EditorsFight v-model="fightData" />
     </div>
 </template>
