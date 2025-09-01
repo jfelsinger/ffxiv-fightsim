@@ -1,8 +1,12 @@
 import glsl from 'vite-plugin-glsl';
+import tailwindcss from '@tailwindcss/vite';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     devtools: { enabled: true },
+    future: {
+        compatibilityVersion: 4,
+    },
 
     runtimeConfig: {
         public: {
@@ -43,12 +47,37 @@ export default defineNuxtConfig({
             'stores',
             'materials',
             'glsl',
+            'utils',
+            'utils/arenas',
+            'utils/effects',
+        ],
+        presets: [
+            {
+                from: '@babylonjs/core',
+                imports: [
+                    'Vector2',
+                    'Vector3',
+                    'Vector4',
+                    'Color3',
+                    { name: '*', as: 'Bab' },
+                ],
+            },
+            {
+                // from: 'eventemitter3',
+                from: 'tseep',
+                imports: ['EventEmitter'],
+            },
+            {
+                from: 'debug',
+                imports: [{ name: 'default', as: 'Debug' }],
+            },
         ],
     },
 
     vite: {
         plugins: [
             glsl(),
+            tailwindcss()
         ],
         css: {
             preprocessorOptions: {
@@ -57,15 +86,18 @@ export default defineNuxtConfig({
                         `
 @use 'sass:math';
 @use 'sass:color';
-@import '~/assets/styles/vars.scss';
 `,
                 },
             },
         },
     },
 
+    dayjs: {
+        plugins: ['duration', 'calendar'],
+    },
+
     modules: [
-        '@nuxtjs/tailwindcss',
+        // '@nuxtjs/tailwindcss',
         // [
         //     '@pinia/nuxt',
         //     {
@@ -76,8 +108,9 @@ export default defineNuxtConfig({
         // '@pinia-plugin-persistedstate/nuxt',
         '@vueuse/nuxt',
         [
-            'nuxt-icon',
+            '@nuxt/icon',
             {
+                size: '1.2rem',
                 class: 'nx-icon',
                 // customCollections: [
                 //     {
@@ -99,12 +132,7 @@ export default defineNuxtConfig({
                 // ],
             },
         ],
-        [
-            'dayjs-nuxt',
-            {
-                plugins: ['duration'],
-            }
-        ],
+        'dayjs-nuxt',
         [
             '@nuxt/content',
             {
@@ -114,6 +142,11 @@ export default defineNuxtConfig({
             },
         ],
         '@nuxt/image',
+        [
+            '@nuxt/eslint',
+            {
+            }
+        ],
     ],
 
     compatibilityDate: '2024-08-01',
