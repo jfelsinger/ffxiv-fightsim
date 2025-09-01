@@ -255,7 +255,7 @@ export class Character extends EventEmitter {
     }
 
     makeMarker(charMat: Bab.StandardMaterial) {
-        const markerSize = yalmsToM(1.25);
+        const markerSize = yalmsToM(1.04);
         const markerMat = createMarkerMat(this.scene, charMat.diffuseColor);
         const marker = Bab.MeshBuilder.CreatePlane(`${this.name}-marker`, { height: markerSize, width: markerSize }, this.scene);
         marker.metadata = {

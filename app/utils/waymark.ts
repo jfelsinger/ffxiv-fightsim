@@ -56,8 +56,13 @@ export type WaymarkOptions = {
     positionType?: PositionType
 }
 
-const SquareWaymarkRadius = 1.875;
-const RoundWaymarkRadius = 1.455;
+// const SquareWaymarkRadius = 1.875;
+// const RoundWaymarkRadius = 1.455;
+
+// const SquareWaymarkRadius = 0.625;
+// const RoundWaymarkRadius = 0.725;
+const SquareWaymarkRadius = 1.6;
+const RoundWaymarkRadius = 1.25;
 
 export class Waymark {
     name: WaymarkName;
