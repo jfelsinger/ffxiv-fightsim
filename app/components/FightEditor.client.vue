@@ -10,7 +10,8 @@ const workingCopy = ref<FightOptions>(JSON.parse(JSON.stringify(model.value)));
         <div class="p-2 bg-gray-50 rounded-md">
             <p>{{ workingCopy.name }}</p>
 
-            <VueDraggable class="cursor-move w-full flex flex-col gap-1" v-model="workingCopy.sections"
+            <VueDraggable class="cursor-move w-full flex flex-col gap-1"
+                          v-model="workingCopy.sections"
                 group="sections">
                 <div class="rounded-sm p-1 bg-gray-100 flex flex-col gap-1" v-for="section in workingCopy.sections"
                     :key="section.item.name">

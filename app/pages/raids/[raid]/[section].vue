@@ -22,8 +22,8 @@ watch(showInfo, (newValue, oldValue) => {
         <Babylon :fight-data="fightData" :info-data="data?.info" :show-ui="true" />
 
         <div class="drawer drawer-end info-drawer z-[999] absolute top-0 right-0" v-if="data?.info">
-            <input v-if="infoExists" id="info-drawer" type="checkbox" v-model="showInfo" class="drawer-toggle" ref="input"
-                :checked="showInfo" />
+            <input v-if="infoExists" id="info-drawer" type="checkbox" v-model="showInfo" class="drawer-toggle"
+                ref="input" :checked="showInfo" />
             <div v-if="infoExists" class="drawer-content">
                 <label for="info-drawer"
                     class="drawer-button font-bold text-lg btn btn-ghost btn-sm absolute top-1 right-1">

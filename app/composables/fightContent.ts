@@ -36,6 +36,13 @@ export function useFightContent(fightParams?: Array<string>) {
             info: await infoPromise,
         };
 
+        if (JSON.stringify(result.fight).includes('bject Object')) {
+            console.warn('useFightContent() - result.fight improperly queried', result.fight);
+        }
+        if (JSON.stringify(result.info).includes('bject Object')) {
+            console.warn('useFightContent() - result.info improperly queried', result.info);
+        }
+
         return result;
     });
 }

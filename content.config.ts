@@ -32,10 +32,10 @@ export default defineContentConfig({
                 title: z.any().optional(),
                 description: z.any().optional(),
 
-                arena: z.any().optional(),
+                arena: z.record(z.string(), z.any()).optional(),
                 arenaType: z.any().optional(),
                 scheduling: z.any().optional(),
-                sections: z.any().optional(),
+                sections: z.array(z.any()).optional(),
                 waymarks: z.any().optional(),
                 waymarksPositionType: z.any().optional(),
                 waymarkPositionType: z.any().optional(),

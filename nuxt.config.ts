@@ -142,6 +142,11 @@ export default defineNuxtConfig({
             },
         ],
         '@nuxt/image',
+        [
+            '@nuxt/eslint',
+            {
+            }
+        ],
     ],
 
     compatibilityDate: '2024-08-01',
