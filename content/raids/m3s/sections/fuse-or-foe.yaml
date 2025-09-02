@@ -49,7 +49,7 @@ sections:
                   innerRadius: 0
                   thetaLength: pi / 2
                   angle: 45.5
-                  yalms: 9.5
+                  yalms: 8.0
                   positionType: arena
                   aoes:
                     - name: aoe-disc
@@ -62,8 +62,8 @@ sections:
                   name: aoe-group
                   duration: 3650
                   shiftSnapshot: 300
-                  outerRadius: 19
-                  innerRadius: 9.55
+                  outerRadius: 16
+                  innerRadius: 8.035
                   positionType: arena
                   segments: 38
                   aoes:
@@ -78,7 +78,7 @@ sections:
                   duration: 3650
                   shiftSnapshot: 300
                   outerRadius: 29
-                  innerRadius: 19
+                  innerRadius: 16
                   positionType: arena
                   segments: 55
                   aoes:
@@ -102,7 +102,7 @@ sections:
                   innerRadius: 0
                   thetaLength: pi / 2
                   angle: 45.5
-                  yalms: 9.5
+                  yalms: 8.0
                   positionType: arena
                   aoes:
                     - name: aoe-disc
@@ -115,8 +115,8 @@ sections:
                   name: aoe-group
                   duration: 3650
                   shiftSnapshot: 300
-                  outerRadius: 19
-                  innerRadius: 9.55
+                  outerRadius: 16
+                  innerRadius: 8.035
                   positionType: arena
                   segments: 38
                   aoes:
@@ -131,7 +131,7 @@ sections:
                   duration: 3650
                   shiftSnapshot: 300
                   outerRadius: 29
-                  innerRadius: 19
+                  innerRadius: 16
                   positionType: arena
                   segments: 55
                   aoes:
@@ -155,7 +155,7 @@ sections:
         #           innerRadius: 0
         #           thetaLength: pi / 2
         #           angle: 45.5
-        #           yalms: 9.5
+        #           yalms: 8.0
         #           positionType: arena
         #           aoes:
         #             - name: aoe-disc
@@ -168,8 +168,8 @@ sections:
         #           name: aoe-group
         #           duration: 2250
         #           shiftSnapshot: 300
-        #           outerRadius: 19
-        #           innerRadius: 9.55
+        #           outerRadius: 16
+        #           innerRadius: 8.035
         #           positionType: arena
         #           segments: 38
         #           aoes:
@@ -184,7 +184,7 @@ sections:
         #           duration: 2250
         #           shiftSnapshot: 300
         #           outerRadius: 29
-        #           innerRadius: 19
+        #           innerRadius: 16
         #           positionType: arena
         #           segments: 55
         #           aoes:
@@ -208,7 +208,7 @@ sections:
         #           innerRadius: 0
         #           thetaLength: pi / 2
         #           angle: 45.5
-        #           yalms: 9.5
+        #           yalms: 8.0
         #           positionType: arena
         #           aoes:
         #             - name: aoe-disc
@@ -221,8 +221,8 @@ sections:
         #           name: aoe-group
         #           duration: 2250
         #           shiftSnapshot: 300
-        #           outerRadius: 19
-        #           innerRadius: 9.55
+        #           outerRadius: 16
+        #           innerRadius: 8.035
         #           positionType: arena
         #           segments: 38
         #           aoes:
@@ -237,7 +237,7 @@ sections:
         #           duration: 2250
         #           shiftSnapshot: 300
         #           outerRadius: 29
-        #           innerRadius: 19
+        #           innerRadius: 16
         #           positionType: arena
         #           segments: 55
         #           aoes:
