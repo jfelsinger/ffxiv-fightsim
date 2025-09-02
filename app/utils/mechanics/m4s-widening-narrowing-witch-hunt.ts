@@ -30,44 +30,46 @@ export class M4SWideningNarrowingWitchHunt extends Mechanic {
                 this.options.castName = 'Narrowing Witch Hunt';
             }
 
+            // const ringRadius: ringRadius;
+            const ringRadius = 10;
             const hit1 = this.effects.find((m) => m.label === 'inner-outer-1');
             if (hit1) {
                 if (huntType.value === 'widening') {
                     hit1.item.innerRadius = 0;
-                    hit1.item.outerRadius = 12.925;
+                    hit1.item.outerRadius = ringRadius;
                 } else {
-                    hit1.item.innerRadius = 12.925;
+                    hit1.item.innerRadius = ringRadius;
                     hit1.item.outerRadius = 60;
                 }
             }
             const hit2 = this.effects.find((m) => m.label === 'inner-outer-2');
             if (hit2) {
                 if (huntType.value === 'widening') {
-                    hit2.item.innerRadius = 12.925;
+                    hit2.item.innerRadius = ringRadius;
                     hit2.item.outerRadius = 60;
                 } else {
                     hit2.item.innerRadius = 0;
-                    hit2.item.outerRadius = 12.925;
+                    hit2.item.outerRadius = ringRadius;
                 }
             }
             const hit3 = this.effects.find((m) => m.label === 'inner-outer-3');
             if (hit3) {
                 if (huntType.value === 'widening') {
                     hit3.item.innerRadius = 0;
-                    hit3.item.outerRadius = 12.925;
+                    hit3.item.outerRadius = ringRadius;
                 } else {
-                    hit3.item.innerRadius = 12.925;
+                    hit3.item.innerRadius = ringRadius;
                     hit3.item.outerRadius = 60;
                 }
             }
             const hit4 = this.effects.find((m) => m.label === 'inner-outer-4');
             if (hit4) {
                 if (huntType.value === 'widening') {
-                    hit4.item.innerRadius = 12.925;
+                    hit4.item.innerRadius = ringRadius;
                     hit4.item.outerRadius = 60;
                 } else {
                     hit4.item.innerRadius = 0;
-                    hit4.item.outerRadius = 12.925;
+                    hit4.item.outerRadius = ringRadius;
                 }
             }
         });
