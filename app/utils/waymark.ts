@@ -138,6 +138,7 @@ export class Waymark {
             },
             this.fight.collection.scene
         )
+        mesh.renderingGroupId = 2;
         mesh.position = position?.clone();
         mesh.position.y += bodyHeight / 2;
         mesh.position.y += 0.1;

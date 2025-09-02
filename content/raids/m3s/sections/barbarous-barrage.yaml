@@ -35,9 +35,9 @@ sections:
                   name: kb-tower
                   duration: 10000
                   shiftSnapshot: 150
-                  yalms: 4.8
+                  yalms: 4.05
                   stacks: 4
-                  power: 24.25
+                  power: 20.57
                   position: 0.5825,0
                   positionType: arena
               - label: kb-tower-m2
@@ -46,9 +46,9 @@ sections:
                   name: kb-tower
                   duration: 10000
                   shiftSnapshot: 150
-                  yalms: 4.8
+                  yalms: 4.05
                   stacks: 4
-                  power: 24.25
+                  power: 20.57
                   position: -0.5825,0
                   positionType: arena
 
@@ -59,9 +59,9 @@ sections:
                   name: kb-tower
                   duration: 10000 + 3000
                   shiftSnapshot: 150
-                  yalms: 4.8
+                  yalms: 4.05
                   stacks: 2
-                  power: 20.5
+                  power: 20.45
                   position: 0.5825,0.5825
                   positionType: arena
               - label: kb-tower-c2
@@ -70,9 +70,9 @@ sections:
                   name: kb-tower
                   duration: 10000 + 3000
                   shiftSnapshot: 150
-                  yalms: 4.8
+                  yalms: 4.05
                   stacks: 2
-                  power: 20.5
+                  power: 20.45
                   position: -0.5825,0.5825
                   positionType: arena
               - label: kb-tower-c3
@@ -81,9 +81,9 @@ sections:
                   name: kb-tower
                   duration: 10000 + 3000
                   shiftSnapshot: 150
-                  yalms: 4.8
+                  yalms: 4.05
                   stacks: 2
-                  power: 20.5
+                  power: 20.45
                   position: 0.5825,-0.5825
                   positionType: arena
               - label: kb-tower-c4
@@ -92,9 +92,9 @@ sections:
                   name: kb-tower
                   duration: 10000 + 3000
                   shiftSnapshot: 150
-                  yalms: 4.8
+                  yalms: 4.05
                   stacks: 2
-                  power: 20.5
+                  power: 20.45
                   position: -0.5825,-0.5825
                   positionType: arena
 
@@ -105,6 +105,6 @@ sections:
                   name: kb-tower
                   duration: 10250
                   shiftSnapshot: 150
-                  yalms: 4.8
+                  yalms: 4.05
                   stacks: 8
-                  power: 18.5
+                  power: 15.65

@@ -263,13 +263,15 @@ export class Character extends EventEmitter {
             character: this,
             label: this.name,
         };
+
+        // marker.renderingGroupId = 0;
         marker.material = markerMat;
         marker.rotation.x = Math.PI / 2;
 
         this.collider.setParent(marker);
         this.body.setParent(marker);
         marker.rotation.z = Math.PI / 2;
-        marker.position.y += 0.05;
+        marker.position.y += 0.065;
         marker.bakeCurrentTransformIntoVertices();
         marker.checkCollisions = true;
         marker.isPickable = false;

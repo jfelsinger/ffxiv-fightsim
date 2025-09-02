@@ -31,10 +31,10 @@ export class M3SBarbarousBarrage extends Mechanic {
                 const m2 = this.effects.find(e => e.label === 'kb-tower-m2');
                 if (m1 && m2) {
                     console.log('set middle kbs horizontal: ', m1, m2);
-                    m1.item.options.position = '0,0.5';
-                    m1.item.position = '0,0.5';
-                    m2.item.options.position = '0,-0.5';
-                    m2.item.position = '0,-0.5';
+                    m1.item.options.position = '0,0.5825';
+                    m1.item.position = '0,0.5825';
+                    m2.item.options.position = '0,-0.5825';
+                    m2.item.position = '0,-0.5825';
                 }
             }
 
