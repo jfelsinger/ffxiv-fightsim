@@ -15,22 +15,22 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
         options.aoes = [
             {
                 name: 'aoe-square',
-                yalms: 10.5,
+                yalms: 10,
                 width: 62,
                 position: '0,0.365',
             }, {
                 name: 'aoe-square',
-                yalms: 10.5,
+                yalms: 10,
                 height: 62,
                 position: '0.365,0',
             }, {
                 name: 'aoe-square',
-                yalms: 10.5,
+                yalms: 10,
                 width: 62,
                 position: '0,-0.365',
             }, {
                 name: 'aoe-square',
-                yalms: 10.5,
+                yalms: 10,
                 height: 62,
                 position: '-0.365,0',
             },

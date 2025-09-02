@@ -9,8 +9,9 @@ export function useTutorialMode() {
     const canContinueTutorial = useState<boolean>('can-continue-tutorial', () => true);
 
     function showTutorialStep(step: number, force = false) {
+        console.log('showTutorialStep', { step, force, isTutorial: isTutorial.value, isVisible: isTutorialVisible.value });
         if (isTutorial || force) {
-            if (!isTutorial && force) {
+            if (!isTutorial?.value && force) {
                 isTutorial.value = true;
             }
 

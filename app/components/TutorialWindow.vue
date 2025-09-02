@@ -36,18 +36,23 @@ function next() {
     });
 }
 
-const { data: list } = await useAsyncData(route.path, () => {
-    return queryCollection('content').where('path', 'LIKE', `/tutorials/${tutorial}-steps%`)
+const { data: list } = await useAsyncData(`${route.path}-steps`, async () => {
+    console.log('Get tutorial steps data...', tutorial);
+    const tutorialData = await queryCollection('content').where('path', 'LIKE', `/tutorials/${tutorial}-steps%`)
         .order('step', 'ASC')
-        .select('title', 'description', 'path', 'datetime')
+        // .select('title', 'step', 'description', 'DESC', 'path', 'datetime')
         .all();
+
+    console.log('Tutorial steps data: ', tutorialData);
+    return tutorialData;
 });
+console.log('Tutorial steps list: ', list.value);
 
 </script>
 
 <template>
     <div v-show="isTutorialModeOn && isTutorialVisible && tutorialStep" class="tutorial-window__container">
-        <div v-for="step in list" class="card bg-base-100/45 glass" :key="step._path">
+        <div v-for="step in list" class="card bg-base-100/45 glass" :key="step._path" :data-step="step?.step || -1">
             <div v-if="isTutorialModeOn && isTutorialVisible && tutorialStep === step.step" class="card-body">
                 <h2 class="card-title">
                     {{ step.title }}

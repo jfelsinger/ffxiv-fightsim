@@ -118,7 +118,7 @@ sections:
                   positionType: arena
                   aoes:
                     - name: aoe-ring
-                      yalms: 14.325
+                      yalms: 13.5
                       outerRadius: 30
                       innerRadius: 6.5
                       thetaLength: pi * 2
