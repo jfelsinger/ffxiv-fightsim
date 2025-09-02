@@ -31,12 +31,18 @@ export class TetherEffect extends Effect {
 
     makeAoe() {
         const fromPosition =
-            (this.collection.characters[this.from as any] ||
-                this.collection.getMeshByName(this.from))?.position || Bab.Vector3.Zero();
+            ((this.collection.characters[this.from as any] ||
+                this.collection.getMeshByName(this.from))?.position)?.clone() || Bab.Vector3.Zero();
+
         const toPosition =
             (this.to && (this.collection.characters[this.to as any] ||
-                this.collection.getMeshByName(this.to))?.position) || this.getPosition() || Bab.Vector3.Zero();
+                this.collection.getMeshByName(this.to))?.position)?.clone() || this.getPosition() || Bab.Vector3.Zero();
 
+        const direction = toPosition.subtract(fromPosition).normalize().scale(1.45);
+
+        console.log('makeAoe() - ', fromPosition, toPosition);
+
+        // const emitter = new Bab.CustomParticleEmitter();
         const emitter = new Bab.CustomParticleEmitter();
         let id = 0;
 
@@ -49,10 +55,16 @@ export class TetherEffect extends Effect {
         }
 
         emitter.particlePositionGenerator = (_index, _particle, out) => {
-            out.x = fromPosition.x + Math.sin(Math.random() * 10) * spread.x;
-            out.y = fromPosition.y + Math.cos(Math.random() * 10) * spread.y;
-            out.z = fromPosition.z + Math.sin(Math.random() * 10) * spread.z;
+            out.x = Math.sin(Math.random() * 10) * spread.x;
+            out.y = Math.cos(Math.random() * 10) * spread.y;
+            out.z = Math.sin(Math.random() * 10) * spread.z;
             id += 1;
+        };
+
+        emitter.particleDirectionGenerator = (_index, _particle, out) => {
+            out.x = direction.x;
+            out.y = direction.y;
+            out.z = direction.z;
         };
 
         emitter.particleDestinationGenerator = (_index, _particle, out) => {
@@ -62,30 +74,35 @@ export class TetherEffect extends Effect {
         };
 
         const particles = Bab.ParticleHelper.CreateDefault(fromPosition);
-        particles.emitter = Bab.Vector3.Zero();
+        // const particles = new Bab.GPUParticleSystem('tether-particles', { capacity: 1500 }, this.collection.scene);
+        particles.direction1 = toPosition.subtract(fromPosition);
+        particles.direction2 = toPosition.subtract(fromPosition);
+
+        // particles.emitter = Bab.Vector3.Zero();
+        particles.emitter = fromPosition;
         particles.particleEmitterType = emitter;
+
+        particles.maxSize = 1.25;
+        particles.minSize = 0.25;
         if (this.from === 'ifrit') {
             particles.maxSize = 2.5;
             particles.minSize = 0.25;
         } else if (this.from === 'garuda') {
             particles.maxSize = 1.25;
             particles.minSize = 0.25;
-        } else {
-            particles.maxSize = 1.25;
-            particles.minSize = 0.25;
         }
-        particles.maxEmitPower = 0.95;
+        particles.minEmitPower = 0.90;
         if (this.from === 'ifrit') {
             particles.minEmitPower = 0.70;
         } else if (this.from === 'garuda') {
             particles.minEmitPower = 0.90;
-        } else {
-            particles.minEmitPower = 0.90;
         }
+        particles.maxEmitPower = 0.95;
         particles.updateSpeed = 0.25;
         particles.maxLifeTime = 17.45;
         particles.minLifeTime = 17.20;
         particles.preWarmCycles = 100;
+        particles.isLocal = true;
 
         if (this.from === 'ifrit') {
             particles.color1 = Bab.Color4.FromInts(211, 108, 79, 0.8 * 255);
@@ -107,17 +124,21 @@ export class TetherEffect extends Effect {
 
         particles.billboardMode = Bab.ParticleSystem.BILLBOARDMODE_STRETCHED;
 
+        const attractor = new Bab.Attractor();
+        attractor.strength = 11;
+        attractor.position = toPosition;
+        particles.addAttractor(attractor);
+
         const noiseTex = new Bab.NoiseProceduralTexture('perlin', 256, this.collection.scene);
         noiseTex.animationSpeedFactor = 8;
         noiseTex.persistence = 2;
         noiseTex.brightness = 0.5;
         noiseTex.octaves = 2;
         particles.noiseTexture = noiseTex;
+        particles.noiseStrength = new Bab.Vector3(.015, .015, .015);
         if (this.from === 'ifrit') {
             particles.noiseStrength = new Bab.Vector3(.03, .03, .03);
         } else if (this.from === 'garuda') {
-            particles.noiseStrength = new Bab.Vector3(.015, .015, .015);
-        } else {
             particles.noiseStrength = new Bab.Vector3(.015, .015, .015);
         }
 
