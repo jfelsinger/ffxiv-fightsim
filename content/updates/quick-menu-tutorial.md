@@ -1,5 +1,5 @@
 ---
-title: "[Tutorial] Creating/Using Virtual Menus in FFXIV"
+title: '[Tutorial] Creating/Using Virtual Menus in FFXIV'
 description: Not an update, but a steam controller configuration journey.
 datetime: 2024-11-19 20:50
 ---
@@ -10,8 +10,10 @@ up virtual menus in Steam, to make using a controller that much more cooler.
 ---
 
 If you've not seen them, this scuffed a.f. example picture shows how Steam's virtual menus can look in game:
+
 <details class="collapse bg-base-300 my-2">
-    <summary class="collapse-title text-xl font-medium">
+    <summary class="collapse-title text-xl font-medium" style="display: flex; align-items: center; gap: 0.325em;">
+        <Icon name="solar:camera-linear" size="1.25em"></Icon>
         An example of a virtual menu for FFXIV
     </summary>
     <div class="collapse-content">
@@ -28,7 +30,8 @@ Inside Steam, whether in Steam Deck, Big Picture, or on regular desktop Steam, s
 controller layout and go to "Edit Layout"
 
 <details class="collapse bg-base-300 my-2">
-    <summary class="collapse-title text-xl font-medium">
+    <summary class="collapse-title text-xl font-medium" style="display: flex; align-items: center; gap: 0.325em;">
+        <Icon name="solar:camera-linear" size="1.25em"></Icon>
         Edit Layout
     </summary>
     <div class="collapse-content">
@@ -48,7 +51,8 @@ As well, you will be given the option for what style of menu it will be. I prefe
 want, the next steps are the same regardless, it's just the layout on your screen that will change.
 
 <details class="collapse bg-base-300 my-2">
-    <summary class="collapse-title text-xl font-medium">
+    <summary class="collapse-title text-xl font-medium" style="display: flex; align-items: center; gap: 0.325em;">
+        <Icon name="solar:camera-linear" size="1.25em"></Icon>
         Add Virtual Menu
     </summary>
     <div class="collapse-content">
@@ -59,7 +63,8 @@ want, the next steps are the same regardless, it's just the layout on your scree
 Once you have created and named your Virtual Menu, hit the pencil to actually go in and start adding commands to it.
 
 <details class="collapse bg-base-300 my-2">
-    <summary class="collapse-title text-xl font-medium">
+    <summary class="collapse-title text-xl font-medium" style="display: flex; align-items: center; gap: 0.325em;">
+        <Icon name="solar:camera-linear" size="1.25em"></Icon>
         Hit the pencil
     </summary>
     <div class="collapse-content">
@@ -72,7 +77,8 @@ Once you have created and named your Virtual Menu, hit the pencil to actually go
 Once in the interface for editing your Virtual Menu, you can start adding options to it:
 
 <details class="collapse bg-base-300 my-2">
-    <summary class="collapse-title text-xl font-medium">
+    <summary class="collapse-title text-xl font-medium" style="display: flex; align-items: center; gap: 0.325em;">
+        <Icon name="solar:camera-linear" size="1.25em"></Icon>
         Add Virtual Menu Entry
     </summary>
     <div class="collapse-content">
@@ -86,7 +92,8 @@ gamepad button binding, changing something in your steam config, etc.
 For this example, we'll want the menu entry to open the "Crafting Log," which is bound to the key N.
 
 <details class="collapse bg-base-300 my-2">
-    <summary class="collapse-title text-xl font-medium">
+    <summary class="collapse-title text-xl font-medium" style="display: flex; align-items: center; gap: 0.325em;">
+        <Icon name="solar:camera-linear" size="1.25em"></Icon>
         Select Keyboard Binding
     </summary>
     <div class="collapse-content">
@@ -100,7 +107,8 @@ From there the entry is in place, but you might want to hit the gear and rename 
 a custom icon.
 
 <details class="collapse bg-base-300 my-2">
-    <summary class="collapse-title text-xl font-medium">
+    <summary class="collapse-title text-xl font-medium" style="display: flex; align-items: center; gap: 0.325em;">
+        <Icon name="solar:camera-linear" size="1.25em"></Icon>
         Setup the rest of the menu entry.
     </summary>
     <div class="collapse-content">
@@ -127,7 +135,8 @@ For something like the FFXIV "Timers" window, which uses Ctrl+U as a keybind by 
 You'll then add the keypress binding for the `U` key.
 
 <details class="collapse bg-base-300 my-2">
-    <summary class="collapse-title text-xl font-medium">
+    <summary class="collapse-title text-xl font-medium" style="display: flex; align-items: center; gap: 0.325em;">
+        <Icon name="solar:camera-linear" size="1.25em"></Icon>
         Add Sub Command
     </summary>
     <div class="collapse-content">
@@ -138,7 +147,8 @@ You'll then add the keypress binding for the `U` key.
 When you're done, your entries can look something like the following:
 
 <details class="collapse bg-base-300 my-2">
-    <summary class="collapse-title text-xl font-medium">
+    <summary class="collapse-title text-xl font-medium" style="display: flex; align-items: center; gap: 0.325em;">
+        <Icon name="solar:camera-linear" size="1.25em"></Icon>
         Finished multi-key entry
     </summary>
     <div class="collapse-content">
@@ -151,9 +161,9 @@ you can setup how you want to activating the menu entries in game to work.
 
 I use the Steamdeck's touchpad for my menus, so I like to set the "Radial Menu Button Type" to "Click."
 
-
 <details class="collapse bg-base-300 my-2">
-    <summary class="collapse-title text-xl font-medium">
+    <summary class="collapse-title text-xl font-medium" style="display: flex; align-items: center; gap: 0.325em;">
+        <Icon name="solar:camera-linear" size="1.25em"></Icon>
         Radial Menu Button Type
     </summary>
     <div class="collapse-content">
