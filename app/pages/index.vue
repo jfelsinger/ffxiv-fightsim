@@ -50,9 +50,9 @@
 
                         <div class="card bg-base-100/50 glass">
                             <div class="card-body">
-                                <div class="badge badge-neutral">WIP, Under Construction</div>
                                 <h2 class="card-title">M4S Widening/Narrowing Witch Hunt, DN Strat</h2>
                                 <p>A tutorial for solving Witch Hunt using DN strat</p>
+                                <div class="badge badge-neutral">WIP, Under Construction</div>
                                 <div class="card-actions justify-end">
                                     <NuxtLink to="/tutorials/m4s-widening-narrowing-witch-hunt" class="btn min-w-20">
                                         Play
@@ -65,6 +65,7 @@
                             <div class="card-body">
                                 <h2 class="card-title">M2S Alarm Pheromones, Second Casting</h2>
                                 <p>A tutorial for M2S's Second Alarm Pheromones cast</p>
+                                <div class="badge badge-info">Tutorial</div>
                                 <div class="card-actions justify-end">
                                     <NuxtLink to="/tutorials/m2s-alarm-pheromones-2" class="btn min-w-20">Play
                                     </NuxtLink>
@@ -109,11 +110,11 @@
 
                         <div class="card bg-base-100/50 glass">
                             <div class="card-body">
-                                <div class="badge badge-neutral">WIP, Under Construction</div>
                                 <h2 class="card-title">M3S Fuse or Foe, WIP</h2>
                                 <p>A sim of Fuse or Foe from M3s</p>
                                 <p>This is just the crazy aoe variations. todo: The lariat at the end, and the bomb
                                     positioning</p>
+                                <div class="badge badge-neutral">WIP, Under Construction</div>
                                 <div class="card-actions justify-end">
                                     <NuxtLink to="/raids/m3s/fuse-or-foe" class="btn min-w-20">
                                         Play
