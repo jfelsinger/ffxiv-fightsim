@@ -39,11 +39,6 @@ export class AoeDiscEffect extends Effect {
         );
     }
 
-    override cleanup() {
-        // this.mesh?.dispose()
-        super.cleanup();
-    }
-
     // override runHide(): void {
     //     super.runHide();
     // }

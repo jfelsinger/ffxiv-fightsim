@@ -179,6 +179,7 @@ export class AoeSquareGridEffect extends AoeSquareEffect {
         square.position = this.getPosition();
         square.material = squareMat;
         square.checkCollisions = true;
+        this.assetContainer?.meshes?.push(square);
 
         const cols = this.cols;
         const rows = this.rows;

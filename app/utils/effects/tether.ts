@@ -18,15 +18,20 @@ export class TetherEffect extends Effect {
 
     override startup() {
         super.startup();
-        this.makeAoe();
+        if (!this.particles) {
+            this.makeAoe();
+        }
         this.particles?.start();
     }
 
-    override cleanup() {
-        this.mesh?.dispose()
+    override runShow() {
+        super.runShow();
+        this.particles?.start();
+    }
+
+    override runHide() {
         this.particles?.stop();
-        this.particles?.dispose();
-        super.cleanup();
+        super.runHide();
     }
 
     makeAoe() {
@@ -144,6 +149,7 @@ export class TetherEffect extends Effect {
 
         particles.start();
         this.particles = particles;
+        this.assetContainer?.particles?.push(particles);
 
         return {
             emitter,

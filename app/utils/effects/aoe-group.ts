@@ -62,7 +62,9 @@ export class AoeGroupEffect extends Effect {
 
     override startup() {
         super.startup();
-        this.mesh = this.makeAoe().mesh;
+        if (!this.mesh) {
+            this.mesh = this.makeAoe().mesh;
+        }
         const len = this.aoes.length;
         for (let i = 0; i < len; i++) {
             const aoe = this.aoes[i];
@@ -82,7 +84,7 @@ export class AoeGroupEffect extends Effect {
         this.duration = parseNumber(duration);
         const len = this.aoes.length;
         for (let i = 0; i < len; i++) {
-            this.aoes[i].setDuration(this.duration);
+            this.aoes[i]?.setDuration(this.duration);
         }
     }
 
@@ -90,7 +92,7 @@ export class AoeGroupEffect extends Effect {
         super.setTelegraph(telegraph);
         const len = this.aoes.length;
         for (let i = 0; i < len; i++) {
-            this.aoes[i].setTelegraph(this.telegraph);
+            this.aoes[i]?.setTelegraph(this.telegraph);
         }
     }
 
@@ -104,7 +106,6 @@ export class AoeGroupEffect extends Effect {
             }
         }
 
-        this.mesh?.dispose()
         super.cleanup();
     }
 
@@ -116,6 +117,7 @@ export class AoeGroupEffect extends Effect {
             emptyMesh.rotation.y = this.options.rotation * (Math.PI / 180);
         }
 
+        this.assetContainer?.meshes?.push(emptyMesh);
         return {
             mesh: emptyMesh,
         };

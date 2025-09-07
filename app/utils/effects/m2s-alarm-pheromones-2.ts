@@ -78,7 +78,7 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
         stinger1.position.y += hoverHeight;
         stinger1.parent = (empty);
         stinger1.material = stingerMat;
-        this.on('dispose', () => stinger1.dispose());
+        this.assetContainer?.meshes?.push(stinger1);
 
         const stinger2 = Bab.MeshBuilder.CreateCylinder('stinger-2', {
             diameterTop: 0,
@@ -97,7 +97,7 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
         stinger2.rotation.y = 90 * (Math.PI / 180);
         stinger2.parent = (empty);
         stinger2.material = stingerMat;
-        this.on('dispose', () => stinger2.dispose());
+        this.assetContainer?.meshes?.push(stinger2);
 
         const stinger3 = Bab.MeshBuilder.CreateCylinder('stinger-3', {
             diameterTop: 0,
@@ -116,7 +116,7 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
         stinger3.rotation.y = 180 * (Math.PI / 180);
         stinger3.parent = (empty);
         stinger3.material = stingerMat;
-        this.on('dispose', () => stinger3.dispose());
+        this.assetContainer?.meshes?.push(stinger3);
 
         const stinger4 = Bab.MeshBuilder.CreateCylinder('stinger-4', {
             diameterTop: 0,
@@ -135,7 +135,7 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
         stinger4.rotation.y = (90 * 3) * (Math.PI / 180);
         stinger4.parent = (empty);
         stinger4.material = stingerMat;
-        this.on('dispose', () => stinger4.dispose());
+        this.assetContainer?.meshes?.push(stinger4);
 
         const size = yalmsToM(1.5);
         const bee1 = Bab.MeshBuilder.CreatePlane('bee-1', {
@@ -151,7 +151,7 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
         bee1.rotation.y = yRotation;
         bee1.setParent(empty);
         bee1.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
-        this.on('dispose', () => bee1.dispose());
+        this.assetContainer?.meshes?.push(bee1);
 
         const bee2 = Bab.MeshBuilder.CreatePlane('bee-1', {
             size,
@@ -166,7 +166,7 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
         bee2.rotation.y = yRotation;
         bee2.setParent(empty);
         bee2.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
-        this.on('dispose', () => bee2.dispose());
+        this.assetContainer?.meshes?.push(bee2);
 
         const bee3 = Bab.MeshBuilder.CreatePlane('bee-1', {
             size,
@@ -181,7 +181,7 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
         bee3.rotation.y = yRotation;
         bee3.setParent(empty);
         bee3.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
-        this.on('dispose', () => bee3.dispose());
+        this.assetContainer?.meshes?.push(bee3);
 
         const bee4 = Bab.MeshBuilder.CreatePlane('bee-1', {
             size,
@@ -196,7 +196,7 @@ export class M2SAlarmPheromones2Effect extends AoeGroupEffect {
         bee4.rotation.y = yRotation;
         bee4.setParent(empty);
         bee4.billboardMode = Bab.Mesh.BILLBOARDMODE_ALL;
-        this.on('dispose', () => bee4.dispose());
+        this.assetContainer?.meshes?.push(bee4);
 
 
         return {

@@ -38,6 +38,7 @@ export class M4SNearFarIndicatorEffect extends Effect {
         far.setParent(mesh);
         far.renderingGroupId = 1;
         this.collection.addGlow(far);
+        this.assetContainer?.meshes?.push(far);
 
         const nearWidth = .68;
         const near = Bab.MeshBuilder.CreatePlane('near', {
@@ -57,6 +58,7 @@ export class M4SNearFarIndicatorEffect extends Effect {
         near.setParent(mesh);
         near.renderingGroupId = 1;
         this.collection.addGlow(near);
+        this.assetContainer?.meshes?.push(near);
 
         const startBait = useState<string>('m4s-wnwh-start-bait', () => Math.round(Math.random()) ? 'near' : 'far');
         const firstIndicator = startBait.value === 'far' ? farMat : nearMat;

@@ -100,13 +100,10 @@ export class DiceEffect extends Effect {
 
     override startup() {
         super.startup();
-        this.pipCount = this.getPipCount();
-        this.mesh = this.makeAoe().dice;
-    }
-
-    override cleanup() {
-        this.mesh?.dispose()
-        super.cleanup();
+        if (!this.mesh) {
+            this.pipCount = this.getPipCount();
+            this.mesh = this.makeAoe().dice;
+        }
     }
 
     makeAoe() {
@@ -145,12 +142,14 @@ export class DiceEffect extends Effect {
         dice.position = this.getPosition() || Bab.Vector3.Zero();
         dice.position.y += 2;
         dice.billboardMode = Bab.Mesh.BILLBOARDMODE_ALL;
+        this.assetContainer?.meshes?.push(dice);
 
         for (let i = 0; i < pipCount; i++) {
             const pip = this.getPip(i, pipCount);
             this.collection.addGlow(pip);
             pip.material = diceMat;
             pip.parent = dice;
+            this.assetContainer?.meshes?.push(pip);
         }
 
         return {

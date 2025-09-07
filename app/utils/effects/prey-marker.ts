@@ -37,8 +37,7 @@ export class PreyMarkerEffect extends Effect {
         mesh.position = this.getPosition() || Bab.Vector3.Zero();
         mesh.position.y += 2.5;
         mesh.billboardMode = Bab.Mesh.BILLBOARDMODE_Y;
-        this.on('dispose', () => mesh.dispose());
-        this.on('cleanup', () => mesh.dispose());
+        this.assetContainer?.meshes?.push(mesh);
 
         return {
             mesh,

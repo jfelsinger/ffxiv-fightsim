@@ -21,12 +21,9 @@ export class AoeSquareEffect extends Effect {
 
     override startup() {
         super.startup();
-        this.mesh = this.makeAoe().square;
-    }
-
-    override cleanup() {
-        this.mesh?.dispose()
-        super.cleanup();
+        if (!this.mesh) {
+            this.mesh = this.makeAoe().square;
+        }
     }
 
     makeAoe() {
@@ -52,6 +49,7 @@ export class AoeSquareEffect extends Effect {
         square.position = this.getPosition() || Bab.Vector3.Zero();
         square.material = squareMat;
         square.checkCollisions = true;
+        this.assetContainer?.meshes?.push(square);
 
         return {
             square

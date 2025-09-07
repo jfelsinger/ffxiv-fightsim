@@ -47,10 +47,12 @@ export class AoeRingEffect extends Effect {
 
     override startup() {
         super.startup();
-        this.mesh = this.makeAoe().ring;
+        if (!this.mesh) {
+            this.mesh = this.makeAoe().ring;
+        }
     }
 
-    checkMeshCollision(target: Bab.Mesh) {
+    override checkMeshCollision(target: Bab.Mesh) {
         const mesh = this.mesh;
         if (!mesh || !target) {
             return false;
@@ -81,11 +83,6 @@ export class AoeRingEffect extends Effect {
             posTheta >= startAngle &&
             posTheta <= endAngle
         );
-    }
-
-    override cleanup() {
-        this.mesh?.dispose()
-        super.cleanup();
     }
 
     makeAoe() {
@@ -120,6 +117,7 @@ export class AoeRingEffect extends Effect {
         ring.position = this.getPosition() || Bab.Vector3.Zero();
         ring.material = ringMat;
         ring.checkCollisions = true;
+        this.assetContainer?.meshes?.push(ring);
 
         return {
             ring,

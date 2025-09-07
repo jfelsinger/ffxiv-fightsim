@@ -17,7 +17,7 @@ export class M2SPoisonStingEffect extends AoeGroupEffect {
                     });
                 });
                 aoe.on('snapshot', () => {
-                    aoe.dispose();
+                    aoe.hide();
                 });
             } else if (aoe.name === 'aoe-disc') {
                 aoe.duration *= 2.5;

@@ -177,7 +177,6 @@ export class DistributeEffect extends Effect {
             }
         }
 
-        this.mesh?.dispose()
         super.cleanup();
     }
 

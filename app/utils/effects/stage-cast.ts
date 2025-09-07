@@ -42,10 +42,6 @@ export class StageCastEffect extends AoeGroupEffect {
         }
     }
 
-    override cleanup() {
-        super.cleanup();
-    }
-
     override toJSON() {
         return {
             ...super.toJSON(),
