@@ -32,6 +32,10 @@ export class Mechanic extends EventEmitter {
     usePlayerTick: boolean = false;
     options: MechanicOptions;
 
+    startTime: number = 0;
+    endTime: number = 0;
+    get elapsed() { return this.clock.time - this.startTime; }
+
     toJSON() {
         const results = getBasicValues(this.options);
         return {
@@ -117,10 +121,6 @@ export class Mechanic extends EventEmitter {
         return this.effects;
     }
 
-    startTime: number = 0;
-    endTime: number = 0;
-    get elapsed() { return this.clock.time - this.startTime; }
-
     getDurationPercent(duration?: number) {
         duration = duration || this.getDuration();
         if (!duration || (!this.isActive && !this.startTime)) {
@@ -199,5 +199,52 @@ export class Mechanic extends EventEmitter {
             promises.push(this.effects[i]?.item?.dispose());
         }
         await Promise.all(promises);
+    }
+
+    toJSONSnapshot() {
+        const result = {
+            n: this.n,
+            name: this.name,
+            label: this.label,
+            scheduling: this.scheduling,
+            isActive: this.isActive,
+            usePlayerTick: this.usePlayerTick,
+            startTime: this.startTime,
+            endTime: this.endTime,
+
+            // TODO: Deal with scheduledParent properly
+            // scheduledParent: this.scheduledParent,
+
+            options: JSON.parse(JSON.stringify(this.options)),
+            effects: (this.effects)?.map(s => getScheduledJSONSnapshot(s)),
+            activeEffects: (this.activeEffects)?.map(s => getScheduledJSONSnapshot(s)),
+        };
+
+        return result;
+    }
+
+    loadJSONSnapshot(state: any) {
+        if (!state) return;
+        this.n = state.n;
+        this.name = state.name;
+        this.label = state.label;
+        this.scheduling = state.scheduling;
+        this.isActive = state.isActive;
+        this.usePlayerTick = state.usePlayerTick;
+        this.startTime = state.startTime;
+        this.endTime = state.endTime;
+        this.options = state.options;
+
+        // TODO: Deal with scheduledParent properly
+        // this.scheduledParent = state.scheduledParent;
+
+        this.effects.forEach((s, i) => {
+            state.effects?.[i] && loadScheduledFromJSONSnapshot(s, state.effects[i]);
+        });
+
+        // May be unnecessary, since `activeEffects` is just a ref to the original effects array
+        this.activeEffects.forEach((s, i) => {
+            state.activeEffects?.[i] && loadScheduledFromJSONSnapshot(s, state.activeEffects[i]);
+        });
     }
 }

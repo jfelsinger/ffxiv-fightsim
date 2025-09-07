@@ -56,6 +56,7 @@ export class Effect extends EventEmitter {
     collection: FightCollection;
     color?: string;
     isActive: boolean = false;
+    isVisible: boolean = false;
     usePlayerTick: boolean = false;
 
     duration: number;
@@ -78,6 +79,10 @@ export class Effect extends EventEmitter {
     // The mesh for the effect itself
     mesh?: Bab.Mesh;
     options: EffectOptions;
+
+    startTime: number = 0;
+    endTime: number = 0;
+    get elapsed() { return this.clock.time - this.startTime; }
 
     get scene() { return this.collection.scene; }
 
@@ -284,10 +289,6 @@ export class Effect extends EventEmitter {
         }
     }
 
-    startTime: number = 0;
-    endTime: number = 0;
-    get elapsed() { return this.clock.time - this.startTime; }
-
     getDurationPercent(duration?: number, unshifted?: boolean) {
         duration = duration || (this.getDuration() - (unshifted ? 0 : this.getShift()));
         if (!duration || (!this.isActive && !this.startTime)) {
@@ -415,10 +416,12 @@ export class Effect extends EventEmitter {
 
     async startup() {
         this.isActive = true;
+        this.show();
         this.collection.addActiveEffect(this);
     }
 
     async cleanup() {
+        this.hide();
         this.isActive = false;
         if (this.options.castName) {
             castState.value = undefined;
@@ -426,9 +429,30 @@ export class Effect extends EventEmitter {
     }
 
     async dispose() {
+        this.hide();
         this.isActive = false;
         this.emit('dispose');
         await this.cleanup();
+    }
+
+    runHide() {
+    }
+
+    runShow() {
+    }
+
+    hide() {
+        if (this.isVisible) {
+            this.isVisible = false;
+            this.runHide();
+        }
+    }
+
+    show() {
+        if (!this.isVisible) {
+            this.isVisible = true;
+            this.runShow();
+        }
     }
 
     toJSON() {
@@ -453,6 +477,86 @@ export class Effect extends EventEmitter {
             positions: this.options.positions,
             positionSteps: this.options.positionSteps,
             positionTypes: this.options.positionTypes,
+        }
+    }
+
+    toJSONSnapshot() {
+        const result = {
+            n: this.n,
+
+            name: this.name,
+            label: this.label,
+            color: this.color,
+            isActive: this.isActive,
+            isVisible: this.isVisible,
+            usePlayerTick: this.usePlayerTick,
+
+            duration: this.duration,
+            shiftSnapshot: this.shiftSnapshot,
+            target: JSON.parse(JSON.stringify(this.target)),
+
+            position: this.position,
+            positionType: this.positionType,
+            followPosition: this.followPosition,
+
+            positions: this.positions,
+            positionTypes: this.positionTypes,
+            positionSteps: this.positionSteps,
+            easing: this.easing,
+
+            repeatTarget: this.repeatTarget,
+            telegraph: this.telegraph,
+            telegraphShown: this.telegraphShown,
+
+            startTime: this.startTime,
+            endTime: this.endTime,
+
+            options: JSON.parse(JSON.stringify(this.options)),
+        };
+
+        if (this.mesh) {
+            // THIS... probably won't work quite right.
+            const mesh = {
+                // position: this.mesh.position.toString(),
+                // rotation: this.mesh.rotation.toString(),
+                position: this.mesh.position.asArray(),
+                rotation: this.mesh.rotation.asArray(),
+            };
+
+            (result as any).mesh = mesh;
+        }
+
+        return;
+    }
+
+    loadJSONSnapshot(state: any) {
+        if (!state) { return; }
+        this.n = state.n;
+        this.name = state.name;
+        this.label = state.label;
+        this.color = state.color;
+        this.isActive = state.isActive;
+        this.isVisible = state.isVisible;
+        this.usePlayerTick = state.usePlayerTick;
+        this.duration = state.duration;
+        this.shiftSnapshot = state.shiftSnapshot;
+        this.position = state.position;
+        this.positionType = state.positionType;
+        this.followPosition = state.followPosition;
+        this.positions = state.positions;
+        this.positionTypes = state.positionTypes;
+        this.positionSteps = state.positionSteps;
+        this.easing = state.easing;
+        this.repeatTarget = state.repeatTarget;
+        this.telegraph = state.telegraph;
+        this.telegraphShown = state.telegraphShown;
+        this.startTime = state.startTime;
+        this.endTime = state.endTime;
+        this.target = state.target;
+        this.options = state.options;
+
+        // TODO: Restore mesh state
+        if (state.mesh && this.mesh) {
         }
     }
 }

@@ -116,5 +116,40 @@ export class FightSection extends EventEmitter {
         }
         await Promise.all(promises);
     }
+
+    toJSONSnapshot() {
+        const result = {
+            n: this.n,
+            name: this.name,
+            label: this.label,
+            scheduling: this.scheduling,
+            isActive: this.isActive,
+
+            // TODO: Deal with scheduledParent properly
+            // scheduledParent: this.scheduledParent,
+
+            options: JSON.parse(JSON.stringify(this.options)),
+            mechanics: (this.mechanics)?.map(s => getScheduledJSONSnapshot(s)),
+        };
+
+        return result;
+    }
+
+    loadJSONSnapshot(state: any) {
+        if (!state) return;
+        this.n = state.n;
+        this.name = state.name;
+        this.label = state.label;
+        this.scheduling = state.scheduling;
+        this.isActive = state.isActive;
+        this.options = state.options;
+
+        // TODO: Deal with scheduledParent properly
+        // this.scheduledParent = state.scheduledParent;
+
+        this.mechanics.forEach((s, i) => {
+            state.mechanics?.[i] && loadScheduledFromJSONSnapshot(s, state.mechanics[i]);
+        });
+    }
 }
 

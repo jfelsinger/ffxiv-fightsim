@@ -250,4 +250,31 @@ export class Steering {
 
         this.update();
     }
+
+    toJSONSnapshot() {
+        const result = {
+            options: JSON.parse(JSON.stringify(this.options)),
+            steeringForce: this.steeringForce.asArray(),
+            velocity: this.velocity.asArray(),
+            vSamples: this.vSamples.map((v) => v.asArray()),
+            forces: this.forces.map(f => ({
+                ...f,
+                vector: f.vector.asArray(),
+            })),
+        };
+
+        return result;
+    }
+
+    loadJSONSnapshot(state: any) {
+        if (!state) return;
+        this.options = state.options;
+        this.steeringForce = Bab.Vector3.FromArray(state.steeringForce);
+        this.velocity = Bab.Vector3.FromArray(state.velocity);
+        this.vSamples = state.vSamples.map((v: number[]) => Bab.Vector3.FromArray(v));
+        this.forces = state.forces.map((f: any) => ({
+            ...f,
+            vector: Bab.Vector3.FromArray(f.vector),
+        }));
+    }
 }

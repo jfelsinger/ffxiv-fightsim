@@ -171,6 +171,51 @@ export class FightCollection {
         return npc;
     }
 
+    toJSONSnapshot() {
+        const result = {
+            worldClock: this.worldClock.toJSONSnapshot(),
+            playerClock: this.playerClock.toJSONSnapshot(),
+            arena: this.arena?.toJSONSnapshot(),
+
+            // TODO: Snapshot and restore generic meshes
+
+            characters: Object.keys(this.characters).map((key) => [
+                key,
+                this.characters[key as CharacterName]?.toJSONSnapshot()
+            ]),
+
+            // // Likely unnecessary...
+            // activeEffects: Object.keys(this.activeEffects).map((key) => [
+            //     key,
+            //     this.activeEffects[key as CharacterName]?.toJSONSnapshot()
+            // ]),
+        };
+
+        return result;
+    }
+
+    loadJSONSnapshot(state: any) {
+        if (!state) return;
+        if (state.worldClock) { this.worldClock.loadJSONSnapshot(state.worldClock); }
+        if (state.playerClock) { this.playerClock.loadJSONSnapshot(state.playerClock); }
+        if (state.arena && this.arena) { this.arena.loadJSONSnapshot(state.arena); }
+
+        // TODO: Snapshot and restore generic meshes
+
+        state.characters?.forEach(([key, charState]: [CharacterName, any]) => {
+            if (charState && this.characters[key]) {
+                this.characters[key]?.loadJSONSnapshot(charState);
+            }
+        });
+
+        // // Likely unnecessary...
+        // state.activeEffects?.forEach(([key, effectState]: [string, any]) => {
+        //     if (effectState && this.activeEffects[key]) {
+        //         this.activeEffects[key]?.loadJSONSnapshot(effectState);
+        //     }
+        // });
+    }
+
     constructor(options: FightCollectionOptions) {
         this.playerClock = options.playerClock;
         this.worldClock = options.worldClock;

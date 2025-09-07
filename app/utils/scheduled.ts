@@ -48,6 +48,8 @@ export type ScheduledParent<T> = {
     parent?: ScheduledParent<T>,
 }
 
+// Using async/await was a mistake. Instead of executing and waiting, scheduling will have
+// to be done through the tick system... probably
 export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T, n: number, parent?: ScheduledParent<T>) => Promise<any>, clock: Clock, repeatNumber = 0) {
     if (scheduled.startDelay) {
         await clock.wait(scheduled.startDelay);
@@ -96,4 +98,52 @@ export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: 
             }
         }
     }
+}
+
+export function getScheduledJSONSnapshot<T>(scheduled: Scheduled<T>) {
+    const result: any = {
+        label: scheduled.label,
+        repeat: scheduled.repeat,
+        preStartDelay: scheduled.preStartDelay,
+        startDelay: scheduled.startDelay,
+        endDelay: scheduled.endDelay,
+    };
+
+    const item: any = scheduled.item;
+    if (item && 'toJSONSnapshot' in item) {
+        result.item = item.toJSONSnapshot();
+    }
+
+    if (scheduled.after) {
+        result.after = getScheduledJSONSnapshot(scheduled.after as Scheduled<T>);
+    }
+
+    if (scheduled.afterRepeats) {
+        result.afterRepeats = getScheduledJSONSnapshot(scheduled.afterRepeats as Scheduled<T>);
+    }
+
+    return result;
+}
+
+export function loadScheduledJSONSnapshot<T>(scheduled: Scheduled<T>, snapshot: any) {
+    if (snapshot.label) { scheduled.label = snapshot.label; }
+    if (snapshot.repeat) { scheduled.repeat = snapshot.repeat; }
+    if (snapshot.preStartDelay) { scheduled.preStartDelay = snapshot.preStartDelay; }
+    if (snapshot.startDelay) { scheduled.startDelay = snapshot.startDelay; }
+    if (snapshot.endDelay) { scheduled.endDelay = snapshot.endDelay; }
+
+    const item: any = scheduled.item;
+    if (snapshot.item && 'loadJSONSnapshot' in item) {
+        item.loadJSONSnapshot(snapshot.item);
+    }
+
+    if (scheduled.after && snapshot.after) {
+        loadScheduledJSONSnapshot(scheduled.after as Scheduled<T>, snapshot.after);
+    }
+
+    if (scheduled.afterRepeats && snapshot.afterRepeats) {
+        loadScheduledJSONSnapshot(scheduled.afterRepeats as Scheduled<T>, snapshot.afterRepeats);
+    }
+
+    return scheduled;
 }

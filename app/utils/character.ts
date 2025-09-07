@@ -50,8 +50,8 @@ export class Character extends EventEmitter {
     camMarker: Bab.Mesh;
     collider: Bab.Mesh;
     marker: Bab.Mesh;
-    steering: Steering;
     startPosition: Bab.Vector3;
+    steering: Steering;
 
     getStatus(status: Parameters<typeof getStatus>[1]) {
         return getStatus(this.statuses.value, status);
@@ -110,6 +110,10 @@ export class Character extends EventEmitter {
         return this.marker?.position;
     }
 
+    get rotation(): Bab.Vector3 {
+        return this.marker?.rotation;
+    }
+
     get uniqueId() {
         return this.marker?.uniqueId;
     }
@@ -117,6 +121,12 @@ export class Character extends EventEmitter {
     set position(pos: Bab.Vector3) {
         if (this.marker) {
             this.marker.position = pos;
+        }
+    }
+
+    set rotation(pos: Bab.Vector3) {
+        if (this.marker) {
+            this.marker.rotation = pos;
         }
     }
 
@@ -340,6 +350,49 @@ export class Character extends EventEmitter {
             charMat,
             invisMat,
         };
+    }
+
+    toJSONSnapshot() {
+        const result = {
+            name: this.name,
+            role: this.role,
+            height: this.height,
+            heads: this.heads,
+
+            diffuseColor: this.diffuseColor.toHexString(),
+            specularColor: this.specularColor.toHexString(),
+
+            tags: [...this.tags],
+            statuses: JSON.parse(JSON.stringify(this.statuses.value)),
+
+            position: this.position.asArray(),
+            rotation: this.position.asArray(),
+
+            speed: this.speed,
+            speedRotation: this.speedRotation,
+            startPosition: this.startPosition.asArray(),
+            steering: this.steering.toJSONSnapshot(),
+        };
+
+        return result;
+    }
+
+    loadJSONSnapshot(state: any) {
+        if (!state) return;
+        this.name = state.name;
+        this.role = state.role;
+        this.height = state.height;
+        this.heads = state.heads;
+        this.diffuseColor = Bab.Color3.FromHexString(state.diffuseColor);
+        this.specularColor = Bab.Color3.FromHexString(state.specularColor);
+        this.tags = new Set(state.tags);
+        this.statuses.value = state.statuses;
+        this.position = Bab.Vector3.FromArray(state.position);
+        this.rotation = Bab.Vector3.FromArray(state.rotation);
+        this.speed = state.speed;
+        this.speedRotation = state.speedRotation;
+        this.startPosition = Bab.Vector3.FromArray(state.startPosition);
+        this.steering.loadJSONSnapshot(state.steering);
     }
 
     dispose() {

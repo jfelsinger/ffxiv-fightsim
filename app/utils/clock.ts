@@ -35,6 +35,8 @@ const DefaultClockOptions: ClockOptions = {
     paused: false,
 } as const;
 
+type ClockState = ReturnType<Clock['toJSON']>;
+
 export class Clock extends EventEmitter {
     name?: string;
     time: number;
@@ -46,6 +48,7 @@ export class Clock extends EventEmitter {
     executeOnTick: boolean = true;
 
     timeouts: ClockTimeoutEntry[] = [];
+    clearedTimeouts: ClockTimeoutEntry[] = [];
 
     constructor(options?: Partial<ClockOptions>) {
         super();
@@ -64,6 +67,49 @@ export class Clock extends EventEmitter {
             this.start(); // To make sure the event is emitted
         }
     }
+
+    toJSON() {
+        const timeouts = this.timeouts.map((e) => {
+            const entry: Omit<ClockTimeoutEntry, 'func'> = { ...e };
+            delete (entry as any).func;
+            return entry;
+        });
+        const clearedTimeouts = this.clearedTimeouts.map((e) => {
+            const entry: Omit<ClockTimeoutEntry, 'func'> = { ...e };
+            delete (entry as any).func;
+            return entry;
+        });
+
+        return {
+            time: this.time,
+            lastDelta: this.lastDelta,
+            _prevTime: this._prevTime,
+            scaling: this.scaling,
+            duration: this.duration,
+            executeOnTick: this.executeOnTick,
+            // isPaused: this.isPaused,
+
+            timeouts,
+            clearedTimeouts,
+        };
+    }
+
+    toJSONSnapshot() {
+        return this.toJSON();
+    }
+
+    loadJSONSnapshot(state: ClockState) {
+        if (state.time) { this.time = state.time; }
+        if (state.lastDelta) { this.lastDelta = state.lastDelta; }
+        if (state._prevTime) { this._prevTime = state._prevTime; }
+        if (state.scaling) { this.scaling = state.scaling; }
+        if (state.duration) { this.duration = state.duration; }
+        if (state.executeOnTick !== undefined) { this.executeOnTick = state.executeOnTick; }
+        // if (state.isPaused !== undefined) { this.isPaused = state.isPaused; }
+
+        state.timeouts?.forEach((e) => { this.unclear(e.id) });
+        state.clearedTimeouts?.forEach((e) => { this.clear(e.id) });
+    };
 
     start() {
         this.emit('start', this.time, this);
@@ -121,11 +167,26 @@ export class Clock extends EventEmitter {
         if (index === -1)
             return;
         if (index === 0) {
-            this.timeouts.shift();
-        } else if (index === this.timeouts.length - 1) {
-            this.timeouts.length = this.timeouts.length - 1;
+            const entry = this.timeouts.shift();
+            this.clearedTimeouts.push(entry!);
         } else {
-            this.timeouts.slice(index, 1);
+            const entry = this.timeouts.slice(index, 1)[0];
+            this.clearedTimeouts.push(entry!);
+        }
+    }
+
+    unclear(id: number) {
+        // this.clearedTimeouts = this.clearedTimeouts.filter((e) => e.id != id)
+        const index = this.clearedTimeouts.findIndex((e) => e.id === id)
+
+        if (index === -1)
+            return;
+        if (index === 0) {
+            const entry = this.clearedTimeouts.shift();
+            this.timeouts.push(entry!);
+        } else {
+            const entry = this.clearedTimeouts.slice(index, 1)[0];
+            this.timeouts.push(entry!);
         }
     }
 

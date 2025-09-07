@@ -183,6 +183,42 @@ export class Fight extends EventEmitter {
         this.arena?.dispose();
     }
 
+    toJSONSnapshot() {
+        const result = {
+            name: this.name,
+            description: this.description,
+            isDisposed: this.isDisposed,
+            scheduling: this.scheduling,
+            isActive: this.isActive,
+            startPosition: JSON.parse(JSON.stringify(this.startPosition)),
+            startPositionType: this.startPositionType,
+
+            options: JSON.parse(JSON.stringify(this.options)),
+            arena: this.arena.toJSONSnapshot(),
+            sections: (this.sections)?.map(s => getScheduledJSONSnapshot(s)),
+        };
+
+        return result;
+    }
+
+    loadJSONSnapshot(state: any) {
+        if (!state) return;
+        this.name = state.name;
+        this.description = state.description;
+        this.isDisposed = state.isDisposed;
+        this.scheduling = state.scheduling;
+        this.isActive = state.isActive;
+        this.startPosition = JSON.parse(JSON.stringify(this.startPosition));
+        this.startPositionType = state.startPositionType;
+
+
+        this.options = state.options;
+        this.arena.loadJSONSnapshot(state.arena);
+        this.sections.forEach((s, i) => {
+            state.sections?.[i] && loadScheduledFromJSONSnapshot(s, state.sections[i]);
+        });
+    }
+
     clone() {
         return decodeFight(JSON.parse(JSON.stringify(this)), {
             collection: this.collection,

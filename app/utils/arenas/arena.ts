@@ -15,13 +15,13 @@ export type ArenaOptions = {
 export class Arena {
     name: string;
     yalms: number;
-    scene: Bab.Scene;
     shape: ArenaShape;
     collection: FightCollection;
     floorType: string;
     tessellation: number;
     options: ArenaOptions;
 
+    scene: Bab.Scene;
     floor: Bab.Mesh;
     globalFloor?: Bab.Mesh;
     boundary?: Bab.Mesh;
@@ -253,5 +253,16 @@ export class Arena {
         this.camCollider.checkCollisions = true;
         this.camCollider.isVisible = false;
         return this.camCollider;
+    }
+
+    toJSONSnapshot() {
+        // TODO: Not really necessary, atm, since there are no scenarios where the arena changes currently.
+        const result = {
+        };
+
+        return result;
+    }
+
+    loadJSONSnapshot(state: any) {
     }
 }
