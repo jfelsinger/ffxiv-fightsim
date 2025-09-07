@@ -31,6 +31,7 @@ export class KBTowerEffect extends AoeDiscEffect {
         disc.material = mat;
         disc.checkCollisions = true;
         this.collection.addGlow(disc);
+        this.assetContainer?.meshes?.push(disc);
 
         const poleMat = new Bab.StandardMaterial('kb-pole-mat', this.scene);
         poleMat.diffuseColor = Bab.Color3.Yellow();
@@ -47,7 +48,8 @@ export class KBTowerEffect extends AoeDiscEffect {
         pole.parent = disc;
         pole.material = poleMat;
         this.collection.addGlow(pole);
-        this.on('dispose', () => pole.dispose());
+        this.assetContainer?.meshes?.push(pole);
+        // this.on('dispose', () => pole.dispose());
 
         const ring = Bab.MeshBuilder.CreateTorus('kb-tower-ring', {
             diameter: radius * 2,
@@ -58,7 +60,8 @@ export class KBTowerEffect extends AoeDiscEffect {
         ring.parent = disc;
         ring.material = poleMat;
         this.collection.addGlow(ring);
-        this.on('dispose', () => ring.dispose());
+        this.assetContainer?.meshes?.push(ring);
+        // this.on('dispose', () => ring.dispose());
 
         const ballMat = new Bab.StandardMaterial(`kb-tower-${this.stacks}`, this.scene);
         ballMat.diffuseColor = Bab.Color3.FromHexString('#222222');
@@ -84,7 +87,8 @@ export class KBTowerEffect extends AoeDiscEffect {
             ball.position.z += positions[i][1];
             ball.parent = ring;
             ball.material = ballMat;
-            this.on('dispose', () => ball.dispose());
+            this.assetContainer?.meshes?.push(ball);
+            // this.on('dispose', () => ball.dispose());
         }
 
         const ballHeight = 16;
@@ -96,7 +100,8 @@ export class KBTowerEffect extends AoeDiscEffect {
         ball.position.y = ballHeight + triggerRadius;
         ball.parent = disc;
         ball.material = poleMat;
-        this.on('dispose', () => ball.dispose());
+        this.assetContainer?.meshes?.push(ball);
+        // this.on('dispose', () => ball.dispose());
 
         this.on('tick', ({ durationPercent }) => {
             ring.rotation.y = (Math.PI * 4) * (durationPercent * 0.125);
@@ -107,15 +112,6 @@ export class KBTowerEffect extends AoeDiscEffect {
             disc
         };
     }
-
-    // override async cleanup() {
-    //     this.mesh?.dispose()
-    //     await super.cleanup();
-    // }
-
-    // override async cleanup() {
-    //     this.isActive = false;
-    // }
 
     override snapshot() {
         if (!this.isActive) { return; }

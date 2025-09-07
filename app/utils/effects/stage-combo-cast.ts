@@ -13,16 +13,11 @@ export class StageComboCastEffect extends CastBarEffect {
     }
 
 
-    override async startup() {
-        this.makeMeshes();
-        await super.startup();
-    }
-
-    override async cleanup() {
-        for (const mesh of this.meshes) {
-            mesh?.dispose()
+    override startup() {
+        if (!this.meshes.length) {
+            this.makeMeshes();
         }
-        await super.cleanup();
+        super.startup();
     }
 
     makeMeshes() {

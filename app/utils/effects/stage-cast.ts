@@ -25,26 +25,25 @@ export class StageCastEffect extends AoeGroupEffect {
         }
     }
 
-    override async startup() {
-        await super.startup();
+    override startup() {
+        super.startup();
         this.mesh = this.makeAoe().mesh;
         const len = this.aoes.length;
-        const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
-            promises.push((async () => {
-                this.aoes[i].startTime = this.clock.time;
-                await this.aoes[i].startup();
-                const mesh = this.aoes[i].mesh;
+            const aoe = this.aoes[i];
+            if (aoe) {
+                aoe.startTime = this.clock.time;
+                aoe.startup();
+                const mesh = aoe.mesh;
                 if (mesh && this.mesh) {
                     mesh.parent = this.mesh;
                 }
-            })());
+            }
         }
-        await Promise.all(promises);
     }
 
-    override async cleanup() {
-        await super.cleanup();
+    override cleanup() {
+        super.cleanup();
     }
 
     override toJSON() {

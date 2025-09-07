@@ -16,17 +16,17 @@ export class TetherEffect extends Effect {
         this.to = options.to;
     }
 
-    override async startup() {
-        await super.startup();
+    override startup() {
+        super.startup();
         this.makeAoe();
         this.particles?.start();
     }
 
-    override async cleanup() {
+    override cleanup() {
         this.mesh?.dispose()
         this.particles?.stop();
         this.particles?.dispose();
-        await super.cleanup();
+        super.cleanup();
     }
 
     makeAoe() {

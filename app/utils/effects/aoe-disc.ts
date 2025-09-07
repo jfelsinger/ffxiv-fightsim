@@ -18,9 +18,11 @@ export class AoeDiscEffect extends Effect {
         this.yalms = parseNumber(options.yalms || 15);
     }
 
-    override async startup() {
-        await super.startup();
-        this.mesh = this.makeAoe().disc;
+    override startup() {
+        super.startup();
+        if (!this.mesh) {
+            this.mesh = this.makeAoe().disc;
+        }
     }
 
     override checkMeshCollision(target: Bab.Mesh) {
@@ -37,10 +39,18 @@ export class AoeDiscEffect extends Effect {
         );
     }
 
-    override async cleanup() {
-        this.mesh?.dispose()
-        await super.cleanup();
+    override cleanup() {
+        // this.mesh?.dispose()
+        super.cleanup();
     }
+
+    // override runHide(): void {
+    //     super.runHide();
+    // }
+
+    // override runShow(): void {
+    //     super.runShow();
+    // }
 
     makeAoe() {
         const discMat = createAoeMat(this.scene, this.getColor(), 'discMat');
@@ -65,6 +75,7 @@ export class AoeDiscEffect extends Effect {
         disc.position = this.getPosition() || Bab.Vector3.Zero();
         disc.material = discMat;
         disc.checkCollisions = true;
+        this.assetContainer?.meshes?.push(disc);
 
         return {
             disc

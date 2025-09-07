@@ -76,9 +76,9 @@ export class P9SSection extends FightSection {
         });
     }
 
-    override async dispose() {
+    override dispose() {
         this.orbs.forEach(o => o?.dispose());
-        await super.dispose();
+        super.dispose();
     }
 }
 

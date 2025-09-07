@@ -170,16 +170,14 @@ export class Fight extends EventEmitter {
         }
     }
 
-    async dispose() {
+    dispose() {
         this.isDisposed = true;
         this.isActive = false;
         this.emit('dispose');
         const len = this.sections.length;
-        const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
-            promises.push(this.sections[i]?.item?.dispose());
+            this.sections[i]?.item?.dispose();
         }
-        await Promise.all(promises);
         this.arena?.dispose();
     }
 

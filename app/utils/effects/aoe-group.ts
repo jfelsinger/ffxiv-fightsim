@@ -60,22 +60,21 @@ export class AoeGroupEffect extends Effect {
         }
     }
 
-    override async startup() {
-        await super.startup();
+    override startup() {
+        super.startup();
         this.mesh = this.makeAoe().mesh;
         const len = this.aoes.length;
-        const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
-            promises.push((async () => {
-                this.aoes[i].startTime = this.clock.time;
-                await this.aoes[i].startup();
-                const mesh = this.aoes[i].mesh;
+            const aoe = this.aoes[i];
+            if (aoe) {
+                aoe.startTime = this.clock.time;
+                aoe.startup();
+                const mesh = aoe.mesh;
                 if (mesh && this.mesh) {
                     mesh.parent = this.mesh;
                 }
-            })());
+            }
         }
-        await Promise.all(promises);
     }
 
     override setDuration(duration: number | string) {
@@ -95,19 +94,18 @@ export class AoeGroupEffect extends Effect {
         }
     }
 
-    override async cleanup() {
+    override cleanup() {
         const len = this.aoes.length;
-        const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
-            promises.push((async () => {
-                await this.aoes[i].cleanup();
-                this.aoes[i].endTime = this.clock.time;
-            })());
+            const aoe = this.aoes[i];
+            if (aoe) {
+                aoe.cleanup();
+                aoe.endTime = this.clock.time;
+            }
         }
-        await Promise.all(promises);
 
         this.mesh?.dispose()
-        await super.cleanup();
+        super.cleanup();
     }
 
     makeAoe() {

@@ -45,8 +45,8 @@ export class AoeRingEffect extends Effect {
         this.segments = Math.max(Math.floor(this.thetaLength / Math.PI + 1), this.segments);
     }
 
-    override async startup() {
-        await super.startup();
+    override startup() {
+        super.startup();
         this.mesh = this.makeAoe().ring;
     }
 
@@ -83,9 +83,9 @@ export class AoeRingEffect extends Effect {
         );
     }
 
-    override async cleanup() {
+    override cleanup() {
         this.mesh?.dispose()
-        await super.cleanup();
+        super.cleanup();
     }
 
     makeAoe() {

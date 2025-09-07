@@ -89,8 +89,8 @@ export class E12SFight extends Fight {
         this.leviathan = leviathan;
     }
 
-    override async dispose() {
+    override dispose() {
         this.boss?.dispose();
-        await super.dispose();
+        super.dispose();
     }
 }

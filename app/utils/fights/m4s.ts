@@ -53,8 +53,8 @@ export class M4SFight extends Fight {
         });
     }
 
-    override async dispose() {
+    override dispose() {
         this.boss?.dispose();
-        await super.dispose();
+        super.dispose();
     }
 }

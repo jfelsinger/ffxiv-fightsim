@@ -219,7 +219,7 @@ export class ClockSpotsTutorial extends Fight {
         });
     }
 
-    override async dispose() {
-        await super.dispose();
+    override dispose() {
+        super.dispose();
     }
 }

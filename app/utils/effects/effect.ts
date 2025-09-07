@@ -77,6 +77,7 @@ export class Effect extends EventEmitter {
     telegraphShown = false;
 
     // The mesh for the effect itself
+    assetContainer: Bab.AssetContainer;
     mesh?: Bab.Mesh;
     options: EffectOptions;
 
@@ -96,6 +97,7 @@ export class Effect extends EventEmitter {
         this.duration = parseNumber(options.duration ?? 0);
         this.shiftSnapshot = parseNumber(options.shiftSnapshot ?? 0);
         this.collection = options.collection;
+        this.assetContainer = new Bab.AssetContainer(this.collection.scene);
         this.clock = options.clock || this.collection.worldClock;
         this.color = options.color;
         this.repeatTarget = options.repeatTarget ?? false;
@@ -321,13 +323,13 @@ export class Effect extends EventEmitter {
 
         this.startTime = this.clock.time;
         this.emit('start');
-        await this.startup();
+        this.startup();
 
         this.emit('post-startup');
         await this.execute();
         this.emit('pre-cleanup');
 
-        await this.cleanup();
+        this.cleanup();
         this.endTime = this.clock.time;
         this.emit('end');
     }
@@ -414,13 +416,13 @@ export class Effect extends EventEmitter {
         return false;
     }
 
-    async startup() {
+    startup() {
         this.isActive = true;
         this.show();
         this.collection.addActiveEffect(this);
     }
 
-    async cleanup() {
+    cleanup() {
         this.hide();
         this.isActive = false;
         if (this.options.castName) {
@@ -428,17 +430,19 @@ export class Effect extends EventEmitter {
         }
     }
 
-    async dispose() {
+    dispose() {
         this.hide();
         this.isActive = false;
         this.emit('dispose');
-        await this.cleanup();
+        this.cleanup();
     }
 
     runHide() {
+        this.assetContainer?.removeAllFromScene();
     }
 
     runShow() {
+        this.assetContainer?.addAllToScene();
     }
 
     hide() {

@@ -107,14 +107,12 @@ export class FightSection extends EventEmitter {
         this.emit('end-mechanic', { mechanic });
     }
 
-    async dispose() {
+    dispose() {
         this.isActive = false;
         const len = this.mechanics.length;
-        const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
-            promises.push(this.mechanics[i]?.item?.dispose());
+            this.mechanics[i]?.item?.dispose();
         }
-        await Promise.all(promises);
     }
 
     toJSONSnapshot() {

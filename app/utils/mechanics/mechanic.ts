@@ -190,15 +190,13 @@ export class Mechanic extends EventEmitter {
         this.emit('end-effect', { effect });
     }
 
-    async dispose() {
+    dispose() {
         this.isActive = false;
         this.emit('dispose');
         const len = this.effects.length;
-        const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
-            promises.push(this.effects[i]?.item?.dispose());
+            this.effects[i]?.item?.dispose();
         }
-        await Promise.all(promises);
     }
 
     toJSONSnapshot() {

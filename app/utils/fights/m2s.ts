@@ -26,8 +26,8 @@ export class M2SFight extends Fight {
         boss.body.position.y = bossSize / 1.25;
     }
 
-    override async dispose() {
+    override dispose() {
         this.boss?.dispose();
-        await super.dispose();
+        super.dispose();
     }
 }

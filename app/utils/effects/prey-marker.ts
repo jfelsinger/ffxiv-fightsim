@@ -12,14 +12,14 @@ export class PreyMarkerEffect extends Effect {
         this.mesh = mesh;
     }
 
-    override async cleanup() {
+    override cleanup() {
         this.mesh?.dispose()
-        await super.cleanup();
+        super.cleanup();
     }
 
-    override async dispose() {
+    override dispose() {
         this.mesh?.dispose()
-        await super.dispose();
+        super.dispose();
     }
 
     makeAoe() {

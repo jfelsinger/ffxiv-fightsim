@@ -137,18 +137,17 @@ export class DistributeEffect extends Effect {
         }
     }
 
-    override async startup() {
-        await super.startup();
+    override startup() {
+        super.startup();
         const len = this.effects.length;
-        const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
-            promises.push((async () => {
-                this.effects[i].startTime = this.clock.time;
+            const effect = this.effects[i];
+            if (effect) {
+                effect.startTime = this.clock.time;
                 // TODO: make sure I don't need some startup logic
-                await this.effects[i].startup();
-            })());
+                effect.startup();
+            }
         }
-        await Promise.all(promises);
     }
 
     override setDuration(duration: number | string) {
@@ -168,19 +167,18 @@ export class DistributeEffect extends Effect {
         }
     }
 
-    override async cleanup() {
+    override cleanup() {
         const len = this.effects.length;
-        const promises: Promise<void>[] = [];
         for (let i = 0; i < len; i++) {
-            promises.push((async () => {
-                await this.effects[i].cleanup();
-                this.effects[i].endTime = this.clock.time;
-            })());
+            const effect = this.effects[i];
+            if (effect) {
+                effect.cleanup();
+                effect.endTime = this.clock.time;
+            }
         }
-        await Promise.all(promises);
 
         this.mesh?.dispose()
-        await super.cleanup();
+        super.cleanup();
     }
 
     override toJSON() {

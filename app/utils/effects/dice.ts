@@ -98,15 +98,15 @@ export class DiceEffect extends Effect {
         return parseNumber(pips || 1);
     }
 
-    override async startup() {
-        await super.startup();
+    override startup() {
+        super.startup();
         this.pipCount = this.getPipCount();
         this.mesh = this.makeAoe().dice;
     }
 
-    override async cleanup() {
+    override cleanup() {
         this.mesh?.dispose()
-        await super.cleanup();
+        super.cleanup();
     }
 
     makeAoe() {

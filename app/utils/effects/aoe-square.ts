@@ -19,14 +19,14 @@ export class AoeSquareEffect extends Effect {
         this.height = parseNumber(options.height || options.yalms || 15);
     }
 
-    override async startup() {
-        await super.startup();
+    override startup() {
+        super.startup();
         this.mesh = this.makeAoe().square;
     }
 
-    override async cleanup() {
+    override cleanup() {
         this.mesh?.dispose()
-        await super.cleanup();
+        super.cleanup();
     }
 
     makeAoe() {

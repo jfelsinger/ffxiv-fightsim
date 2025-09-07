@@ -10,8 +10,8 @@ export class M4SNearFarIndicatorEffect extends Effect {
         super(options);
     }
 
-    override async startup() {
-        await super.startup();
+    override startup() {
+        super.startup();
         this.mesh = this.makeAoe().mesh;
     }
 

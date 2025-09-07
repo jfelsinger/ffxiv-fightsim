@@ -479,7 +479,7 @@ export class M2STutorial extends M2SFight {
         return false;
     }
 
-    override async dispose() {
-        await super.dispose();
+    override dispose() {
+        super.dispose();
     }
 }
