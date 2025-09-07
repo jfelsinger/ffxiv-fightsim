@@ -237,12 +237,12 @@ export class Mechanic extends EventEmitter {
         // this.scheduledParent = state.scheduledParent;
 
         this.effects.forEach((s, i) => {
-            state.effects?.[i] && loadScheduledFromJSONSnapshot(s, state.effects[i]);
+            state.effects?.[i] && loadScheduledJSONSnapshot(s, state.effects[i]);
         });
 
         // May be unnecessary, since `activeEffects` is just a ref to the original effects array
         this.activeEffects.forEach((s, i) => {
-            state.activeEffects?.[i] && loadScheduledFromJSONSnapshot(s, state.activeEffects[i]);
+            state.activeEffects?.[i] && loadScheduledJSONSnapshot(s, state.activeEffects[i]);
         });
     }
 }

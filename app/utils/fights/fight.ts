@@ -163,7 +163,11 @@ export class Fight extends EventEmitter {
             if (section?.preStartDelay) { await this.clock.wait(section.preStartDelay); }
         }
         if (!this.isDisposed) {
-            await executeScheduled(section, (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)), this.clock)
+            await executeScheduled(
+                section,
+                (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)),
+                this.clock
+            );
         }
         if (!this.isDisposed) {
             this.emit('end-section', { section });
@@ -179,6 +183,7 @@ export class Fight extends EventEmitter {
             this.sections[i]?.item?.dispose();
         }
         this.arena?.dispose();
+        this.removeAllListeners();
     }
 
     toJSONSnapshot() {
@@ -213,7 +218,7 @@ export class Fight extends EventEmitter {
         this.options = state.options;
         this.arena.loadJSONSnapshot(state.arena);
         this.sections.forEach((s, i) => {
-            state.sections?.[i] && loadScheduledFromJSONSnapshot(s, state.sections[i]);
+            state.sections?.[i] && loadScheduledJSONSnapshot(s, state.sections[i]);
         });
     }
 

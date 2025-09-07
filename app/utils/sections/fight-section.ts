@@ -146,7 +146,7 @@ export class FightSection extends EventEmitter {
         // this.scheduledParent = state.scheduledParent;
 
         this.mechanics.forEach((s, i) => {
-            state.mechanics?.[i] && loadScheduledFromJSONSnapshot(s, state.mechanics[i]);
+            state.mechanics?.[i] && loadScheduledJSONSnapshot(s, state.mechanics[i]);
         });
     }
 }
