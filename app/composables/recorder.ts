@@ -9,8 +9,10 @@ export function useRecorder() {
     })
 
     function restart() {
-        snapshots.value = [];
-        currentIndex.value = -1;
+        if (snapshots.value.length) {
+            snapshots.value = snapshots.value.slice(0, 1);
+            currentIndex.value = 0;
+        }
     }
 
     function recordCurrentSnapshot(time?: number) {
@@ -27,8 +29,8 @@ export function useRecorder() {
     function recordSnapshot(time: number, snapshot: any) {
         if (!snapshot) { return; }
         if (currentIndex.value < (snapshots.value.length - 1)) {
-            snapshots.value = snapshots.value.slice(0, currentIndex.value);
-            currentIndex.value--;
+            snapshots.value = snapshots.value.slice(0, Math.max(1, currentIndex.value));
+            currentIndex.value = snapshots.value.length - 1;
         };
 
         snapshots.value.push([time, snapshot]);

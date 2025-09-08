@@ -267,6 +267,7 @@ export class Effect extends EventEmitter {
             const durationPercent = this.getDurationPercent();
             const adjustedTelegraph = this.adjustedTelegraph;
             if (this.options.castName) {
+                console.log('Effect cast percent: ', this.options.castName, this.getDuration(), this.elapsed);
                 if (durationPercent < 1) {
                     castState.value = {
                         name: this.options.castName,
@@ -350,7 +351,6 @@ export class Effect extends EventEmitter {
     }
 
     init(n = 0, parent?: ScheduledParent<Effect>, startTime?: number) {
-        console.log('Effect init: ', n, startTime, this, parent, this.duration);
         this.n = n;
         this.scheduledParent = parent;
         this.telegraphShown = false;

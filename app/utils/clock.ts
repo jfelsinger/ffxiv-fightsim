@@ -315,7 +315,7 @@ export class Clock extends EventEmitter {
                 if (timeout.reverse) {
                 } else {
                     if (timeout.isExecuting ||
-                        timeout.time <= this._prevTime ||
+                        (timeout.time && timeout.time <= this._prevTime) ||
                         timeout.time > this.time
                     )
                         continue;

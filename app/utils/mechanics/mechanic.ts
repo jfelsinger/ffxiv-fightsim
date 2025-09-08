@@ -162,17 +162,22 @@ export class Mechanic extends EventEmitter {
     }
 
     init(n = 0, parent?: ScheduledParent<Mechanic>, startTime?: number) {
-        console.log('Mechanic init: ', n, startTime, this, parent);
         this.n = n;
         this.scheduledParent = parent;
 
         startTime = startTime ?? this.clock.time ?? 0;
+        this.emit('init');
         this.startTime = startTime;
 
         const effects = this.getEffects();
-
         this.activeEffects = effects;
+
         let delay = startTime;
+
+        this.clock.at(() => {
+            this.isActive = true;
+        }, this.startTime);
+
         const len = effects.length;
         if (this.scheduling === 'sequential') {
             for (let i = 0; i < len; i++) {
@@ -189,6 +194,12 @@ export class Mechanic extends EventEmitter {
                 }
             }
         }
+
+        this.clock.at(() => {
+            this.endTime = this.clock.time;
+            this.isActive = false;
+            this.emit('end-execute');
+        }, this.startTime + this.getDuration() + 1);
 
         this.emit('end-init');
     }
@@ -236,6 +247,7 @@ export class Mechanic extends EventEmitter {
     }
 
     tickUpdate(time: number, delta: number) {
+        // console.log('Mechanic update: ', this.isActive, time, delta, this);
         if (this.isActive) {
             const durationPercent = this.getDurationPercent();
             if (this.options.castName) {
