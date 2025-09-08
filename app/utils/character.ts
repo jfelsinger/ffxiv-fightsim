@@ -363,7 +363,7 @@ export class Character extends EventEmitter {
             specularColor: this.specularColor.toHexString(),
 
             tags: [...this.tags],
-            statuses: JSON.parse(JSON.stringify(this.statuses.value)),
+            statuses: JSON.parse(JSON.stringify(this.statuses?.value || [])),
 
             position: this.position.asArray(),
             rotation: this.position.asArray(),

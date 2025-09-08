@@ -66,6 +66,7 @@ const inputElapsedPercent = computed({
     get() { return (elapsedPercent.value * 10); },
     set(value: number) {
         const newTime = duration.value * (value / 1000);
+        // TODO: Make this cleaner
         let snapshot = (window as any).__recorder.windToTime(newTime);
         if (snapshot) {
             clock.value.setTime(snapshot[0]);

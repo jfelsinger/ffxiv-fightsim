@@ -19,13 +19,14 @@ export class Recorder<T> {
     windToTime(time: number) {
         if (this.snapshots.length < 0) { return; }
         const latestTime = this.latestTime;
+        const lastIndex = this.snapshots.length - 1;
+        const lastEntry = this.snapshots[lastIndex];
         let currentTime = latestTime;
         let currentIndex = this.currentIndex;
         let entry = this.snapshots[currentIndex];
 
 
         if (time <= latestTime) {
-            console.log('windBackToTime', { time, currentTime, currentIndex, latestTime, entry });
 
             while (currentTime > time && currentIndex > 0) {
                 currentIndex--;
@@ -38,7 +39,6 @@ export class Recorder<T> {
         } else if (currentIndex < this.snapshots.length - 1) {
             const lastIndex = this.snapshots.length - 1;
             const lastEntry = this.snapshots[lastIndex];
-            console.log('windForwardToTime', { time, currentTime, currentIndex, latestTime, entry, lastIndex });
             if (lastEntry) {
                 const lastTime = lastEntry[0];
                 if (currentTime >= lastTime) {
@@ -55,6 +55,12 @@ export class Recorder<T> {
                     }
                 }
             }
+        } else if (time <= 0) {
+            this.currentIndex = 0;
+            return this.snapshots[0];
+        } else if (time >= (lastEntry?.[0] ?? Infinity)) {
+            this.currentIndex = lastIndex;
+            return lastEntry;
         } else {
             console.log('windUHHHHhhh:', time, currentTime, currentIndex, this.snapshots.length);
         }
