@@ -21,6 +21,7 @@ clock.value?.on('start', () => { isPaused.value = false });
 clock.value?.on('pause', () => { isPaused.value = true });
 clock.value?.on('time-change', (newTime: number) => { time.value = newTime });
 
+const recorder = useRecorder();
 const globalTelegraph = useState<number>('telegraph', () => 1.0);
 const telegraph = computed({
     get() {
@@ -62,18 +63,16 @@ if (props.overrideDuration) {
     duration.value = props.overrideDuration;
 }
 
+let tokUpdate: ReturnType<typeof setTimeout> | undefined;
 const inputElapsedPercent = computed({
     get() { return (elapsedPercent.value * 10); },
     set(value: number) {
         const newTime = duration.value * (value / 1000);
-        // TODO: Make this cleaner
-        let snapshot = (window as any).__recorder.windToTime(newTime);
-        if (snapshot) {
-            clock.value.setTime(snapshot[0]);
-            (window as any).__fight.loadJSONSnapshot(snapshot[1]);
-        } else {
-            clock.value.setTime(newTime)
-        }
+        const snapshot = recorder.loadSnapshotAt(newTime, clock.value);
+        clearTimeout(tokUpdate);
+        tokUpdate = setTimeout(() => {
+            clock.value.setTime(snapshot?.[0] ?? newTime)
+        }, 100);
     }
 });
 

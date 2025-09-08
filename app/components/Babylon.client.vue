@@ -38,25 +38,10 @@ const { statuses } = useStatuses();
 const castState = useCastState();
 (window as any).castState = castState;
 
+const recorder = useRecorder();
 if (!(window as any).__recorder) {
-    (window as any).__recorder = new Recorder<any>();
-    worldClock.on('tick', (time) => {
-        if (time % 150) {
-            (window as any).__recorder.recordSnapshot(
-                worldClock.time,
-                (window as any).__fight.toJSONSnapshot()
-            );
-        }
-    });
+    (window as any).__recorder = recorder;
 }
-
-worldClock.at(() => {
-    console.log('--- 3000 ---');
-}, 3000);
-
-worldClock.at(() => {
-    console.log('--- 2000 ---');
-}, 2000);
 
 function onResize() {
     game?.resize();
@@ -65,6 +50,8 @@ function onResize() {
 function registerFight(fight: Fight) {
     currentFight.value = fight;
     (window as any).__fight = fight;
+    recorder.restart();
+    recorder.recordCurrentSnapshot(0);
     fight.on('effect-hit', ({ effect }) => {
         debug('hit by: ', effect.name, effect);
         hits.value++;
@@ -365,6 +352,7 @@ onMounted(async () => {
     window.addEventListener('resize', onResize);
     window.addEventListener('blur', onBlur);
     document.addEventListener('visibilitychange', onVisibilityChange);
+    recorder.register();
 
     nextTick(() => {
         debug('mount: ', canvas.value);
@@ -382,6 +370,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(async () => {
+    recorder.unregister();
     canvas.value?.removeEventListener('blur', onBlur);
     window.removeEventListener('keydown', onKeyDown);
     window.removeEventListener('keyup', onKeyUp);
