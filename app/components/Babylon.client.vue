@@ -38,6 +38,25 @@ const { statuses } = useStatuses();
 const castState = useCastState();
 (window as any).castState = castState;
 
+if (!(window as any).__recorder) {
+    (window as any).__recorder = new Recorder<any>();
+    worldClock.on('tick', (time) => {
+        if (time % 150) {
+            (window as any).__recorder.recordSnapshot(
+                worldClock.time,
+                (window as any).__fight.toJSONSnapshot()
+            );
+        }
+    });
+}
+
+worldClock.at(() => {
+    console.log('--- 3000 ---');
+}, 3000);
+
+worldClock.at(() => {
+    console.log('--- 2000 ---');
+}, 2000);
 
 function onResize() {
     game?.resize();
@@ -62,6 +81,8 @@ function getFight(collection: FightCollection) {
 }
 
 const currentFight = ref<Fight | undefined>();
+
+
 
 const inputMap = ref<Record<string, boolean>>({});
 const {

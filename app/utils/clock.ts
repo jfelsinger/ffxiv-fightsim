@@ -99,16 +99,52 @@ export class Clock extends EventEmitter {
     }
 
     loadJSONSnapshot(state: ClockState) {
-        if (state.time) { this.time = state.time; }
-        if (state.lastDelta) { this.lastDelta = state.lastDelta; }
-        if (state._prevTime) { this._prevTime = state._prevTime; }
+        this.setTime(state.time);
+        // if (state.time) { this.time = state.time; }
+        // if (state.lastDelta) { this.lastDelta = state.lastDelta; }
+        // if (state._prevTime) { this._prevTime = state._prevTime; }
         if (state.scaling) { this.scaling = state.scaling; }
         if (state.duration) { this.duration = state.duration; }
         if (state.executeOnTick !== undefined) { this.executeOnTick = state.executeOnTick; }
         // if (state.isPaused !== undefined) { this.isPaused = state.isPaused; }
 
-        state.timeouts?.forEach((e) => { this.unclear(e.id) });
-        state.clearedTimeouts?.forEach((e) => { this.clear(e.id) });
+        this.timeouts = state.timeouts.map((e) => {
+            const id = e.id;
+
+            const timeoutIndex = this.timeouts.findIndex((e) => e?.id && e.id === id)
+            if (timeoutIndex > -1) {
+                return {
+                    ...e,
+                    func: this.timeouts[timeoutIndex]!.func,
+                };
+            }
+            const clearedIndex = this.clearedTimeouts.findIndex((e) => e?.id && e.id === id)
+            if (clearedIndex > -1) {
+                return {
+                    ...e,
+                    func: this.clearedTimeouts[clearedIndex]!.func,
+                };
+            }
+        }).filter(e => e?.id) as any;
+
+        this.clearedTimeouts = state.clearedTimeouts.map((e) => {
+            const id = e.id;
+            const timeoutIndex = this.timeouts.findIndex((e) => e?.id && e.id === id)
+            if (timeoutIndex > -1) {
+                return {
+                    ...e,
+                    func: this.timeouts[timeoutIndex]!.func,
+                };
+            }
+            const clearedIndex = this.clearedTimeouts.findIndex((e) => e?.id && e.id === id)
+            if (clearedIndex > -1) {
+                return {
+                    ...e,
+                    func: this.clearedTimeouts[clearedIndex]!.func,
+                };
+            }
+
+        }).filter(e => e?.id) as any;
     };
 
     start() {
@@ -162,7 +198,7 @@ export class Clock extends EventEmitter {
 
     clear(id: number) {
         // this.timeouts = this.timeouts.filter((e) => e.id != id)
-        const index = this.timeouts.findIndex((e) => e.id === id)
+        const index = this.timeouts.findIndex((e) => e?.id && e.id === id)
 
         if (index === -1)
             return;
@@ -177,7 +213,7 @@ export class Clock extends EventEmitter {
 
     unclear(id: number) {
         // this.clearedTimeouts = this.clearedTimeouts.filter((e) => e.id != id)
-        const index = this.clearedTimeouts.findIndex((e) => e.id === id)
+        const index = this.clearedTimeouts.findIndex((e) => e?.id && e.id === id)
 
         if (index === -1)
             return;

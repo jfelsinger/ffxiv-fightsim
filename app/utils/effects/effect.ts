@@ -2,6 +2,17 @@ const debug = Debug('game:utils:effect');
 
 const castState = useCastState();
 
+export const enum EffectStage {
+    preInitialization = 0,
+    initialized = 1,
+    preStartup = 2,
+    postStartup = 3,
+    executing = 4,
+    preSnapshot = 5,
+    preCleanup = 6,
+    ended = 7,
+};
+
 export type EffectTargetType =
     | 'boss' | 'adds'
     | 'all' // All players
@@ -59,6 +70,7 @@ export class Effect extends EventEmitter {
     isVisible: boolean = false;
     usePlayerTick: boolean = false;
 
+    stage: EffectStage = EffectStage.preInitialization;
     duration: number;
     shiftSnapshot: number;
     target: EffectTarget[] = [];
@@ -306,10 +318,12 @@ export class Effect extends EventEmitter {
     }
 
 
-    async start(n = 0, parent?: ScheduledParent<Effect>) {
-        this.n = n;
-        this.scheduledParent = parent;
-        this.telegraphShown = false;
+    async start(n = 0, parent?: ScheduledParent<Effect>, startTime?: number) {
+        return;
+
+        // this.n = n;
+        // this.scheduledParent = parent;
+        // this.telegraphShown = false;
 
         // TODO: Implement this somewhere else.
         // TODO: if tutorial mode
@@ -321,12 +335,70 @@ export class Effect extends EventEmitter {
         //     this.clock.pause();
         // });
 
-        this.startTime = this.clock.time;
-        this.emit('start');
-        this.startup();
+        // this.startTime = startTime ?? this.clock.time;
+        // this.emit('start');
+        // this.startup();
 
         this.emit('post-startup');
         await this.execute();
+
+        this.emit('pre-cleanup');
+
+        this.cleanup();
+        this.endTime = this.clock.time;
+        this.emit('end');
+    }
+
+    init(n = 0, parent?: ScheduledParent<Effect>, startTime?: number) {
+        console.log('Effect init: ', n, startTime, this, parent, this.duration);
+        this.n = n;
+        this.scheduledParent = parent;
+        this.telegraphShown = false;
+
+        this.startTime = startTime ?? this.clock.time;
+        this.emit('init');
+        this.startup();
+
+        this.clock.at(() => {
+            console.log('Effect starting: ', this.clock.time, this);
+            const status = this.options.startStatus;
+            if (status) {
+                const targets = this.getTargets();
+                targets.forEach(target => {
+                    if ((target as any)?.addStatus) {
+                        (target as Character).addStatus(status);
+                    }
+                })
+            }
+
+            this.isActive;
+            this.show();
+        }, this.startTime);
+
+        this.clock.at(async () => {
+            await this.preSnapshot();
+            this.snapshot();
+        }, this.startTime + this.duration - this.shiftSnapshot);
+        // this.clock.at(() => { this.preSnapshot(); }, this.startTime + this.duration - this.shiftSnapshot - 2);
+        // this.clock.at(() => { this.snapshot(); }, this.startTime + this.duration - this.shiftSnapshot);
+
+        this.clock.at(() => {
+            this.emit('pre-cleanup');
+            this.cleanup();
+
+            this.endTime = this.clock.time;
+            // console.log('Effect ending: ', this.endTime, this.startTime + this.duration, this);
+            this.emit('end');
+        }, this.startTime + this.duration + 1);
+
+        this.emit('post-init');
+    }
+
+    run(n = 0, parent?: ScheduledParent<Effect>, startTime?: number) {
+        return;
+        this.emit('post-startup');
+        this.execute();
+
         this.emit('pre-cleanup');
 
         this.cleanup();
@@ -335,6 +407,7 @@ export class Effect extends EventEmitter {
     }
 
     async execute() {
+        return;
         const status = this.options.startStatus;
         if (status) {
             const targets = this.getTargets();
@@ -345,12 +418,19 @@ export class Effect extends EventEmitter {
             })
         }
 
+        this.clock.after(async () => {
+            await this.preSnapshot();
+            this.snapshot();
+        }, this.duration - this.shiftSnapshot);
+        // this.clock.after(() => { this.preSnapshot(); }, this.duration - this.shiftSnapshot - 2);
+        // this.clock.after(() => { this.snapshot(); }, this.duration - this.shiftSnapshot);
+
         if (this.duration) {
             await this.clock.wait(this.duration - this.shiftSnapshot);
         }
 
-        await this.preSnapshot();
-        this.snapshot();
+        // await this.preSnapshot();
+        // this.snapshot();
 
         if (this.shiftSnapshot) {
             await this.clock.wait(this.shiftSnapshot);
@@ -418,7 +498,7 @@ export class Effect extends EventEmitter {
 
     startup() {
         this.isActive = true;
-        this.show();
+        // this.show();
         this.collection.addActiveEffect(this);
     }
 
@@ -438,25 +518,28 @@ export class Effect extends EventEmitter {
     }
 
     runHide() {
+        this.mesh?.setEnabled(false);
         this.assetContainer?.removeAllFromScene();
     }
 
     runShow() {
         this.assetContainer?.addAllToScene();
+        this.mesh?.setEnabled(true);
+        this.tickUpdate(this.clock.time, 0);
     }
 
     hide() {
         if (this.isVisible) {
             this.isVisible = false;
-            this.runHide();
         }
+        this.runHide();
     }
 
     show() {
         if (!this.isVisible) {
             this.isVisible = true;
-            this.runShow();
         }
+        this.runShow();
     }
 
     toJSON() {
@@ -494,6 +577,7 @@ export class Effect extends EventEmitter {
             isActive: this.isActive,
             isVisible: this.isVisible,
             usePlayerTick: this.usePlayerTick,
+            stage: this.stage,
 
             duration: this.duration,
             shiftSnapshot: this.shiftSnapshot,
@@ -515,7 +599,7 @@ export class Effect extends EventEmitter {
             startTime: this.startTime,
             endTime: this.endTime,
 
-            options: JSON.parse(JSON.stringify(this.options)),
+            // options: JSON.parse(JSON.stringify(this.options)),
         };
 
         if (this.mesh) {
@@ -530,7 +614,7 @@ export class Effect extends EventEmitter {
             (result as any).mesh = mesh;
         }
 
-        return;
+        return result;
     }
 
     loadJSONSnapshot(state: any) {
@@ -539,8 +623,6 @@ export class Effect extends EventEmitter {
         this.name = state.name;
         this.label = state.label;
         this.color = state.color;
-        this.isActive = state.isActive;
-        this.isVisible = state.isVisible;
         this.usePlayerTick = state.usePlayerTick;
         this.duration = state.duration;
         this.shiftSnapshot = state.shiftSnapshot;
@@ -557,10 +639,40 @@ export class Effect extends EventEmitter {
         this.startTime = state.startTime;
         this.endTime = state.endTime;
         this.target = state.target;
-        this.options = state.options;
+        // this.options = state.options;
+
+        if (state.stage !== this.stage) {
+            // Do some stuff.
+        }
+
+        if (state.isActive && !this.isActive) {
+            this.isActive = true;
+            // Handle change to active
+        }
+        if (!state.isActive && this.isActive) {
+            this.isActive = false;
+            // Handle change to inactive
+        }
+
+        if (state.isVisible && !this.isVisible) {
+            this.show();
+            // if (state.mesh && this.mesh) {
+            //     this.mesh.position.fromArray(state.mesh.position);
+            //     this.mesh.rotation.fromArray(state.mesh.rotation);
+            // }
+        }
+        if (!state.isVisible && this.isVisible) {
+            // if (state.mesh && this.mesh) {
+            //     this.mesh.position.fromArray(state.mesh.position);
+            //     this.mesh.rotation.fromArray(state.mesh.rotation);
+            // }
+            this.hide();
+        }
 
         // TODO: Restore mesh state
-        if (state.mesh && this.mesh) {
+        if (this.isVisible && state.mesh && this.mesh) {
+            this.mesh.position.fromArray(state.mesh.position);
+            this.mesh.rotation.fromArray(state.mesh.rotation);
         }
     }
 }

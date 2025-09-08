@@ -108,6 +108,8 @@ export class KBTowerEffect extends AoeDiscEffect {
             ball.position.y = (ballHeight - ballHeight * durationPercent) + triggerRadius;
         });
 
+        disc.setEnabled(false);
+
         return {
             disc
         };
@@ -157,6 +159,7 @@ export class KBTowerEffect extends AoeDiscEffect {
                         target.position.addInPlace(kbVector.scale(perDuration * delta));
                     }
                 };
+
                 this.clock.on('tick', applyKnockback);
                 this.clock.after(() => {
                     target.tags.delete('kb');

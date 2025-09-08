@@ -63,9 +63,16 @@ if (props.overrideDuration) {
 }
 
 const inputElapsedPercent = computed({
-    get() { return elapsedPercent.value; },
+    get() { return (elapsedPercent.value * 10); },
     set(value: number) {
-        clock.value.setTime(duration.value * (value / 100))
+        const newTime = duration.value * (value / 1000);
+        let snapshot = (window as any).__recorder.windToTime(newTime);
+        if (snapshot) {
+            clock.value.setTime(snapshot[0]);
+            (window as any).__fight.loadJSONSnapshot(snapshot[1]);
+        } else {
+            clock.value.setTime(newTime)
+        }
     }
 });
 
@@ -82,7 +89,7 @@ function reset() {
 
 <template>
     <div class="fight-bot-center flex flex-col absolute bottom-12 z-50">
-        <div class="flex p-2 bg-slate-100/45 rounded-box bg-blur min-w-96 gap-2 items-center">
+        <div class="flex p-2 bg-slate-100/45 rounded-box bg-blur w-xl max-w-[90vw] gap-2 items-center">
             <div class="tooltip tooltip-bottom" data-tip="Start/Pause <Space>">
                 <label @click="togglePause()"
                     class="swap swap-rotate btn btn-sm bg-transparent border-transparent shadow-none px-2"
@@ -91,11 +98,12 @@ function reset() {
                     <Icon class="swap-off" name="solar:pause-circle-linear" />
                 </label>
             </div>
-            <div class="flex flex-col w-full">
+            <div class="flex flex-col w-full grow">
                 <!--
                 <progress class="progress w-full" :value="elapsedPercent" max="100"></progress>
                 -->
-                <input type="range" min="0" max="100" v-model="inputElapsedPercent" class="range range-xs" />
+                <input type="range" min="0" max="1000" v-model="inputElapsedPercent"
+                    class="range range-xs min-w-full" />
             </div>
             <div class="pr-1 text-xs flex items-center">
                 <span class="countdown font-mono">

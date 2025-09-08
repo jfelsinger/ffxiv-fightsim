@@ -67,7 +67,6 @@ export class Fight extends EventEmitter {
 
     createWaymarks() {
         const waymarks = this.options.waymarks;
-        console.log('Create Waymarks: ', waymarks);
         if (waymarks) {
             const keys = Object.keys(waymarks) as any as WaymarkName[];
             keys.forEach((name) => {
@@ -138,23 +137,25 @@ export class Fight extends EventEmitter {
 
     async execute() {
         this.isActive = true;
-        this.createWaymarks();
-        this.emit('start-execute');
+        this.init();
 
-        if (this.scheduling === 'sequential') {
-            const len = this.sections.length;
-            for (let i = 0; i < len; i++) {
-                if (!this.isActive) break;
-                await this.executeSection(this.sections[i])
-            }
-        } else if (this.isActive) {
-            await Promise.all(this.sections.map(s => this.executeSection(s)));
-        }
+        // this.createWaymarks();
+        // this.emit('start-execute');
 
-        this.isActive = false;
-        if (!this.isDisposed) {
-            this.emit('end-execute');
-        }
+        // if (this.scheduling === 'sequential') {
+        //     const len = this.sections.length;
+        //     for (let i = 0; i < len; i++) {
+        //         if (!this.isActive) break;
+        //         await this.executeSection(this.sections[i])
+        //     }
+        // } else if (this.isActive) {
+        //     await Promise.all(this.sections.map(s => this.executeSection(s)));
+        // }
+
+        // this.isActive = false;
+        // if (!this.isDisposed) {
+        //     this.emit('end-execute');
+        // }
     }
 
     async executeSection(section: Scheduled<FightSection>) {
@@ -172,6 +173,46 @@ export class Fight extends EventEmitter {
         if (!this.isDisposed) {
             this.emit('end-section', { section });
         }
+    }
+
+    init(startTime = 0) {
+        this.createWaymarks();
+
+        let delay = startTime;
+        const len = this.sections.length;
+        if (this.scheduling === 'sequential') {
+            for (let i = 0; i < len; i++) {
+                const section = this.sections[i];
+                if (section) {
+                    delay += this.initSection(section, delay)
+                }
+            }
+        } else {
+            for (let i = 0; i < len; i++) {
+                const section = this.sections[i];
+                if (section) {
+                    this.initSection(section, delay)
+                }
+            }
+        }
+
+        this.emit('end-init');
+    }
+
+    initSection(section: Scheduled<FightSection>, startTime: number) {
+        this.emit('pre-init-section', { section, startTime });
+        if (section?.preStartDelay) { startTime += section.preStartDelay; }
+        const result = traverseScheduled(
+            section,
+            (item, n, st, cd, p) => {
+                item.init(n, p, st + cd)
+            },
+            this.clock,
+            0,
+            startTime
+        );
+        this.emit('init-section', { section, startTime, duration: result });
+        return result;
     }
 
     dispose() {
@@ -196,9 +237,9 @@ export class Fight extends EventEmitter {
             startPosition: JSON.parse(JSON.stringify(this.startPosition)),
             startPositionType: this.startPositionType,
 
-            options: JSON.parse(JSON.stringify(this.options)),
             arena: this.arena.toJSONSnapshot(),
             sections: (this.sections)?.map(s => getScheduledJSONSnapshot(s)),
+            collection: this.collection.toJSONSnapshot(),
         };
 
         return result;
@@ -215,8 +256,9 @@ export class Fight extends EventEmitter {
         this.startPositionType = state.startPositionType;
 
 
-        this.options = state.options;
+        // this.options = state.options;
         this.arena.loadJSONSnapshot(state.arena);
+        this.collection.loadJSONSnapshot(state.collection);
         this.sections.forEach((s, i) => {
             state.sections?.[i] && loadScheduledJSONSnapshot(s, state.sections[i]);
         });

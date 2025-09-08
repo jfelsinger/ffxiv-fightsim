@@ -136,6 +136,7 @@ export class Mechanic extends EventEmitter {
     }
 
     async execute(n = 0, parent?: ScheduledParent<Mechanic>) {
+        return;
         this.n = n;
         this.scheduledParent = parent;
 
@@ -158,6 +159,80 @@ export class Mechanic extends EventEmitter {
         this.endTime = this.clock.time;
         this.isActive = false;
         this.emit('end-execute');
+    }
+
+    init(n = 0, parent?: ScheduledParent<Mechanic>, startTime?: number) {
+        console.log('Mechanic init: ', n, startTime, this, parent);
+        this.n = n;
+        this.scheduledParent = parent;
+
+        startTime = startTime ?? this.clock.time ?? 0;
+        this.startTime = startTime;
+
+        const effects = this.getEffects();
+
+        this.activeEffects = effects;
+        let delay = startTime;
+        const len = effects.length;
+        if (this.scheduling === 'sequential') {
+            for (let i = 0; i < len; i++) {
+                const effect = effects[i];
+                if (effect) {
+                    delay += this.initEffect(effect, delay)
+                }
+            }
+        } else {
+            for (let i = 0; i < len; i++) {
+                const effect = effects[i];
+                if (effect) {
+                    this.initEffect(effect, delay)
+                }
+            }
+        }
+
+        this.emit('end-init');
+    }
+
+    initEffect(effect: Scheduled<Effect>, startTime: number) {
+        this.emit('pre-init-effect', { effect, startTime });
+        if (effect?.preStartDelay) { startTime += effect.preStartDelay; }
+        console.log('Init effect: ', effect, startTime);
+        const result = traverseScheduled(
+            effect,
+            (item, n, st, cd, p) => {
+                item.init(n, p, st + cd);
+            },
+            this.clock,
+            0,
+            startTime
+        );
+        this.emit('init-effect', { effect, startTime, duration: result });
+        return result;
+    }
+
+    run(n = 0, parent?: ScheduledParent<Mechanic>, startTime?: number) {
+        // this.n = n;
+        // this.scheduledParent = parent;
+
+        // this.isActive = true;
+        // this.startTime = this.clock.time;
+        // this.emit('start-execute');
+
+        // const effects = this.getEffects();
+        // this.activeEffects = effects;
+        // if (this.scheduling === 'sequential') {
+        //     const len = effects.length;
+        //     for (let i = 0; i < len; i++) {
+        //         if (!this.isActive) break;
+        //         await this.executeEffect(effects[i])
+        //     }
+        // } else if (this.isActive) {
+        //     await Promise.all(effects.map(effect => this.executeEffect(effect)));
+        // }
+
+        // this.endTime = this.clock.time;
+        // this.isActive = false;
+        // this.emit('end-execute');
     }
 
     tickUpdate(time: number, delta: number) {
@@ -186,7 +261,12 @@ export class Mechanic extends EventEmitter {
     async executeEffect(effect: Scheduled<Effect>) {
         this.emit('start-effect', { effect });
         if (effect?.preStartDelay) { await this.clock.wait(effect.preStartDelay); }
-        await executeScheduled(effect, (item, n, p) => Promise.resolve(this.isActive && item.start(n, p)), this.clock)
+        await executeScheduled(
+            effect,
+            // (item, n, p) => Promise.resolve(this.isActive && item.start(n, p)),
+            () => Promise.resolve(),
+            this.clock
+        );
         this.emit('end-effect', { effect });
     }
 
@@ -213,7 +293,7 @@ export class Mechanic extends EventEmitter {
             // TODO: Deal with scheduledParent properly
             // scheduledParent: this.scheduledParent,
 
-            options: JSON.parse(JSON.stringify(this.options)),
+            // options: JSON.parse(JSON.stringify(this.options)),
             effects: (this.effects)?.map(s => getScheduledJSONSnapshot(s)),
             activeEffects: (this.activeEffects)?.map(s => getScheduledJSONSnapshot(s)),
         };
@@ -231,7 +311,7 @@ export class Mechanic extends EventEmitter {
         this.usePlayerTick = state.usePlayerTick;
         this.startTime = state.startTime;
         this.endTime = state.endTime;
-        this.options = state.options;
+        // this.options = state.options;
 
         // TODO: Deal with scheduledParent properly
         // this.scheduledParent = state.scheduledParent;

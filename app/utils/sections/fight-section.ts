@@ -80,6 +80,7 @@ export class FightSection extends EventEmitter {
     }
 
     async execute(n = 0, parent?: ScheduledParent<FightSection>) {
+        return;
         this.n = n;
         this.scheduledParent = parent;
 
@@ -107,6 +108,49 @@ export class FightSection extends EventEmitter {
         this.emit('end-mechanic', { mechanic });
     }
 
+    init(n = 0, parent?: ScheduledParent<FightSection>, startTime = 0) {
+        this.n = n;
+        this.scheduledParent = parent;
+
+        startTime = startTime ?? this.clock.time ?? 0;
+
+        let delay = startTime;
+        const len = this.mechanics.length;
+        if (this.scheduling === 'sequential') {
+            for (let i = 0; i < len; i++) {
+                const mechanic = this.mechanics[i];
+                if (mechanic) {
+                    delay += this.initMechanic(mechanic, delay)
+                }
+            }
+        } else {
+            for (let i = 0; i < len; i++) {
+                const mechanic = this.mechanics[i];
+                if (mechanic) {
+                    this.initMechanic(mechanic, delay)
+                }
+            }
+        }
+
+        this.emit('end-init');
+    }
+
+    initMechanic(mechanic: Scheduled<Mechanic>, startTime: number) {
+        this.emit('pre-init-mechanic', { mechanic, startTime });
+        if (mechanic?.preStartDelay) { startTime += mechanic.preStartDelay; }
+        const result = traverseScheduled(
+            mechanic,
+            (item, n, st, cd, p) => {
+                item.init(n, p, st + cd);
+            },
+            this.clock,
+            0,
+            startTime
+        );
+        this.emit('init-mechanic', { mechanic, startTime, duration: result });
+        return result;
+    }
+
     dispose() {
         this.isActive = false;
         const len = this.mechanics.length;
@@ -126,7 +170,7 @@ export class FightSection extends EventEmitter {
             // TODO: Deal with scheduledParent properly
             // scheduledParent: this.scheduledParent,
 
-            options: JSON.parse(JSON.stringify(this.options)),
+            // options: JSON.parse(JSON.stringify(this.options)),
             mechanics: (this.mechanics)?.map(s => getScheduledJSONSnapshot(s)),
         };
 
@@ -140,7 +184,7 @@ export class FightSection extends EventEmitter {
         this.label = state.label;
         this.scheduling = state.scheduling;
         this.isActive = state.isActive;
-        this.options = state.options;
+        // this.options = state.options;
 
         // TODO: Deal with scheduledParent properly
         // this.scheduledParent = state.scheduledParent;

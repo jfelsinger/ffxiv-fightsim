@@ -100,6 +100,59 @@ export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: 
     }
 }
 
+export function traverseScheduled<T>(scheduled: Scheduled<T>, func: (item: T, n: number, startTime: number, currentDelay: number, parent?: ScheduledParent<T>) => any, clock: Clock, repeatNumber = 0, startTime = 0) {
+    let delay = scheduled.startDelay || 0;
+    func(scheduled.item, repeatNumber, startTime, delay);
+
+    if (scheduled.endDelay) {
+        delay += scheduled.endDelay;
+    }
+
+    if (scheduled.after) {
+        if (isScheduled(scheduled.after)) {
+            if (scheduled.after.preStartDelay) { delay += scheduled.after.preStartDelay; }
+            traverseScheduled(
+                scheduled.after,
+                (i, n, st, cd, p) => {
+                    if (p) { p.parent = { n: repeatNumber, scheduled }; }
+                    else { p = { n: repeatNumber, scheduled }; }
+                    return func(i, n, st, cd, p);
+                },
+                clock,
+                0,
+                startTime + delay
+            )
+        } else {
+            func(scheduled.after, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
+        }
+    }
+
+    if (scheduled.repeat) {
+        if (scheduled.repeat > repeatNumber) {
+            traverseScheduled(scheduled, func, clock, (repeatNumber || 0) + 1, startTime + delay);
+        } else if (scheduled.afterRepeats) {
+            if (isScheduled(scheduled.afterRepeats)) {
+                if (scheduled.afterRepeats.preStartDelay) { delay += scheduled.afterRepeats.preStartDelay; }
+                traverseScheduled(
+                    scheduled.afterRepeats,
+                    (i, n, st, cd, p) => {
+                        if (p) { p.parent = { n: repeatNumber, scheduled }; }
+                        else { p = { n: repeatNumber, scheduled }; }
+                        return func(i, n, st, cd, p);
+                    },
+                    clock,
+                    0,
+                    startTime + delay
+                )
+            } else {
+                func(scheduled.afterRepeats, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
+            }
+        }
+    }
+
+    return startTime + delay;
+}
+
 export function getScheduledJSONSnapshot<T>(scheduled: Scheduled<T>) {
     const result: any = {
         label: scheduled.label,
