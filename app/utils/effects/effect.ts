@@ -350,9 +350,10 @@ export class Effect extends EventEmitter {
         this.emit('end');
     }
 
-    init(n = 0, parent?: ScheduledParent<Effect>, startTime?: number) {
+    init(n = 0, scheduledSelf: Scheduled<Effect>, parent?: ScheduledParent<Effect>, startTime?: number) {
         this.n = n;
         this.scheduledParent = parent;
+        console.log('ScheduledParent: ', parent);
         this.telegraphShown = false;
 
         this.startTime = startTime ?? this.clock.time;
@@ -361,6 +362,7 @@ export class Effect extends EventEmitter {
 
         this.clock.at(() => {
             console.log('Effect starting: ', this.clock.time, this);
+            this.emit('start-effect', { effect: scheduledSelf });
             const status = this.options.startStatus;
             if (status) {
                 const targets = this.getTargets();
@@ -383,6 +385,7 @@ export class Effect extends EventEmitter {
         // this.clock.at(() => { this.snapshot(); }, this.startTime + this.duration - this.shiftSnapshot);
 
         this.clock.at(() => {
+            this.emit('end-effect', { effect: scheduledSelf });
             this.emit('pre-cleanup');
             this.cleanup();
 

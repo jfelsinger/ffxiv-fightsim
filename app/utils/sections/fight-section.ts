@@ -81,38 +81,43 @@ export class FightSection extends EventEmitter {
 
     async execute(n = 0, parent?: ScheduledParent<FightSection>) {
         return;
-        this.n = n;
-        this.scheduledParent = parent;
+        // this.n = n;
+        // this.scheduledParent = parent;
 
-        this.isActive = true;
-        this.emit('start-execute');
+        // this.isActive = true;
+        // this.emit('start-execute');
 
-        if (this.scheduling === 'sequential') {
-            const len = this.mechanics.length;
-            for (let i = 0; i < len; i++) {
-                if (!this.isActive) break;
-                await this.executeMechanic(this.mechanics[i])
-            }
-        } else if (this.isActive) {
-            await Promise.all(this.mechanics.map(m => this.executeMechanic(m)));
-        }
+        // if (this.scheduling === 'sequential') {
+        //     const len = this.mechanics.length;
+        //     for (let i = 0; i < len; i++) {
+        //         if (!this.isActive) break;
+        //         await this.executeMechanic(this.mechanics[i])
+        //     }
+        // } else if (this.isActive) {
+        //     await Promise.all(this.mechanics.map(m => this.executeMechanic(m)));
+        // }
 
-        this.isActive = false;
-        this.emit('end-execute');
+        // this.isActive = false;
+        // this.emit('end-execute');
     }
 
-    async executeMechanic(mechanic: Scheduled<Mechanic>) {
-        this.emit('start-mechanic', { mechanic });
-        if (mechanic?.preStartDelay) { await this.clock.wait(mechanic.preStartDelay); }
-        await executeScheduled(mechanic, (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)), this.clock)
-        this.emit('end-mechanic', { mechanic });
-    }
+    // async executeMechanic(mechanic: Scheduled<Mechanic>) {
+    //     this.emit('start-mechanic', { mechanic });
+    //     if (mechanic?.preStartDelay) { await this.clock.wait(mechanic.preStartDelay); }
+    //     await executeScheduled(mechanic, (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)), this.clock)
+    //     this.emit('end-mechanic', { mechanic });
+    // }
 
-    init(n = 0, parent?: ScheduledParent<FightSection>, startTime = 0) {
+    init(n = 0, scheduledSelf: Scheduled<Mechanic>, parent?: ScheduledParent<FightSection>, startTime = 0) {
         this.n = n;
         this.scheduledParent = parent;
 
         startTime = startTime ?? this.clock.time ?? 0;
+
+        this.clock.at(() => {
+            this.isActive = true;
+            this.emit('start-section', { section: scheduledSelf });
+        }, startTime);
 
         let delay = startTime;
         const len = this.mechanics.length;
@@ -141,7 +146,7 @@ export class FightSection extends EventEmitter {
         const result = traverseScheduled(
             mechanic,
             (item, n, st, cd, p) => {
-                item.init(n, p, st + cd);
+                item.init(n, mechanic, p, st + cd);
             },
             this.clock,
             0,

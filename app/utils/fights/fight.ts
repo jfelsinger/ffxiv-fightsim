@@ -158,22 +158,22 @@ export class Fight extends EventEmitter {
         // }
     }
 
-    async executeSection(section: Scheduled<FightSection>) {
-        this.emit('start-section', { section });
-        if (!this.isDisposed) {
-            if (section?.preStartDelay) { await this.clock.wait(section.preStartDelay); }
-        }
-        if (!this.isDisposed) {
-            await executeScheduled(
-                section,
-                (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)),
-                this.clock
-            );
-        }
-        if (!this.isDisposed) {
-            this.emit('end-section', { section });
-        }
-    }
+    // async executeSection(section: Scheduled<FightSection>) {
+    //     this.emit('start-section', { section });
+    //     if (!this.isDisposed) {
+    //         if (section?.preStartDelay) { await this.clock.wait(section.preStartDelay); }
+    //     }
+    //     if (!this.isDisposed) {
+    //         await executeScheduled(
+    //             section,
+    //             (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)),
+    //             this.clock
+    //         );
+    //     }
+    //     if (!this.isDisposed) {
+    //         this.emit('end-section', { section });
+    //     }
+    // }
 
     init(startTime = 0) {
         this.createWaymarks();
@@ -205,7 +205,7 @@ export class Fight extends EventEmitter {
         const result = traverseScheduled(
             section,
             (item, n, st, cd, p) => {
-                item.init(n, p, st + cd)
+                item.init(n, section, p, st + cd)
             },
             this.clock,
             0,
