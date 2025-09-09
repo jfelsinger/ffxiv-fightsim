@@ -7,19 +7,13 @@ export class PreyMarkerEffect extends Effect {
 
     constructor(options: PreyMarkerEffectOptions) {
         super(options);
-
-        const { mesh } = this.makeAoe();
-        this.mesh = mesh;
     }
 
-    override cleanup() {
-        this.mesh?.dispose()
-        super.cleanup();
-    }
-
-    override dispose() {
-        this.mesh?.dispose()
-        super.dispose();
+    override startup() {
+        super.startup();
+        if (!this.mesh) {
+            this.mesh = this.makeAoe().mesh;
+        }
     }
 
     makeAoe() {

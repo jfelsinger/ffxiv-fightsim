@@ -7,5 +7,4 @@ export class CastBarEffect extends Effect {
     constructor(options: CastBarEffectOptions) {
         super(options);
     }
-
 }

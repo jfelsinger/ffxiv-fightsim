@@ -29,6 +29,5 @@ export class StageComboCastEffect extends CastBarEffect {
         // const disc1 = Bab.MeshBuilder.CreateDisc('stage-telegraph-1', {
         //     radius,
         // }, this.collection.scene);
-
     }
 }

@@ -8,6 +8,13 @@ export type M3SBarbarousBarrageOptions = MechanicOptions & {
 };
 
 
+const positions = [
+    '-0.55,-0.55',
+    '0.55,-0.55',
+    '-0.55,0.55',
+    '0.55,0.55',
+];
+
 export class M3SBarbarousBarrage extends Mechanic {
     override name = 'm3s-barbarous-barrage';
     override options: M3SBarbarousBarrageOptions;
@@ -25,7 +32,9 @@ export class M3SBarbarousBarrage extends Mechanic {
         // const effectPreSnapshot = (effect: Scheduled<Effect>) => {
         // };
 
+
         this.on('start-mechanic', () => {
+            let randomPosition = positions[Math.round(Math.random() * (positions.length - 1))];
             if (Math.round(Math.random())) {
                 const m1 = this.effects.find(e => e.label === 'kb-tower-m1');
                 const m2 = this.effects.find(e => e.label === 'kb-tower-m2');
@@ -41,15 +50,9 @@ export class M3SBarbarousBarrage extends Mechanic {
             this.clock.after(() => {
                 const boss = this.collection.getMeshByName('boss-marker');
                 console.log('MECHANIC:', this, boss);
-                const positions = [
-                    '-0.55,-0.55',
-                    '0.55,-0.55',
-                    '-0.55,0.55',
-                    '0.55,0.55',
-                ];
                 if (boss) {
                     boss.position = getPosition(
-                        positions[Math.round(Math.random() * (positions.length - 1))],
+                        randomPosition,
                         'arena',
                         this.collection,
                     );

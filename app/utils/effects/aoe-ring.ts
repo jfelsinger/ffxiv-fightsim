@@ -54,7 +54,6 @@ export class AoeRingEffect extends Effect {
 
     override checkMeshCollision(target: Bab.Mesh) {
         const mesh = this.mesh;
-        console.log('aoe-ring checkMeshCollision', this, mesh, target);
         if (!mesh || !target) {
             return false;
         }
