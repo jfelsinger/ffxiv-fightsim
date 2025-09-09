@@ -22,7 +22,7 @@ export class M4SWitchHuntBaits extends Mechanic {
 
         const startBait = useState<BaitType>('m4s-wnwh-start-bait', () => Math.round(Math.random()) ? 'near' : 'far');
 
-        this.on('start-execute', () => {
+        this.on('start-mechanic', () => {
             startBait.value = Math.round(Math.random()) ? 'near' : 'far';
 
             const hit1 = this.effects.find((m) => m.label === 'bait-1');

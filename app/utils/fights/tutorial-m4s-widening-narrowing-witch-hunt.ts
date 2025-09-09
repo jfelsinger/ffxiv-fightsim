@@ -79,7 +79,7 @@ export class M4STutorialFight extends M4SFight {
         const { role: playerRole } = useRole();
         const { hits, hitsRecord, recordHits } = useHits();
 
-        this.on('end-execute', () => {
+        this.on('end-fight', () => {
             if (hits.value === 0) {
                 recordHits();
             }
@@ -87,7 +87,7 @@ export class M4STutorialFight extends M4SFight {
             console.log('HITS: ', hitsRecord.value);
         });
 
-        this.on('start-execute', () => {
+        this.on('start-fight', () => {
             let player = this.collection.characters['player'];
             const { npcs } = this.collection.setupStandardParty();
             npcs.forEach((npc) => this.setupNpc(npc));

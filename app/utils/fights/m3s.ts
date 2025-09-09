@@ -14,7 +14,7 @@ export class M3SFight extends Fight {
         super(options);
         this.options = options;
 
-        this.on('start-execute', () => {
+        this.on('start-fight', () => {
             const bossSize = yalmsToM(5.25);
             const height = bossSize * 2.75;
             const width = height * 0.655;

@@ -23,6 +23,7 @@ export class AoeGroupEffect extends Effect {
                 const aoeOptions = {
                     ...options,
                     position: '0,0,0',
+                    assetContainer: this.assetContainer,
                     ...options.aoes[i],
                 };
 
@@ -47,6 +48,7 @@ export class AoeGroupEffect extends Effect {
     }
 
     override async execute() {
+        return;
         const len = this.aoes.length;
         const promises: Promise<void>[] = [];
 
@@ -57,6 +59,16 @@ export class AoeGroupEffect extends Effect {
 
         if (this.isActive) {
             this.snapshot();
+        }
+    }
+
+    override init(n = 0, scheduledSelf: Scheduled<Effect>, parent?: ScheduledParent<Effect>, startTime?: number) {
+        super.init(n, scheduledSelf, parent, startTime);
+
+        const len = this.aoes.length;
+        for (let i = 0; i < len; i++) {
+            const aoe = this.aoes[i];
+            aoe?.init(0, scheduledSelf, parent, this.startTime);
         }
     }
 
@@ -76,6 +88,22 @@ export class AoeGroupEffect extends Effect {
                     mesh.parent = this.mesh;
                 }
             }
+        }
+    }
+
+    override runHide() {
+        super.runHide();
+        const len = this.aoes.length;
+        for (let i = 0; i < len; i++) {
+            this.aoes[i]?.runHide();
+        }
+    }
+
+    override runShow() {
+        super.runShow();
+        const len = this.aoes.length;
+        for (let i = 0; i < len; i++) {
+            this.aoes[i]?.runShow();
         }
     }
 

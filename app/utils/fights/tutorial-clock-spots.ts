@@ -43,7 +43,7 @@ export class ClockSpotsTutorial extends Fight {
         console.log('ClockSpotsTutorial: ', this);
 
 
-        this.on('start-execute', () => {
+        this.on('start-fight', () => {
             const makeNpc = (name: string, position: string) => {
                 const npc = new Character(name, {
                     diffuseColor: Bab.Color3.FromHexString('#e9c8aa'),

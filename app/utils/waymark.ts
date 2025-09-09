@@ -93,7 +93,8 @@ export class Waymark {
 
         const position = this.getPosition();
         const iconSize = 2;
-        const icon = Bab.MeshBuilder.CreatePlane(waymarkName, { width: iconSize, height: iconSize }, this.fight.collection.scene);
+        const icon = Bab.MeshBuilder.CreatePlane(`${waymarkName}-icon`, { width: iconSize, height: iconSize }, this.fight.collection.scene);
+        icon.isPickable = false;
         icon.position = position?.clone();
         icon.position.y += 5.5;
 
@@ -122,7 +123,7 @@ export class Waymark {
         let sides = WaymarkNameToSidesMapping[this.name];
         const bodyHeight = 4.5;
         const mesh = Bab.MeshBuilder.CreateCylinder(
-            `${waymarkName}-body`,
+            `${waymarkName}`,
             {
                 diameter: (sides === 4 ? SquareWaymarkRadius : RoundWaymarkRadius) * 2,
                 height: bodyHeight,
@@ -139,6 +140,7 @@ export class Waymark {
             this.fight.collection.scene
         )
         mesh.renderingGroupId = 2;
+        mesh.isPickable = false;
         mesh.position = position?.clone();
         mesh.position.y += bodyHeight / 2;
         mesh.position.y += 0.1;
@@ -167,6 +169,7 @@ export class Waymark {
         })
 
         this.mesh = mesh;
+        icon.setParent(mesh);
 
         return {
             mesh,

@@ -117,7 +117,7 @@ export class M2STutorial extends M2SFight {
 
                 section.item.on('start-mechanic', ({ mechanic }) => {
                     if (mechanic?.item?.name === 'm2s-poison-sting') {
-                        mechanic.item.once('start-execute', () => {
+                        mechanic.item.once('start-mechanic', () => {
                             this.activeStep = 'poison-sting';
                         });
 
@@ -235,7 +235,7 @@ export class M2STutorial extends M2SFight {
                             });
                         });
                     } else if (mechanic?.item?.name === 'm2s-bee-sting') {
-                        mechanic.item.once('start-execute', () => {
+                        mechanic.item.once('start-mechanic', () => {
                             this.clock.after(() => {
                                 this.activeStep = 'bee-sting';
                             }, 200);
@@ -266,7 +266,7 @@ export class M2STutorial extends M2SFight {
             }
         });
 
-        this.on('start-execute', () => {
+        this.on('start-fight', () => {
             (window as any).__m2s = this;
 
             let dpsCount = 1;

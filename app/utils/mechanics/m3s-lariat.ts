@@ -24,7 +24,7 @@ export class M3SLariat extends Mechanic {
 
         const lariatType = useState<LariatType>('m3s-lariat-type', () => options?.lariatType || (Math.round(Math.random()) ? 'octuple' : 'quadruple'));
         const lariatPosition = useState<LariatPosition>('m3s-lariat-position', () => options?.lariatPosition || (Math.round(Math.random()) ? 'inner' : 'outer'));
-        this.on('start-execute', () => {
+        this.on('start-mechanic', () => {
             lariatType.value = options?.lariatType || (Math.round(Math.random()) ? 'octuple' : 'quadruple');
             lariatPosition.value = options?.lariatPosition || (Math.round(Math.random()) ? 'inner' : 'outer');
 

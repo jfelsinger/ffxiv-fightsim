@@ -19,33 +19,6 @@ export class M2SPoisonSting extends Mechanic {
 
         (window as any).__mechanic = this;
 
-        const effectShowTelegraph = (effect: Scheduled<Effect>) => {
-        };
-
-        const effectPreSnapshot = (effect: Scheduled<Effect>) => {
-        };
-
-        this.on('start-execute', () => {
-        });
-
-        this.on('start-effect', ({ effect }) => {
-            effect.item.on('start', () => {
-                console.log('Start Poison Sting: ', effect);
-            });
-            effect.item.on('end', () => {
-                console.log('End Poison Sting: ', effect);
-            });
-            effect.item.on('show-telegraph', effectShowTelegraph);
-            effect.item.on('pre-snapshot', effectPreSnapshot);
-        });
-
-        this.on('end-effect', ({ effect }) => {
-            effect.item.off('show-telegraph', effectShowTelegraph);
-            effect.item.off('pre-snapshot', effectPreSnapshot);
-        });
-
-        this.on('dispose', () => {
-        });
     }
 
     // override getEffects(): Scheduled<Effect>[] {

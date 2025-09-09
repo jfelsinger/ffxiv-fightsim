@@ -22,7 +22,7 @@ export class M4SWideningNarrowingWitchHunt extends Mechanic {
 
         const huntType = useState<WitchHuntType>('m4s-wnwh-type', () => Math.round(Math.random()) ? 'widening' : 'narrowing');
 
-        this.on('start-execute', () => {
+        this.on('start-mechanic', () => {
             huntType.value = Math.round(Math.random()) ? 'widening' : 'narrowing';
             if (huntType.value === 'widening') {
                 this.options.castName = 'Widening Witch Hunt';

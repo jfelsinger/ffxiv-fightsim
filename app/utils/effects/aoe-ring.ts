@@ -54,6 +54,7 @@ export class AoeRingEffect extends Effect {
 
     override checkMeshCollision(target: Bab.Mesh) {
         const mesh = this.mesh;
+        console.log('aoe-ring checkMeshCollision', this, mesh, target);
         if (!mesh || !target) {
             return false;
         }
@@ -79,10 +80,13 @@ export class AoeRingEffect extends Effect {
 
         const endAngle = startAngle + this.thetaLength;
 
-        return (
+        const result = (
             posTheta >= startAngle &&
             posTheta <= endAngle
         );
+
+        console.log('aoe-ring collision', result);
+        return result;
     }
 
     makeAoe() {

@@ -37,6 +37,8 @@ export class Fight extends EventEmitter {
     startPosition?: PositionOption
     startPositionType?: PositionType
     waymarks?: Waymark[]
+    totalSections = 0;
+    endedSections = 0;
 
     getDuration() {
         let duration = 0;
@@ -140,7 +142,6 @@ export class Fight extends EventEmitter {
         this.init();
 
         // this.createWaymarks();
-        // this.emit('start-execute');
 
         // if (this.scheduling === 'sequential') {
         //     const len = this.sections.length;
@@ -154,29 +155,13 @@ export class Fight extends EventEmitter {
 
         // this.isActive = false;
         // if (!this.isDisposed) {
-        //     this.emit('end-execute');
         // }
     }
 
-    // async executeSection(section: Scheduled<FightSection>) {
-    //     this.emit('start-section', { section });
-    //     if (!this.isDisposed) {
-    //         if (section?.preStartDelay) { await this.clock.wait(section.preStartDelay); }
-    //     }
-    //     if (!this.isDisposed) {
-    //         await executeScheduled(
-    //             section,
-    //             (item, n, p) => Promise.resolve(this.isActive && item.execute(n, p)),
-    //             this.clock
-    //         );
-    //     }
-    //     if (!this.isDisposed) {
-    //         this.emit('end-section', { section });
-    //     }
-    // }
-
     init(startTime = 0) {
         this.createWaymarks();
+        this.endedSections = 0;
+        this.emit('start-fight');
 
         let delay = startTime;
         const len = this.sections.length;
@@ -195,12 +180,9 @@ export class Fight extends EventEmitter {
                 }
             }
         }
-
-        this.emit('end-init');
     }
 
     initSection(section: Scheduled<FightSection>, startTime: number) {
-        this.emit('pre-init-section', { section, startTime });
         if (section?.preStartDelay) { startTime += section.preStartDelay; }
         const result = traverseScheduled(
             section,
@@ -211,7 +193,16 @@ export class Fight extends EventEmitter {
             0,
             startTime
         );
-        this.emit('init-section', { section, startTime, duration: result });
+
+        this.totalSections++;
+        section.item.on('start-section', () => { this.emit('start-section', { section }) });
+        section.item.on('end-section', () => {
+            this.emit('end-section', { section })
+            this.endedSections++;
+            if (this.endedSections >= this.totalSections) {
+                this.emit('end-fight');
+            }
+        });
         return result;
     }
 

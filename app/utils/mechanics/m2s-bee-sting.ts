@@ -18,28 +18,6 @@ export class M2SBeeSting extends Mechanic {
         super(options);
         this.options = options;
         this.scheduling = options.scheduling || 'parallel';
-
-        const effectShowTelegraph = (effect: Scheduled<Effect>) => {
-            console.log('show effect: ', effect);
-        };
-
-        const effectPreSnapshot = (effect: Scheduled<Effect>) => {
-            console.log('pre-snapshot: ', effect);
-        };
-
-        this.on('start-execute', () => {
-        });
-
-        this.on('start-effect', ({ effect }) => {
-            effect.item.once('show-telegraph', effectShowTelegraph);
-            effect.item.once('pre-snapshot', effectPreSnapshot);
-        });
-
-        this.on('end-effect', ({ effect }) => {
-        });
-
-        this.on('dispose', () => {
-        });
     }
 
     // override getEffects(): Scheduled<Effect>[] {

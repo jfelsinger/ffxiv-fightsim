@@ -25,7 +25,7 @@ export class M3SBarbarousBarrage extends Mechanic {
         // const effectPreSnapshot = (effect: Scheduled<Effect>) => {
         // };
 
-        this.on('start-execute', () => {
+        this.on('start-mechanic', () => {
             if (Math.round(Math.random())) {
                 const m1 = this.effects.find(e => e.label === 'kb-tower-m1');
                 const m2 = this.effects.find(e => e.label === 'kb-tower-m2');

@@ -13,9 +13,6 @@ export class WideningNarrowingWitchHuntSection extends FightSection {
     constructor(options: WideningNarrowingWitchHuntSectionOptions) {
         super(options);
         this.options = options;
-
-        this.on('start-execute', () => {
-        });
     }
 
 }

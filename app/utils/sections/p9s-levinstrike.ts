@@ -35,7 +35,7 @@ export class P9SSection extends FightSection {
 
         const orbCount = 4;
         const diameter = 2.5;
-        this.on('start-execute', () => {
+        this.on('start-section', () => {
             for (let i = 0; i < orbCount; i++) {
                 const orb = Bab.MeshBuilder.CreateSphere(`orb-${i + 1}`, {
                     diameter,

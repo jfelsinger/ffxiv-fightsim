@@ -5,12 +5,18 @@ const castState = useCastState();
 export const enum EffectStage {
     preInitialization = 0,
     initialized = 1,
-    preStartup = 2,
-    postStartup = 3,
-    executing = 4,
-    preSnapshot = 5,
-    preCleanup = 6,
-    ended = 7,
+
+    start = 2,
+    running = 3,
+
+    prePreSnapshot = 4,
+    postPreSnapshot = 5,
+
+    preSnapshot = 6,
+    postSnapshot = 7,
+
+    preCleanup = 8,
+    ended = 9,
 };
 
 export type EffectTargetType =
@@ -34,6 +40,7 @@ export type EffectOptions<TExtras = {}> = {
     clock?: Clock
     usePlayerTick?: boolean
     telegraph?: number
+    assetContainer?: Bab.AssetContainer
 
     target?: EffectTarget | (EffectTarget[])
     position?: PositionOption
@@ -94,6 +101,8 @@ export class Effect extends EventEmitter {
     options: EffectOptions;
 
     startTime: number = 0;
+    snapshotTime: number = 0;
+    cleanupTime: number = 0;
     endTime: number = 0;
     get elapsed() { return this.clock.time - this.startTime; }
 
@@ -109,7 +118,7 @@ export class Effect extends EventEmitter {
         this.duration = parseNumber(options.duration ?? 0);
         this.shiftSnapshot = parseNumber(options.shiftSnapshot ?? 0);
         this.collection = options.collection;
-        this.assetContainer = new Bab.AssetContainer(this.collection.scene);
+        this.assetContainer = options.assetContainer || new Bab.AssetContainer(this.collection.scene);
         this.clock = options.clock || this.collection.worldClock;
         this.color = options.color;
         this.repeatTarget = options.repeatTarget ?? false;
@@ -149,6 +158,13 @@ export class Effect extends EventEmitter {
 
     setColor(color: string) {
         this.color = color;
+    }
+
+    setStage(stage: EffectStage) {
+        const oldStage = this.stage;
+        this.stage = stage;
+        this.emit('stage-change', { effect: this, oldStage, stage });
+        return oldStage;
     }
 
     getColor() {
@@ -263,11 +279,11 @@ export class Effect extends EventEmitter {
     }
 
     tickUpdate(time: number, delta: number) {
+        this.run(time);
         if (this.isActive) {
             const durationPercent = this.getDurationPercent();
             const adjustedTelegraph = this.adjustedTelegraph;
             if (this.options.castName) {
-                console.log('Effect cast percent: ', this.options.castName, this.getDuration(), this.elapsed);
                 if (durationPercent < 1) {
                     castState.value = {
                         name: this.options.castName,
@@ -319,98 +335,53 @@ export class Effect extends EventEmitter {
     }
 
 
-    async start(n = 0, parent?: ScheduledParent<Effect>, startTime?: number) {
-        return;
-
-        // this.n = n;
-        // this.scheduledParent = parent;
-        // this.telegraphShown = false;
-
-        // TODO: Implement this somewhere else.
-        // TODO: if tutorial mode
-        // this.on('show-telegraph', () => {
-        //     this.clock.pause();
-        // });
-
-        // this.on('pre-snapshot', () => {
-        //     this.clock.pause();
-        // });
-
-        // this.startTime = startTime ?? this.clock.time;
-        // this.emit('start');
-        // this.startup();
-
-        this.emit('post-startup');
-        await this.execute();
-
-        this.emit('pre-cleanup');
-
-        this.cleanup();
-        this.endTime = this.clock.time;
-        this.emit('end');
-    }
-
     init(n = 0, scheduledSelf: Scheduled<Effect>, parent?: ScheduledParent<Effect>, startTime?: number) {
         this.n = n;
         this.scheduledParent = parent;
-        console.log('ScheduledParent: ', parent);
         this.telegraphShown = false;
 
+        this.label = this.label || scheduledSelf.label;
         this.startTime = startTime ?? this.clock.time;
-        this.emit('init');
-        this.startup();
+        this.snapshotTime = this.startTime + this.duration - this.shiftSnapshot;
+        this.cleanupTime = this.startTime + this.duration + 1;
 
-        this.clock.at(() => {
-            console.log('Effect starting: ', this.clock.time, this);
-            this.emit('start-effect', { effect: scheduledSelf });
-            const status = this.options.startStatus;
-            if (status) {
-                const targets = this.getTargets();
-                targets.forEach(target => {
-                    if ((target as any)?.addStatus) {
-                        (target as Character).addStatus(status);
-                    }
-                })
+        this.startup();
+        this.hide();
+        this.setStage(EffectStage.initialized);
+    }
+
+    run(time: number) {
+        if (time >= this.startTime) {
+            if (this.stage === EffectStage.initialized) {
+                console.log('runStart() - ', time, this);
+                this.runStart();
             }
 
-            this.isActive;
-            this.show();
-        }, this.startTime);
+            if (time >= this.snapshotTime) {
+                // If it is time for the pre-snapshot, return so that the actual
+                // snapshot+ takes another tick.
+                if (this.stage === EffectStage.running) {
+                    console.log('runPreSnapshot() - ', time, this);
+                    return this.runPreSnapshot();
+                } else if (this.stage === EffectStage.postPreSnapshot) {
+                    console.log('runSnapshot() - ', time, this);
+                    this.runSnapshot();
+                }
+            }
 
-        this.clock.at(async () => {
-            await this.preSnapshot();
-            this.snapshot();
-        }, this.startTime + this.duration - this.shiftSnapshot);
-        // this.clock.at(() => { this.preSnapshot(); }, this.startTime + this.duration - this.shiftSnapshot - 2);
-        // this.clock.at(() => { this.snapshot(); }, this.startTime + this.duration - this.shiftSnapshot);
-
-        this.clock.at(() => {
-            this.emit('end-effect', { effect: scheduledSelf });
-            this.emit('pre-cleanup');
-            this.cleanup();
-
-            this.endTime = this.clock.time;
-            // console.log('Effect ending: ', this.endTime, this.startTime + this.duration, this);
-            this.emit('end');
-        }, this.startTime + this.duration + 1);
-
-        this.emit('post-init');
+            if (time >= this.cleanupTime && this.stage === EffectStage.postSnapshot) {
+                console.log('runEnd() - ', time, this);
+                this.runEnd();
+            }
+        }
     }
 
-    run(n = 0, parent?: ScheduledParent<Effect>, startTime?: number) {
-        return;
-        this.emit('post-startup');
-        this.execute();
+    runStart() {
+        this.setStage(EffectStage.start);
+        this.isActive = true;
+        this.show();
+        this.emit('start-effect');
 
-        this.emit('pre-cleanup');
-
-        this.cleanup();
-        this.endTime = this.clock.time;
-        this.emit('end');
-    }
-
-    async execute() {
-        return;
         const status = this.options.startStatus;
         if (status) {
             const targets = this.getTargets();
@@ -421,38 +392,41 @@ export class Effect extends EventEmitter {
             })
         }
 
-        this.clock.after(async () => {
-            await this.preSnapshot();
-            this.snapshot();
-        }, this.duration - this.shiftSnapshot);
-        // this.clock.after(() => { this.preSnapshot(); }, this.duration - this.shiftSnapshot - 2);
-        // this.clock.after(() => { this.snapshot(); }, this.duration - this.shiftSnapshot);
-
-        if (this.duration) {
-            await this.clock.wait(this.duration - this.shiftSnapshot);
-        }
-
-        // await this.preSnapshot();
-        // this.snapshot();
-
-        if (this.shiftSnapshot) {
-            await this.clock.wait(this.shiftSnapshot);
-        }
+        this.setStage(EffectStage.running);
     }
 
-    async preSnapshot() {
+    runPreSnapshot() {
+        this.setStage(EffectStage.prePreSnapshot);
+        this.preSnapshot();
+        this.setStage(EffectStage.postPreSnapshot);
+    }
+
+    runSnapshot() {
+        this.setStage(EffectStage.preSnapshot);
+        this.snapshot();
+        this.setStage(EffectStage.postSnapshot);
+    }
+
+    runEnd() {
+        this.setStage(EffectStage.preCleanup);
+        console.log('END Effect: ', this.clock.time, this.startTime + this.duration + 1);
+        this.emit('end-effect');
+        this.cleanup();
+
+        this.endTime = this.clock.time;
+        this.setStage(EffectStage.ended);
+    }
+
+    preSnapshot() {
         if (!this.isActive) { return; }
-        // else:
-
         this.emit('pre-snapshot', { mesh: this.mesh });
-
-        // Shhh. No-one has to know that we're throwing the timing off by
-        // ~1ms + whatever the clock/frame delay is
-        await this.clock.wait(1);
     }
 
     snapshot() {
-        if (!this.isActive) { return; }
+        if (!this.isActive) {
+            console.log('Skipping snapshot, inactive: ', this);
+            return;
+        }
         // else:
 
         const status = this.options.endStatus;
@@ -472,6 +446,7 @@ export class Effect extends EventEmitter {
         // TODO: Add checks for different party members later
 
         const target = this.collection.player;
+        console.log('Checking collision for ', this, target);
         if (target && this.checkCharacterCollision(target)) {
             if (!skipEmit) {
                 this.emit('effect-hit', {
@@ -500,15 +475,13 @@ export class Effect extends EventEmitter {
     }
 
     startup() {
-        this.isActive = true;
-        // this.show();
         this.collection.addActiveEffect(this);
     }
 
     cleanup() {
         this.hide();
         this.isActive = false;
-        if (this.options.castName) {
+        if (this.options.castName && this.options.castName === castState.value) {
             castState.value = undefined;
         }
     }
@@ -645,6 +618,7 @@ export class Effect extends EventEmitter {
         // this.options = state.options;
 
         if (state.stage !== this.stage) {
+            this.stage = state.stage;
             // Do some stuff.
         }
 

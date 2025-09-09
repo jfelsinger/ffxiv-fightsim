@@ -43,7 +43,7 @@ export class M3SInfernalSpin extends Mechanic {
         };
 
 
-        this.on('start-execute', () => {
+        this.on('start-mechanic', () => {
             isCW.value = !!Math.round(Math.random());
             startDirection.value = Math.round(Math.random()) ? 'north' : 'south';
             const startNorth = isCW.value ? 135 : 45;

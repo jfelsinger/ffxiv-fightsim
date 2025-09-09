@@ -19,31 +19,10 @@ export class M2SAlarmPheromones2 extends Mechanic {
         this.options = options;
         this.scheduling = options.scheduling || 'parallel';
 
-        const effectShowTelegraph = (effect: Scheduled<Effect>) => {
-            // console.log('alarm pheromones, bee - telegraph: ', effect);
-        };
-
-        const effectPreSnapshot = (effect: Scheduled<Effect>) => {
-            // console.log('alarm pheromones, bee - snapshot: ', effect);
-        };
-
-        this.on('start-execute', () => {
-        });
-
         this.on('start-effect', ({ effect }) => {
             effect.item.on('start', () => {
                 (window as any).pheromones = effect;
             });
-            effect.item.on('show-telegraph', effectShowTelegraph);
-            effect.item.on('pre-snapshot', effectPreSnapshot);
-        });
-
-        this.on('end-effect', ({ effect }) => {
-            effect.item.off('show-telegraph', effectShowTelegraph);
-            effect.item.off('pre-snapshot', effectPreSnapshot);
-        });
-
-        this.on('dispose', () => {
         });
     }
 

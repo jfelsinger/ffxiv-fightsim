@@ -1,0 +1,46 @@
+name: test-one
+scheduling: sequential
+startPosition: 0,-0.45
+startPositionType: arena
+arena:
+  name: m3s-arena
+  shape: square
+  yalms: 37.85
+  floorType: m3s
+  sizeAdjustment: 0.8
+waymarksPositionType: arena
+waymarks:
+  A: 0.0,0.385
+  B: 0.385,0.0
+  C: 0.0,-0.385
+  D: -0.385,0.0
+sections:
+  - item:
+      name: test-one
+      scheduling: parallel
+      mechanics:
+        - label: lariat
+          item:
+            name: mech-one
+            scheduling: parallel
+            castName: Test One
+            castTime: 1250
+            duration: 1250
+            effects:
+              - item:
+                  name: cast-bar
+              - label: Ifrit
+                item:
+                  name: aoe-group
+                  castName: Cast
+                  color: 199,42,45
+                  outerRadius: 30
+                  innerRadius: 0
+                  thetaLength: pi / 2
+                  angle: 152
+                  positionType: arena
+                  aoes:
+                    - name: aoe-ring
+                      direction: -90
+                    - name: aoe-ring
+                      direction: 90

@@ -2,6 +2,17 @@ export const DefaultMechanicSchedulingMode = 'parallel';
 
 const castState = useCastState();
 
+export const enum MechanicStage {
+    preInitialization = 0,
+    initialized = 1,
+
+    start = 2,
+    running = 3,
+
+    preCleanup = 4,
+    ended = 5,
+};
+
 export type MechanicOptions = {
     label?: string
     name?: string
@@ -32,7 +43,9 @@ export class Mechanic extends EventEmitter {
     usePlayerTick: boolean = false;
     options: MechanicOptions;
 
+    stage: MechanicStage = MechanicStage.preInitialization;
     startTime: number = 0;
+    cleanupTime: number = 0;
     endTime: number = 0;
     get elapsed() { return this.clock.time - this.startTime; }
 
@@ -117,6 +130,13 @@ export class Mechanic extends EventEmitter {
         }
     }
 
+    setStage(stage: MechanicStage) {
+        const oldStage = this.stage;
+        this.stage = stage;
+        this.emit('stage-change', { mechanic: this, oldStage, stage });
+        return oldStage;
+    }
+
     getEffects() {
         return this.effects;
     }
@@ -135,49 +155,18 @@ export class Mechanic extends EventEmitter {
         return Math.min(1.0, Math.max(0.0, elapsed / duration));
     }
 
-    async execute(n = 0, parent?: ScheduledParent<Mechanic>) {
-        return;
-        // this.n = n;
-        // this.scheduledParent = parent;
-
-        // this.isActive = true;
-        // this.startTime = this.clock.time;
-        // this.emit('start-execute');
-
-        // const effects = this.getEffects();
-        // this.activeEffects = effects;
-        // if (this.scheduling === 'sequential') {
-        //     const len = effects.length;
-        //     for (let i = 0; i < len; i++) {
-        //         if (!this.isActive) break;
-        //         await this.executeEffect(effects[i])
-        //     }
-        // } else if (this.isActive) {
-        //     await Promise.all(effects.map(effect => this.executeEffect(effect)));
-        // }
-
-        // this.endTime = this.clock.time;
-        // this.isActive = false;
-        // this.emit('end-execute');
-    }
-
     init(n = 0, scheduledSelf: Scheduled<Mechanic>, parent?: ScheduledParent<Mechanic>, startTime?: number) {
         this.n = n;
         this.scheduledParent = parent;
 
-        startTime = startTime ?? this.clock.time ?? 0;
-        this.emit('init');
-        this.startTime = startTime;
+        this.label = this.label || scheduledSelf.label;
+        this.startTime = startTime ?? this.clock.time ?? 0;
+        this.cleanupTime = this.startTime + this.getDuration() + 1;
 
         const effects = this.getEffects();
         this.activeEffects = effects;
 
-        let delay = startTime;
-
-        this.clock.at(() => {
-            this.isActive = true;
-            this.emit('start-mechanic', { mechanic: scheduledSelf });
-        }, this.startTime);
+        let delay = this.startTime;
 
         const len = effects.length;
         if (this.scheduling === 'sequential') {
@@ -196,20 +185,14 @@ export class Mechanic extends EventEmitter {
             }
         }
 
-        this.clock.at(() => {
-            this.endTime = this.clock.time;
-            this.isActive = false;
-            this.emit('end-mechanic', { mechanic: scheduledSelf });
-            this.emit('end-execute');
-        }, this.startTime + this.getDuration() + 1);
-
-        this.emit('end-init');
+        this.setStage(MechanicStage.initialized);
     }
 
     initEffect(effect: Scheduled<Effect>, startTime: number) {
-        this.emit('pre-init-effect', { effect, startTime });
         if (effect?.preStartDelay) { startTime += effect.preStartDelay; }
         console.log('Init effect: ', effect, startTime);
+        effect.item.on('start-effect', () => { this.emit('start-effect', { effect }) });
+        effect.item.on('end-effect', () => { this.emit('end-effect', { effect }) });
         const result = traverseScheduled(
             effect,
             (item, n, st, cd, p) => {
@@ -219,37 +202,40 @@ export class Mechanic extends EventEmitter {
             0,
             startTime
         );
-        this.emit('init-effect', { effect, startTime, duration: result });
         return result;
     }
 
-    run(n = 0, parent?: ScheduledParent<Mechanic>, startTime?: number) {
-        // this.n = n;
-        // this.scheduledParent = parent;
+    run(time: number) {
+        if (time >= this.startTime) {
+            if (this.stage === MechanicStage.initialized) {
+                console.log('runStart() - mechanic:', time, this);
+                this.runStart();
+            }
 
-        // this.isActive = true;
-        // this.startTime = this.clock.time;
-        // this.emit('start-execute');
+            if (time >= this.cleanupTime && this.stage === MechanicStage.running) {
+                console.log('runEnd() - mechanic:', time, this);
+                this.runEnd();
+            }
+        }
+    }
 
-        // const effects = this.getEffects();
-        // this.activeEffects = effects;
-        // if (this.scheduling === 'sequential') {
-        //     const len = effects.length;
-        //     for (let i = 0; i < len; i++) {
-        //         if (!this.isActive) break;
-        //         await this.executeEffect(effects[i])
-        //     }
-        // } else if (this.isActive) {
-        //     await Promise.all(effects.map(effect => this.executeEffect(effect)));
-        // }
+    runStart() {
+        this.setStage(MechanicStage.start);
+        this.isActive = true;
+        this.emit('start-mechanic');
+        this.setStage(MechanicStage.running);
+    }
 
-        // this.endTime = this.clock.time;
-        // this.isActive = false;
-        // this.emit('end-execute');
+    runEnd() {
+        this.setStage(MechanicStage.preCleanup);
+        this.endTime = this.clock.time;
+        this.isActive = false;
+        this.emit('end-mechanic');
+        this.setStage(MechanicStage.ended);
     }
 
     tickUpdate(time: number, delta: number) {
-        // console.log('Mechanic update: ', this.isActive, time, delta, this);
+        this.run(time);
         if (this.isActive) {
             const durationPercent = this.getDurationPercent();
             if (this.options.castName) {
@@ -272,18 +258,6 @@ export class Mechanic extends EventEmitter {
         }
     }
 
-    // async executeEffect(effect: Scheduled<Effect>) {
-    //     this.emit('start-effect', { effect });
-    //     if (effect?.preStartDelay) { await this.clock.wait(effect.preStartDelay); }
-    //     await executeScheduled(
-    //         effect,
-    //         // (item, n, p) => Promise.resolve(this.isActive && item.start(n, p)),
-    //         () => Promise.resolve(),
-    //         this.clock
-    //     );
-    //     this.emit('end-effect', { effect });
-    // }
-
     dispose() {
         this.isActive = false;
         this.emit('dispose');
@@ -303,6 +277,7 @@ export class Mechanic extends EventEmitter {
             usePlayerTick: this.usePlayerTick,
             startTime: this.startTime,
             endTime: this.endTime,
+            stage: this.stage,
 
             // TODO: Deal with scheduledParent properly
             // scheduledParent: this.scheduledParent,
@@ -325,6 +300,7 @@ export class Mechanic extends EventEmitter {
         this.usePlayerTick = state.usePlayerTick;
         this.startTime = state.startTime;
         this.endTime = state.endTime;
+        this.stage = state.stage;
         // this.options = state.options;
 
         // TODO: Deal with scheduledParent properly
