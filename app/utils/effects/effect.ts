@@ -335,12 +335,12 @@ export class Effect extends EventEmitter {
     }
 
 
-    init(n = 0, scheduledSelf: Scheduled<Effect>, parent?: ScheduledParent<Effect>, startTime?: number) {
+    init(n = 0, scheduledSelf?: Scheduled<Effect>, parent?: ScheduledParent<Effect>, startTime?: number) {
         this.n = n;
         this.scheduledParent = parent;
         this.telegraphShown = false;
 
-        this.label = this.label || scheduledSelf.label;
+        this.label = this.label || scheduledSelf?.label;
         this.startTime = startTime ?? this.clock.time;
         this.snapshotTime = this.startTime + this.duration - this.shiftSnapshot;
         this.cleanupTime = this.startTime + this.duration + 1;
@@ -353,24 +353,20 @@ export class Effect extends EventEmitter {
     run(time: number) {
         if (time >= this.startTime) {
             if (this.stage === EffectStage.initialized) {
-                console.log('runStart() - ', time, this);
-                this.runStart();
+                return this.runStart();
             }
 
             if (time >= this.snapshotTime) {
                 // If it is time for the pre-snapshot, return so that the actual
                 // snapshot+ takes another tick.
                 if (this.stage === EffectStage.running) {
-                    console.log('runPreSnapshot() - ', time, this);
                     return this.runPreSnapshot();
                 } else if (this.stage === EffectStage.postPreSnapshot) {
-                    console.log('runSnapshot() - ', time, this);
                     this.runSnapshot();
                 }
             }
 
             if (time >= this.cleanupTime && this.stage === EffectStage.postSnapshot) {
-                console.log('runEnd() - ', time, this);
                 this.runEnd();
             }
         }
@@ -409,7 +405,6 @@ export class Effect extends EventEmitter {
 
     runEnd() {
         this.setStage(EffectStage.preCleanup);
-        console.log('END Effect: ', this.clock.time, this.startTime + this.duration + 1);
         this.emit('end-effect');
         this.cleanup();
 
@@ -423,10 +418,7 @@ export class Effect extends EventEmitter {
     }
 
     snapshot() {
-        if (!this.isActive) {
-            console.log('Skipping snapshot, inactive: ', this);
-            return;
-        }
+        if (!this.isActive) { return; }
         // else:
 
         const status = this.options.endStatus;
@@ -446,7 +438,6 @@ export class Effect extends EventEmitter {
         // TODO: Add checks for different party members later
 
         const target = this.collection.player;
-        console.log('Checking collision for ', this, target);
         if (target && this.checkCharacterCollision(target)) {
             if (!skipEmit) {
                 this.emit('effect-hit', {

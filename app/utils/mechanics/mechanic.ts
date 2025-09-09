@@ -190,7 +190,6 @@ export class Mechanic extends EventEmitter {
 
     initEffect(effect: Scheduled<Effect>, startTime: number) {
         if (effect?.preStartDelay) { startTime += effect.preStartDelay; }
-        console.log('Init effect: ', effect, startTime);
         effect.item.on('start-effect', () => { this.emit('start-effect', { effect }) });
         effect.item.on('end-effect', () => { this.emit('end-effect', { effect }) });
         const result = traverseScheduled(
@@ -208,13 +207,11 @@ export class Mechanic extends EventEmitter {
     run(time: number) {
         if (time >= this.startTime) {
             if (this.stage === MechanicStage.initialized) {
-                console.log('runStart() - mechanic:', time, this);
-                this.runStart();
+                return this.runStart();
             }
 
             if (time >= this.cleanupTime && this.stage === MechanicStage.running) {
-                console.log('runEnd() - mechanic:', time, this);
-                this.runEnd();
+                return this.runEnd();
             }
         }
     }
