@@ -10,10 +10,10 @@ const {
 
 <template>
     <div class="dropdown dropdown-hover">
-        <div tabindex="0" role="button">
-            Hits:
-            <span class="countdown font-mono">
-                <span :style="{ '--value': hits }"></span>
+        <div tabindex="0" role="button" class="flex items-center gap-1">
+            <span class="font-mono text-sm">Hits:</span>
+            <span class="countdown font-mono text-sm">
+                <span :style="{ '--value': hits }" aria-live="polite" :ariaLabel="hits"></span>
             </span>
         </div>
         <ul class="dropdown-content menu bg-base-100 rounded-box p-2 min-w-max">

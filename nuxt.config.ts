@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineNuxtConfig({
     devtools: { enabled: true },
     future: {
-        compatibilityVersion: 4,
+        compatibilityVersion: 5,
     },
 
     runtimeConfig: {
@@ -35,6 +35,7 @@ export default defineNuxtConfig({
     },
 
     experimental: {
+        viteEnvironmentApi: true,
         sharedPrerenderData: true,
         componentIslands: true,
         asyncContext: true,
@@ -97,6 +98,7 @@ export default defineNuxtConfig({
     },
 
     modules: [
+        '@nuxt/test-utils/module',
         // '@nuxtjs/tailwindcss',
         // [
         //     '@pinia/nuxt',

@@ -31,6 +31,7 @@ let game: Engine | undefined;
 const cameraDirection = useState<number>('cameraDirection', () => 0);
 const characterDirection = useState<number>('characterDirection', () => 0);
 
+const { reset } = useReset();
 const { isTutorial } = useTutorialMode();
 const { hits, isHit } = useHits();
 const { statuses } = useStatuses();
@@ -50,7 +51,7 @@ function onResize() {
 function registerFight(fight: Fight) {
     currentFight.value = fight;
     (window as any).__fight = fight;
-    recorder.restart();
+    reset();
     recorder.recordCurrentSnapshot(0);
     fight.on('effect-hit', ({ effect }) => {
         debug('hit by: ', effect.name, effect);
@@ -352,6 +353,7 @@ onMounted(async () => {
     window.addEventListener('resize', onResize);
     window.addEventListener('blur', onBlur);
     document.addEventListener('visibilitychange', onVisibilityChange);
+    reset();
     recorder.register();
 
     nextTick(() => {
