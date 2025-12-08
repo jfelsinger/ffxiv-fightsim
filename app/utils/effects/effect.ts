@@ -33,6 +33,7 @@ export type EffectPositionType = PositionType;
 
 export type EffectOptions<TExtras = {}> = {
     label?: string
+    comment?: string
     color?: string
     duration: number | string
     shiftSnapshot: number | string
@@ -70,6 +71,7 @@ export class Effect extends EventEmitter {
 
     name: string = 'default';
     label?: string;
+    comment?: string;
     clock: Clock
     collection: FightCollection;
     color?: string;
@@ -115,6 +117,7 @@ export class Effect extends EventEmitter {
         this.options = options;
         this.telegraph = parseNumber(options.telegraph ?? 1.0);
         this.label = options.label;
+        this.comment = options.comment;
         this.duration = parseNumber(options.duration ?? 0);
         this.shiftSnapshot = parseNumber(options.shiftSnapshot ?? 0);
         this.collection = options.collection;
@@ -522,6 +525,7 @@ export class Effect extends EventEmitter {
         const results = getBasicValues(this.options);
         return {
             label: this.options.label,
+            comment: this.options.comment,
             name: this.name,
             ...results,
             duration: this.options.duration || this.duration,

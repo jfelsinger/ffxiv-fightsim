@@ -5,6 +5,7 @@ export const DefaultFightSchedulingMode = 'sequential';
 export type FightOptions = {
     title?: string
     description?: string
+    comment?: string
 
     name?: string
     scheduling?: ScheduleMode
@@ -24,6 +25,7 @@ export type FightOptions = {
 export class Fight extends EventEmitter {
     name: string;
     description?: string;
+    comment?: string;
     isDisposed?: boolean;
 
     scheduling: ScheduleMode;
@@ -116,6 +118,7 @@ export class Fight extends EventEmitter {
 
         this.name = options.name || options.title || 'fight';
         this.description = options.description;
+        this.comment = options.comment;
 
         const ArenaClass = (options.arenaType && (arenasCollection as any)[options.arenaType]) || arenasCollection.default;
         this.arena = new ArenaClass(
@@ -221,7 +224,6 @@ export class Fight extends EventEmitter {
     toJSONSnapshot() {
         const result = {
             name: this.name,
-            description: this.description,
             isDisposed: this.isDisposed,
             scheduling: this.scheduling,
             isActive: this.isActive,
@@ -239,7 +241,6 @@ export class Fight extends EventEmitter {
     loadJSONSnapshot(state: any) {
         if (!state) return;
         this.name = state.name;
-        this.description = state.description;
         this.isDisposed = state.isDisposed;
         this.scheduling = state.scheduling;
         this.isActive = state.isActive;

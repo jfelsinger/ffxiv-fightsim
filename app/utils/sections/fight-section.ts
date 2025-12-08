@@ -5,6 +5,7 @@ export const DefaultFightSectionSchedulingMode = 'sequential';
 export type SectionOptions = {
     label?: string
     name?: string
+    comment?: string
     scheduling?: ScheduleMode
     mechanics: Scheduled<Mechanic>[]
     collection: FightCollection
@@ -16,6 +17,7 @@ export class FightSection extends EventEmitter {
     scheduledParent?: ScheduledParent<FightSection>;
 
     name: string = 'default';
+    comment?: string;
     label?: string;
     scheduling: ScheduleMode;
     mechanics: Scheduled<Mechanic>[];
@@ -32,6 +34,7 @@ export class FightSection extends EventEmitter {
         return {
             label: this.options.label,
             name: this.name,
+            comment: this.options.comment,
             scheduling: this.scheduling,
             mechanics: this.mechanics,
             ...results,
@@ -61,6 +64,7 @@ export class FightSection extends EventEmitter {
         super();
         this.options = options;
         this.label = options.label;
+        this.comment = options.comment;
         this.mechanics = options.mechanics || [];
         this.scheduling = options.scheduling || DefaultFightSectionSchedulingMode;
         this.collection = options.collection;

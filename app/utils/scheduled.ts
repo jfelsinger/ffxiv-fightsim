@@ -2,6 +2,7 @@ export type ScheduleMode = 'sequential' | 'parallel';
 export type Scheduled<T> = {
     item: T
     label?: string
+    comment?: string
     repeat?: number
     preStartDelay?: number
     startDelay?: number

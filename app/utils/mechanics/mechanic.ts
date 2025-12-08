@@ -16,6 +16,7 @@ export const enum MechanicStage {
 export type MechanicOptions = {
     label?: string
     name?: string
+    comment?: string
     scheduling?: ScheduleMode
     effects: Scheduled<Effect>[]
     collection: FightCollection
@@ -34,6 +35,7 @@ export class Mechanic extends EventEmitter {
 
     name: string = 'default';
     label?: string;
+    comment?: string;
     scheduling: ScheduleMode;
     effects: Scheduled<Effect>[];
     activeEffects: Scheduled<Effect>[] = [];
@@ -53,6 +55,7 @@ export class Mechanic extends EventEmitter {
         const results = getBasicValues(this.options);
         return {
             label: this.options.label,
+            comment: this.options.comment,
             name: this.name,
             scheduling: this.scheduling,
             ...results,
@@ -83,6 +86,7 @@ export class Mechanic extends EventEmitter {
         super();
         this.options = options;
         this.label = options.label;
+        this.comment = options.comment;
         this.effects = options.effects || [];
         this.scheduling = options.scheduling || DefaultMechanicSchedulingMode;
         this.collection = options.collection;
