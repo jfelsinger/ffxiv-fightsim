@@ -4,6 +4,7 @@ const debug = Debug('game:utils:clock');
 type ClockTimeoutFunc = (entry?: ClockTimeoutEntry, delta?: number) => void;
 type ClockTimeoutEntry = {
     id: number
+    key?: string
     func: ClockTimeoutFunc
     time: number
     interval?: number
@@ -16,6 +17,7 @@ type ClockTimeoutEntry = {
 
 type ExtraTimeoutOptions = {
     undo?: ClockTimeoutFunc
+    key?: string
     persist?: boolean
     reverse?: boolean
 }
@@ -240,6 +242,13 @@ export class Clock extends EventEmitter {
 
     at(func: ClockTimeoutFunc, time: number, opts?: ExtraTimeoutOptions) {
         const id = (Math.round(Math.random() * 1000) * 100000) + time + this.time;
+        if (opts?.key) {
+            const existingEntry = this.timeouts.find((e) => e.key === opts.key);
+            if (existingEntry?.id) {
+                return id;
+            }
+        }
+
         this.timeouts.push({
             id,
             func,
@@ -256,6 +265,15 @@ export class Clock extends EventEmitter {
 
     intervalAt(func: ClockTimeoutFunc, interval: number, time = 0, opts?: ExtraTimeoutOptions) {
         const id = (Math.round(Math.random() * 1000) * 100000) + interval + this.time;
+        if (opts?.key) {
+            console.log('Checking existing key timeout: ', opts.key);
+            const existingEntry = this.timeouts.find((e) => e.key === opts.key);
+            console.log('Existing Entry: ', existingEntry?.id, existingEntry);
+            if (existingEntry?.id) {
+                return id;
+            }
+        }
+
         this.timeouts.push({
             id,
             func,

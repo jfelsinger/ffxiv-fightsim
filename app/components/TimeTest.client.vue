@@ -8,7 +8,11 @@ const duration = 1000 * 10;
 
 worldClock.at((_, delta) => {
     console.log('100, forward', delta);
-}, 100);
+}, 100, { key: 'a' });
+
+worldClock.at((_, delta) => {
+    console.log('50p, forward', delta);
+}, 50, { persist: true, key: 'a' });
 
 worldClock.at((_, delta) => {
     console.log('200, forward', delta);
