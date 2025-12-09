@@ -19,7 +19,7 @@ sections:
       name: test-one
       scheduling: parallel
       mechanics:
-        - label: lariat
+        - label: test-mech-one
           item:
             name: mech-one
             scheduling: parallel

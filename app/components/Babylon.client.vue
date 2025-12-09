@@ -52,7 +52,6 @@ function registerFight(fight: Fight) {
     currentFight.value = fight;
     (window as any).__fight = fight;
     reset();
-    recorder.recordCurrentSnapshot(0);
     fight.on('effect-hit', ({ effect }) => {
         debug('hit by: ', effect.name, effect);
         hits.value++;
@@ -298,6 +297,7 @@ function makeScene(game: Engine) {
     if (fight) {
         registerFight(fight);
         fight.execute();
+        recorder.recordCurrentSnapshot(0);
 
         // TODO: Move positioning to be on the fight
         // const spacing = 0.2;
@@ -391,6 +391,7 @@ async function onFightUpdate(updatedFight: Fight) {
     registerFight(updatedFight);
     hits.value = 0;
     updatedFight.execute();
+    recorder.recordCurrentSnapshot(0);
 }
 
 function onResetPosition() {

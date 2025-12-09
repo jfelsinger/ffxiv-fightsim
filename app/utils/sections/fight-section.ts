@@ -100,7 +100,7 @@ export class FightSection extends EventEmitter {
         this.clock.at(() => {
             this.isActive = true;
             this.emit('start-section');
-        }, startTime);
+        }, startTime, { persist: true });
 
         let delay = startTime;
         const len = this.mechanics.length;

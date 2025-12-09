@@ -1,4 +1,4 @@
-const recordingGap = 1200;
+const recordingGap = 200;
 export function useRecorder() {
     const snapshots = useState<([number, any])[]>('snapshots', () => []);
     const currentIndex = useState('snapshots-index', () => -1);
@@ -10,6 +10,7 @@ export function useRecorder() {
 
     function restart() {
         if (snapshots.value.length) {
+            console.log('recorder.restart()');
             snapshots.value = snapshots.value.slice(0, 1);
             currentIndex.value = 0;
         }
@@ -33,6 +34,7 @@ export function useRecorder() {
             currentIndex.value = snapshots.value.length - 1;
         };
 
+        console.log('-- record:', time, snapshot);
         snapshots.value.push([time, snapshot]);
         currentIndex.value++;
     }
@@ -49,7 +51,7 @@ export function useRecorder() {
     }
 
     function unregister() {
-        worldClock.on('tick', onTick);
+        worldClock.off('tick', onTick);
     }
 
     function windToTime(time: number) {
