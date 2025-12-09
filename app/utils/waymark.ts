@@ -139,7 +139,7 @@ export class Waymark {
             },
             this.fight.collection.scene
         )
-        mesh.renderingGroupId = 2;
+        // mesh.renderingGroupId = 2;
         mesh.isPickable = false;
         mesh.position = position?.clone();
         mesh.position.y += bodyHeight / 2;
