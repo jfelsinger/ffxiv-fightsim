@@ -10,7 +10,6 @@ export function useRecorder() {
 
     function restart() {
         if (snapshots.value.length) {
-            console.log('recorder.restart()');
             snapshots.value = snapshots.value.slice(0, 1);
             currentIndex.value = 0;
         }
@@ -34,7 +33,6 @@ export function useRecorder() {
             currentIndex.value = snapshots.value.length - 1;
         };
 
-        console.log('-- record:', time, snapshot);
         snapshots.value.push([time, snapshot]);
         currentIndex.value++;
     }
@@ -99,7 +97,7 @@ export function useRecorder() {
             currentIndex.value = lastIndex;
             return lastEntry;
         } else {
-            console.log('windToTime() - weird:', time, currentTime, currentIndex, snapshots.value.length);
+            // console.log('windToTime() - weird:', time, currentTime, currentIndex, snapshots.value.length);
         }
 
         currentIndex.value = _currentIndex;
