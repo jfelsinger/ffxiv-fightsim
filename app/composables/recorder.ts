@@ -1,4 +1,4 @@
-const recordingGap = 200;
+const recordingGap = 320;
 export function useRecorder() {
     const snapshots = useState<([number, any])[]>('snapshots', () => []);
     const currentIndex = useState('snapshots-index', () => -1);
