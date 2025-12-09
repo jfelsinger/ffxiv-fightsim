@@ -107,8 +107,8 @@ function reset() {
             </div>
             <div class="pr-1 text-xs flex items-center">
                 <span class="countdown font-mono">
-                    <span :style="{ '--value': currentMinutes }"></span>:
-                    <span :style="{ '--value': currentSeconds }"></span>
+                    <span :style="{ '--value': currentMinutes, '--digits': 2 }"></span>:
+                    <span :style="{ '--value': currentSeconds, '--digits': 2 }"></span>
                 </span>
             </div>
             <div class="dropdown dropdown-hover dropdown-top tooltip tooltip-bottom" data-tip="Game Speed">
