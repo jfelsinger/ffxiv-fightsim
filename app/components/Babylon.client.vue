@@ -362,6 +362,7 @@ onMounted(async () => {
             game = new Engine(canvas.value, true);
             debug('game: ', game);
             game.setHardwareScalingLevel(1.0);
+            (window as any).__engine = game;
 
             const { scene } = makeScene(game);
             game.runRenderLoop(() => {

@@ -90,7 +90,7 @@ export class FightSection extends EventEmitter {
         return;
     }
 
-    init(n = 0, scheduledSelf: Scheduled<Mechanic>, parent?: ScheduledParent<FightSection>, startTime = 0) {
+    init(n = 0, scheduledSelf: Scheduled<FightSection>, parent?: ScheduledParent<FightSection>, startTime = 0) {
         this.n = n;
         this.scheduledParent = parent;
 
@@ -126,19 +126,26 @@ export class FightSection extends EventEmitter {
         const result = traverseScheduled(
             mechanic,
             (item, n, st, cd, p) => {
+                console.log('Init mechanic: ', n, p);
                 item.init(n, mechanic, p, st + cd);
             },
+            ((i) => i?.getDuration() || 0),
             this.clock,
             0,
             startTime
         );
 
         this.totalMechanics++;
-        mechanic.item.on('start-mechanic', () => { this.emit('start-mechanic', { mechanic }) });
+        mechanic.item.on('start-mechanic', () => {
+            console.log('Mechanic started: ', this.label, mechanic);
+            this.emit('start-mechanic', { mechanic });
+        });
+
         mechanic.item.on('end-mechanic', () => {
             this.emit('end-mechanic', { mechanic });
             this.endedMechanics++;
             if (this.endedMechanics >= this.totalMechanics) {
+                console.log('Section ended: ', this.label, this.endedMechanics);
                 this.emit('end-section');
             }
         });

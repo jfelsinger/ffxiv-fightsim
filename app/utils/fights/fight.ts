@@ -192,6 +192,7 @@ export class Fight extends EventEmitter {
             (item, n, st, cd, p) => {
                 item.init(n, section, p, st + cd)
             },
+            ((i) => i?.getDuration() || 0),
             this.clock,
             0,
             startTime

@@ -67,26 +67,36 @@ function tryParse(data: any) {
     return data;
 }
 
-export function decodeScheduled<T>(data: any, func: (data: any, optons: FightDecodeOptions) => T, options: FightDecodeOptions): Scheduled<T> {
+export function decodeScheduled<T>(data: any, itemBuilder: (data: any, optons: FightDecodeOptions) => T, options: FightDecodeOptions): Scheduled<T> {
+    const repeat = data.repeat || 0;
     const scheduledResult: Scheduled<T> = {
         ...data,
-        item: func(data.item, options),
-        repeat: parseNumber(data.repeat || 0),
+        item: itemBuilder(data.item, options),
+        repeat,
         startDelay: parseNumber(data.startDelay || 0),
         preStartDelay: parseNumber(data.preStartDelay || 0),
         endDelay: parseNumber(data.endDelay || 0),
     };
 
+    if (repeat) {
+        const repeatedItems: T[] = [];
+        while (repeatedItems.length < repeat) {
+            repeatedItems.push(itemBuilder(data.item, options));
+        }
+
+        scheduledResult.repeatedItems = repeatedItems;
+    }
+
     if (data.after) {
         scheduledResult.after =
-            isScheduled(data.after) ? decodeScheduled<T>(data.after, func, options) :
-                func(data.after, options);
+            isScheduled(data.after) ? decodeScheduled<T>(data.after, itemBuilder, options) :
+                itemBuilder(data.after, options);
     }
 
     if (data.afterRepeats) {
         scheduledResult.afterRepeats =
-            isScheduled(data.afterRepeats) ? decodeScheduled<T>(data.afterRepeats, func, options) :
-                func(data.afterRepeats, options);
+            isScheduled(data.afterRepeats) ? decodeScheduled<T>(data.afterRepeats, itemBuilder, options) :
+                itemBuilder(data.afterRepeats, options);
     }
 
     return scheduledResult;

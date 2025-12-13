@@ -20,6 +20,8 @@ sections:
       scheduling: parallel
       mechanics:
         - label: test-mech-one
+          repeat: 2
+          endDelay: 500
           item:
             name: mech-one
             scheduling: parallel
@@ -27,7 +29,7 @@ sections:
             castTime: 1250
             duration: 1250
             effects:
-              - label: Ifrit
+              - label: Effect One
                 item:
                   name: aoe-group
                   # castName: Ifrit Cast
@@ -42,3 +44,18 @@ sections:
                       direction: -90
                     - name: aoe-ring
                       direction: 90
+              # - label: Effect Two
+              #   item:
+              #     name: aoe-group
+              #     # castName: Ifrit Cast
+              #     color: 42,199,45
+              #     outerRadius: 30
+              #     innerRadius: 0
+              #     thetaLength: pi / 2
+              #     angle: 152
+              #     positionType: arena
+              #     aoes:
+              #       - name: aoe-ring
+              #         direction: 0
+              #       - name: aoe-ring
+              #         direction: 180

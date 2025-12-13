@@ -1,6 +1,7 @@
 export type ScheduleMode = 'sequential' | 'parallel';
 export type Scheduled<T> = {
     item: T
+    repeatedItems?: T[]
     label?: string
     comment?: string
     repeat?: number
@@ -15,7 +16,10 @@ export function isScheduled<T>(v: unknown): v is Scheduled<T> {
     return typeof v === 'object' && v != null && 'item' in v;
 }
 
-export function getScheduledDuration<T>(scheduled: Scheduled<T>, getItemDuration: (item: T) => number = (() => 0)) {
+export function getScheduledDuration<T>(
+    scheduled: Scheduled<T>,
+    getItemDuration: (item: T) => number = (() => 0)
+) {
     let duration = 0;
     duration += scheduled?.startDelay || 0;
     duration += getItemDuration(scheduled.item);
@@ -23,6 +27,7 @@ export function getScheduledDuration<T>(scheduled: Scheduled<T>, getItemDuration
 
     if (scheduled.after) {
         if (isScheduled(scheduled.after)) {
+            duration += scheduled?.after?.preStartDelay || 0;
             duration += getScheduledDuration(scheduled.after, getItemDuration)
         } else {
             duration += getItemDuration(scheduled.after);
@@ -33,6 +38,7 @@ export function getScheduledDuration<T>(scheduled: Scheduled<T>, getItemDuration
         duration += duration * scheduled.repeat;
         if (scheduled.afterRepeats) {
             if (isScheduled(scheduled.afterRepeats)) {
+                duration += scheduled?.afterRepeats?.preStartDelay || 0;
                 duration += getScheduledDuration(scheduled.afterRepeats, getItemDuration)
             } else {
                 duration += getItemDuration(scheduled.afterRepeats);
@@ -101,52 +107,68 @@ export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: 
     }
 }
 
-export function traverseScheduled<T>(scheduled: Scheduled<T>, func: (item: T, n: number, startTime: number, currentDelay: number, parent?: ScheduledParent<T>) => any, clock: Clock, repeatNumber = 0, startTime = 0) {
+export function traverseScheduled<T>(
+    scheduled: Scheduled<T>,
+    func: (item: T, n: number, startTime: number, currentDelay: number, parent?: ScheduledParent<T>) => any,
+    getItemDuration: (item: T) => number = (() => 0),
+    clock: Clock,
+    repeatNumber = 0,
+    startTime = 0
+) {
+    // console.log(`Traversing scheduled, starting at: ${startTime}, repeat #: ${repeatNumber}`, scheduled);
     let delay = scheduled.startDelay || 0;
-    func(scheduled.item, repeatNumber, startTime, delay);
-
-    if (scheduled.endDelay) {
-        delay += scheduled.endDelay;
+    if (repeatNumber > 0 && scheduled.repeatedItems?.[repeatNumber - 1]) {
+        func(scheduled.repeatedItems[repeatNumber - 1] as T, repeatNumber, startTime, delay);
+    } else {
+        func(scheduled.item, repeatNumber, startTime, delay);
     }
+
+    delay += getItemDuration(scheduled.item);
+    delay += scheduled?.endDelay || 0;
 
     if (scheduled.after) {
         if (isScheduled(scheduled.after)) {
-            if (scheduled.after.preStartDelay) { delay += scheduled.after.preStartDelay; }
-            traverseScheduled(
+            delay += scheduled?.after?.preStartDelay || 0;
+            delay += traverseScheduled(
                 scheduled.after,
                 (i, n, st, cd, p) => {
                     if (p) { p.parent = { n: repeatNumber, scheduled }; }
                     else { p = { n: repeatNumber, scheduled }; }
                     return func(i, n, st, cd, p);
                 },
+                getItemDuration,
                 clock,
                 0,
                 startTime + delay
             )
         } else {
             func(scheduled.after, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
+            delay += getItemDuration(scheduled.after);
         }
     }
 
     if (scheduled.repeat) {
+        // console.log('Shcheduled O has repeats: ', scheduled.repeat, repeatNumber, startTime + delay, scheduled);
         if (scheduled.repeat > repeatNumber) {
-            traverseScheduled(scheduled, func, clock, (repeatNumber || 0) + 1, startTime + delay);
+            delay += traverseScheduled(scheduled, func, getItemDuration, clock, (repeatNumber || 0) + 1, startTime + delay);
         } else if (scheduled.afterRepeats) {
             if (isScheduled(scheduled.afterRepeats)) {
-                if (scheduled.afterRepeats.preStartDelay) { delay += scheduled.afterRepeats.preStartDelay; }
-                traverseScheduled(
+                delay += scheduled?.afterRepeats?.preStartDelay || 0;
+                delay += traverseScheduled(
                     scheduled.afterRepeats,
                     (i, n, st, cd, p) => {
                         if (p) { p.parent = { n: repeatNumber, scheduled }; }
                         else { p = { n: repeatNumber, scheduled }; }
                         return func(i, n, st, cd, p);
                     },
+                    getItemDuration,
                     clock,
                     0,
                     startTime + delay
                 )
             } else {
                 func(scheduled.afterRepeats, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
+                delay += getItemDuration(scheduled.afterRepeats);
             }
         }
     }

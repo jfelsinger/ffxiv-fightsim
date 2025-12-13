@@ -38,6 +38,8 @@ export class E12SPrimalCombination extends Mechanic {
             leviathan: allEffects.find(e => e.label?.toLowerCase() === 'leviathan'),
         };
 
+        console.log('getEffects() - Primal Effects:', primalEffects);
+
         if (!primalEffects.ifrit && !primalEffects.ramuh && !primalEffects.garuda && !primalEffects.leviathan) {
             return allEffects;
         }
@@ -51,6 +53,7 @@ export class E12SPrimalCombination extends Mechanic {
                 .map((primalName) => primalEffects[primalName])
                 .filter(_ => _) as Scheduled<Effect>[];
             const second = availableEntries[Math.floor(Math.random() * availableEntries.length)];
+            console.log('getEffects() - Selected Effects:', first, second);
             return [first, second];
         }
 

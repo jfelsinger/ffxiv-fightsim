@@ -27,6 +27,9 @@ export function useRecorder() {
     }
 
     function recordSnapshot(time: number, snapshot: any) {
+        // Have recorder disabled for the moment
+        return;
+
         if (!snapshot) { return; }
         if (currentIndex.value < (snapshots.value.length - 1)) {
             snapshots.value = snapshots.value.slice(0, Math.max(1, currentIndex.value));
@@ -34,6 +37,12 @@ export function useRecorder() {
         };
 
         snapshots.value.push([time, snapshot]);
+
+        // if (snapshots.value.length > 10) {
+        //     snapshots.value.shift();
+        // } else {
+        //     currentIndex.value++;
+        // }
         currentIndex.value++;
     }
 

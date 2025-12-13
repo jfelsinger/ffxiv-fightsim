@@ -201,6 +201,7 @@ export class Mechanic extends EventEmitter {
             (item, n, st, cd, p) => {
                 item.init(n, effect, p, st + cd);
             },
+            ((i) => i?.getDuration() || 0),
             this.clock,
             0,
             startTime
@@ -241,11 +242,19 @@ export class Mechanic extends EventEmitter {
             const durationPercent = this.getDurationPercent();
             if (this.options.castName) {
                 const castPercent = this.options.castTime ? this.getDurationPercent(this.options.castTime) : durationPercent;
-                if (castPercent < 1) {
-                    castState.value = {
-                        name: this.options.castName,
-                        percent: castPercent,
-                    };
+                console.log('Cast Percent: ', this.options.castName, Math.round(castPercent * 100) / 100);
+                if (castPercent > 0 && castPercent <= 1) {
+                    if (castPercent > 0.985) {
+                        castState.value = {
+                            name: this.options.castName,
+                            percent: 1,
+                        };
+                    } else {
+                        castState.value = {
+                            name: this.options.castName,
+                            percent: castPercent,
+                        };
+                    }
                 } else {
                     castState.value = undefined;
                 }
