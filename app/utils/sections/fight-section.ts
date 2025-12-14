@@ -41,7 +41,12 @@ export class FightSection extends EventEmitter {
         };
     }
 
+    __cachedDuration?: number;
     getDuration() {
+        if (this.__cachedDuration !== undefined) {
+            return this.__cachedDuration;
+        }
+
         let duration = 0;
         if (this.scheduling === 'sequential') {
             const len = this.mechanics.length;
@@ -57,6 +62,7 @@ export class FightSection extends EventEmitter {
             );
         }
 
+        this.__cachedDuration = duration;
         return duration;
     }
 

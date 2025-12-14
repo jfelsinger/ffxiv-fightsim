@@ -42,7 +42,12 @@ export class Fight extends EventEmitter {
     totalSections = 0;
     endedSections = 0;
 
+    __cachedDuration?: number;
     getDuration() {
+        if (this.__cachedDuration !== undefined) {
+            return this.__cachedDuration;
+        }
+
         let duration = 0;
         if (this.scheduling === 'sequential') {
             const len = this.sections.length;
@@ -58,6 +63,7 @@ export class Fight extends EventEmitter {
             );
         }
 
+        this.__cachedDuration = duration;
         return duration;
     }
 

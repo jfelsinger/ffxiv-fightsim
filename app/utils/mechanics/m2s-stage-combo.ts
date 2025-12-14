@@ -58,7 +58,7 @@ export class M2SStageCombo extends Mechanic {
         const castName = comboName === 'centerstage' ? 'Centerstage Combo' : 'Outerstage Combo';
         const result = stageCombos[comboName].map(e => stageEffects[e]).filter(e => typeof e !== 'undefined');
         this.options.castName = castName;
-        result[0].startDelay = 650;
+        result[0].startDelay = 2650;
 
 
         let particles: Bab.ParticleSystem[] = [];

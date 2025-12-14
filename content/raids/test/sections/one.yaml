@@ -21,6 +21,7 @@ sections:
       mechanics:
         - label: test-mech-one
           repeat: 2
+          startDelay: 100
           endDelay: 500
           item:
             name: mech-one

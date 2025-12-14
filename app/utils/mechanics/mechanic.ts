@@ -63,7 +63,12 @@ export class Mechanic extends EventEmitter {
         };
     }
 
+    __cachedDuration?: number;
     getDuration() {
+        if (this.__cachedDuration !== undefined) {
+            return this.__cachedDuration;
+        }
+
         let duration = 0;
         if (this.scheduling === 'sequential') {
             const len = this.effects.length;
@@ -79,6 +84,7 @@ export class Mechanic extends EventEmitter {
             );
         }
 
+        this.__cachedDuration = duration;
         return duration;
     }
 
@@ -199,6 +205,7 @@ export class Mechanic extends EventEmitter {
         const result = traverseScheduled(
             effect,
             (item, n, st, cd, p) => {
+                console.log(`Init effect ${effect.label || item.name} ${n}: `, st, effect);
                 item.init(n, effect, p, st + cd);
             },
             ((i) => i?.getDuration() || 0),
@@ -232,6 +239,7 @@ export class Mechanic extends EventEmitter {
         this.setStage(MechanicStage.preCleanup);
         this.endTime = this.clock.time;
         this.isActive = false;
+        console.log('End mechanic: ', this.label);
         this.emit('end-mechanic');
         this.setStage(MechanicStage.ended);
     }
@@ -242,8 +250,7 @@ export class Mechanic extends EventEmitter {
             const durationPercent = this.getDurationPercent();
             if (this.options.castName) {
                 const castPercent = this.options.castTime ? this.getDurationPercent(this.options.castTime) : durationPercent;
-                console.log('Cast Percent: ', this.options.castName, Math.round(castPercent * 100) / 100);
-                if (castPercent > 0 && castPercent <= 1) {
+                if (castPercent >= 0 && castPercent < 1) {
                     if (castPercent > 0.985) {
                         castState.value = {
                             name: this.options.castName,

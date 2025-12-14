@@ -285,6 +285,7 @@ export class Effect extends EventEmitter {
         this.run(time);
         if (this.isActive) {
             const durationPercent = this.getDurationPercent();
+            console.log('Effect tick: ', this.name, time, durationPercent);
             const adjustedTelegraph = this.adjustedTelegraph;
             if (this.options.castName) {
                 if (durationPercent < 1) {
@@ -347,6 +348,8 @@ export class Effect extends EventEmitter {
         this.startTime = startTime ?? this.clock.time;
         this.snapshotTime = this.startTime + this.duration - this.shiftSnapshot;
         this.cleanupTime = this.startTime + this.duration + 1;
+
+        console.log(`Effect init: ${scheduledSelf?.label || this.label || this.name} (start: ${this.startTime}, snapshot: ${this.snapshotTime}, cleanup: ${this.cleanupTime})`);
 
         this.startup();
         this.hide();
