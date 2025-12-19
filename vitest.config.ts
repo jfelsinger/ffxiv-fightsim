@@ -9,6 +9,7 @@ export default defineConfig({
                     name: 'nuxt',
                     include: [
                         'app/**/*\.{test,spec}.ts',
+                        'shared/**/*\.{test,spec}.ts',
                         'test/{e2e,unit}/*\.{test,spec}.ts'
                     ],
                     environment: 'nuxt',
