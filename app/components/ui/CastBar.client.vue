@@ -4,7 +4,7 @@ const props = defineProps<{
     name?: string,
 }>();
 
-const castState = useCastState();
+const { cast: castState } = useCastState();
 const percent = computed(() => Math.max(0, Math.min(100, props.percent ?? ((castState.value?.percent ?? 0) * 100))));
 const name = computed(() => props.name || castState.value?.name || 'Cast');
 

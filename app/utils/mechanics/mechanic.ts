@@ -1,6 +1,6 @@
 export const DefaultMechanicSchedulingMode = 'parallel';
 
-const castState = useCastState();
+const { cast: castState } = useCastState();
 
 export const enum MechanicStage {
     preInitialization = 0,

@@ -3,8 +3,18 @@ export type CastState = {
     percent?: number
 }
 
+const defaultCastValue = undefined;
+
 export function useCastState() {
-    const castState = useState<CastState | undefined>('current-cast', () => undefined);
-    (window as any).__castState = castState;
-    return castState;
+    const cast = useState<CastState | undefined>('current-cast', () => defaultCastValue);
+    (window as any).__castState = cast;
+
+    function reset() {
+        cast.value = defaultCastValue;
+    }
+
+    return {
+        cast,
+        reset,
+    }
 }

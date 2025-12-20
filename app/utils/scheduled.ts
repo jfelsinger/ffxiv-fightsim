@@ -1,7 +1,6 @@
 export type ScheduleMode = 'sequential' | 'parallel';
 export type Scheduled<T> = {
     item: T
-    repeatedItems?: T[]
     label?: string
     comment?: string
     repeat?: number
@@ -34,17 +33,18 @@ export function getScheduledDuration<T>(
         }
     }
 
-    if (scheduled.repeat) {
-        duration += duration * scheduled.repeat;
-        if (scheduled.afterRepeats) {
-            if (isScheduled(scheduled.afterRepeats)) {
-                duration += scheduled?.afterRepeats?.preStartDelay || 0;
-                duration += getScheduledDuration(scheduled.afterRepeats, getItemDuration)
-            } else {
-                duration += getItemDuration(scheduled.afterRepeats);
-            }
-        }
-    }
+    // Phase out repeats outside of decoding logic
+    // if (scheduled.repeat) {
+    //     duration += duration * scheduled.repeat;
+    //     if (scheduled.afterRepeats) {
+    //         if (isScheduled(scheduled.afterRepeats)) {
+    //             duration += scheduled?.afterRepeats?.preStartDelay || 0;
+    //             duration += getScheduledDuration(scheduled.afterRepeats, getItemDuration)
+    //         } else {
+    //             duration += getItemDuration(scheduled.afterRepeats);
+    //         }
+    //     }
+    // }
 
     return duration;
 }
@@ -55,8 +55,7 @@ export type ScheduledParent<T> = {
     parent?: ScheduledParent<T>,
 }
 
-// Using async/await was a mistake. Instead of executing and waiting, scheduling will have
-// to be done through the tick system... probably
+// Deprecrated - Async/Await timeout usage cannot be rewound
 export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T, n: number, parent?: ScheduledParent<T>) => Promise<any>, clock: Clock, repeatNumber = 0) {
     if (scheduled.startDelay) {
         await clock.wait(scheduled.startDelay);
@@ -90,6 +89,8 @@ export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: 
             await executeScheduled(scheduled, func, clock, (repeatNumber || 0) + 1)
         } else if (scheduled.afterRepeats) {
             if (isScheduled(scheduled.afterRepeats)) {
+                // `preStartDelay` only seems implemented for the two after types, and none actually exist, probably ok
+                // to ignore for now, and revisit the intended functionality later
                 if (scheduled.afterRepeats.preStartDelay) { await wait(scheduled.afterRepeats.preStartDelay); }
                 await executeScheduled(
                     scheduled.afterRepeats,
@@ -117,11 +118,13 @@ export function traverseScheduled<T>(
 ) {
     // console.log(`Traversing scheduled, starting at: ${startTime}, repeat #: ${repeatNumber}`, scheduled);
     let delay = scheduled.startDelay || 0;
-    if (repeatNumber > 0 && scheduled.repeatedItems?.[repeatNumber - 1]) {
-        func(scheduled.repeatedItems[repeatNumber - 1] as T, repeatNumber, startTime, delay);
-    } else {
-        func(scheduled.item, repeatNumber, startTime, delay);
-    }
+
+    func(scheduled.item, repeatNumber, startTime, delay);
+    // if (repeatNumber > 0 && scheduled.repeatedItems?.[repeatNumber - 1]) {
+    //     func(scheduled.repeatedItems[repeatNumber - 1] as T, repeatNumber, startTime, delay);
+    // } else {
+    //     func(scheduled.item, repeatNumber, startTime, delay);
+    // }
 
     delay += getItemDuration(scheduled.item);
     delay += scheduled?.endDelay || 0;

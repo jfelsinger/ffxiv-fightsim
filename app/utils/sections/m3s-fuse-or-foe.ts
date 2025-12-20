@@ -14,6 +14,8 @@ export class FuseOrFoeSection extends FightSection {
         super(options);
         this.options = options;
 
+        // TODO: This style of randomization does not work anymore,
+
         // Randomize starting on 1-3 or 2-4
         const fuseOrFoe1 = this.mechanics.find((m) => m.label === 'm3s-fuse-or-foe-1-3');
         const fuseOrFoe2 = this.mechanics.find((m) => m.label === 'm3s-fuse-or-foe-2-4');

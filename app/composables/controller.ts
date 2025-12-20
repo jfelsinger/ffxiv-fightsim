@@ -12,6 +12,12 @@ export function useController() {
     const zoomInputActive = useLocalStorage<boolean>('controller-zoom-active', () => false);
     const zoomInputInverted = useLocalStorage<boolean>('controller-zoom-inverted', () => false);
 
+    function reset() {
+        leftStickVector.value = Bab.Vector3.Zero();
+        rightStickVector.value = Bab.Vector3.Zero();
+        zoomInputActive.value = false;
+    }
+
     return {
         leftStickVector,
         rightStickVector,
@@ -25,5 +31,6 @@ export function useController() {
 
         zoomInputActive,
         zoomInputInverted,
+        reset,
     }
 }

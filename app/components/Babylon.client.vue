@@ -14,11 +14,10 @@ const props = defineProps<{
 
 const debug = Debug('game');
 
-const playerTimeScaling = ref(1.0);
-const playerClock = new Clock({ name: 'player', scaling: playerTimeScaling.value });
-const playerTime = useState<number>('playerTime', () => playerClock.time || 0);
-playerClock.on('tick', (time) => { playerTime.value = time });
-watch(playerTimeScaling, (scaling) => { playerClock.scaling = scaling });
+
+const {
+    playerClock,
+} = usePlayerClock();
 
 const {
     worldTime,
@@ -36,7 +35,7 @@ const { isTutorial } = useTutorialMode();
 const { hits, isHit } = useHits();
 const { statuses } = useStatuses();
 
-const castState = useCastState();
+const { cast: castState } = useCastState();
 (window as any).castState = castState;
 
 const recorder = useRecorder();

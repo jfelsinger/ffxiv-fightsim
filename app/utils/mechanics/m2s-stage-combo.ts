@@ -46,6 +46,7 @@ export class M2SStageCombo extends Mechanic {
     override getEffects(): Scheduled<Effect>[] {
         const allEffects = this.effects;
 
+        // TODO: This all needs replaced with a grouped repeated randomly picked scheduler
         const stageEffects: Record<StageComboEffectName, Scheduled<Effect> | undefined> = {
             // 'centerstage-cast': allEffects.find(e => e.label?.toLowerCase() === 'centerstage-cast'),
             // 'outerstage-cast': allEffects.find(e => e.label?.toLowerCase() === 'outerstage-cast'),

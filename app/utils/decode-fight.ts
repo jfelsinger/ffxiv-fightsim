@@ -67,39 +67,98 @@ function tryParse(data: any) {
     return data;
 }
 
-export function decodeScheduled<T>(data: any, itemBuilder: (data: any, optons: FightDecodeOptions) => T, options: FightDecodeOptions): Scheduled<T> {
+function getDurationDefault(item: any) {
+    return item?.getDuration?.() || 0;
+}
+
+export function decodeScheduled<T>(
+    data: any,
+    itemBuilder: (data: any, optons: FightDecodeOptions) => T,
+    options: FightDecodeOptions,
+    getItemDuration: (item: T) => number = getDurationDefault
+): Scheduled<T>[] {
     const repeat = data.repeat || 0;
     const scheduledResult: Scheduled<T> = {
         ...data,
         item: itemBuilder(data.item, options),
-        repeat,
+        n: 1,
+        repeat: 0,
         startDelay: parseNumber(data.startDelay || 0),
         preStartDelay: parseNumber(data.preStartDelay || 0),
         endDelay: parseNumber(data.endDelay || 0),
     };
 
-    if (repeat) {
-        const repeatedItems: T[] = [];
-        while (repeatedItems.length < repeat) {
-            repeatedItems.push(itemBuilder(data.item, options));
-        }
-
-        scheduledResult.repeatedItems = repeatedItems;
-    }
+    const results: Scheduled<T>[] = [];
+    results.push(scheduledResult);
 
     if (data.after) {
-        scheduledResult.after =
+        const after =
             isScheduled(data.after) ? decodeScheduled<T>(data.after, itemBuilder, options) :
                 itemBuilder(data.after, options);
+        scheduledResult.after = Array.isArray(after) ? after[0] : after;
     }
 
+    if (repeat) {
+        let preRepeatDuration = getScheduledDuration(scheduledResult, getItemDuration);
+        for (let i = 0; i < repeat; i++) {
+            const repeatScheduled = {
+                ...data,
+                item: itemBuilder(data.item, options),
+                n: i + 2,
+                repeat: 0,
+                startDelay: preRepeatDuration + parseNumber(data.startDelay || 0),
+                preStartDelay: parseNumber(data.preStartDelay || 0),
+                endDelay: parseNumber(data.endDelay || 0),
+            };
+
+            if (data.after) {
+                const after =
+                    isScheduled(data.after) ? decodeScheduled<T>(data.after, itemBuilder, options) :
+                        itemBuilder(data.after, options);
+                repeatScheduled.after = Array.isArray(after) ? after[0] : after;
+            }
+
+            results.push(repeatScheduled);
+
+            // TODO: If the scheduling is sequential, need to switch how startDelay is handled.
+            //       For parallel scheduling, this should be correct as-is.
+
+            // Set to, and don't add, the duration because the startDelay has previous items baked in
+            preRepeatDuration = getScheduledDuration(repeatScheduled, getItemDuration);
+        }
+
+        // const repeatedItems: T[] = [];
+        // while (repeatedItems.length < repeat) {
+        //     repeatedItems.push(itemBuilder(data.item, options));
+        // }
+        // scheduledResult.repeatedItems = repeatedItems;
+    }
+
+
+    // Instead of a sub-item, we need repeats to broken out and decoded into their own Scheduled objects
+    //  - An array of unique scheduled items
+    //  - Each one respects and calculates the duration of the previous
+    // if (repeat) {
+    //     const repeatedItems: T[] = [];
+    //     while (repeatedItems.length < repeat) {
+    //         repeatedItems.push(itemBuilder(data.item, options));
+    //     }
+
+    //     scheduledResult.repeatedItems = repeatedItems;
+    // }
+
+    // `afterRepeats` is a scheduled action to happen after the initial item, but also after all the repeats
+    //  - The start time for this would have to be calculated bas on the initial and item durations
+    //  - No `afterRepeats` items are being used right now, so can probably temporarily disable
     if (data.afterRepeats) {
-        scheduledResult.afterRepeats =
+        const afterRepeats =
             isScheduled(data.afterRepeats) ? decodeScheduled<T>(data.afterRepeats, itemBuilder, options) :
                 itemBuilder(data.afterRepeats, options);
+        scheduledResult.afterRepeats = Array.isArray(afterRepeats) ? afterRepeats[0] : afterRepeats;
     }
 
-    return scheduledResult;
+    // return scheduledResult;
+    return results;
 }
 
 export function decodeEffect(data: any, options: FightDecodeOptions) {
@@ -134,7 +193,8 @@ export function decodeMechanic(data: any, options: FightDecodeOptions) {
         mechanicClass = mechanicsCollection[mechanicClassName] as typeof Mechanic;
     }
 
-    const effects = data?.effects?.map((effect: any) => decodeScheduledEffect(effect, options)) || [];
+    // Flatten returned array so that decode can return an array and things still work
+    const effects = data?.effects?.map((effect: any) => decodeScheduledEffect(effect, options))?.flat() || [];
 
     return new mechanicClass({
         ...options,
@@ -158,7 +218,7 @@ export function decodeFightSection(data: any, options: FightDecodeOptions) {
         sectionClass = (sectionsCollection as any)[sectionClassName] as typeof FightSection;
     }
 
-    const mechanics = data?.mechanics?.map((mechanic: any) => decodeScheduledMechanic(mechanic, options)) || [];
+    const mechanics = data?.mechanics?.map((mechanic: any) => decodeScheduledMechanic(mechanic, options))?.flat() || [];
 
     return new sectionClass({
         ...options,
@@ -182,7 +242,7 @@ export function decodeFight(data: any, options: FightDecodeOptions) {
         fightClass = (fightsCollection as any)[fightClassName] as typeof Fight;
     }
 
-    const sections = data?.sections?.map((section: any) => decodeScheduledFightSection(section, options)) || [];
+    const sections = data?.sections?.map((section: any) => decodeScheduledFightSection(section, options))?.flat() || [];
 
     return new fightClass({
         ...options,

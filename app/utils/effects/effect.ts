@@ -1,6 +1,6 @@
 const debug = Debug('game:utils:effect');
 
-const castState = useCastState();
+const { cast: castState } = useCastState();
 
 export const enum EffectStage {
     preInitialization = 0,

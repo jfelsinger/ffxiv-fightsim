@@ -16,9 +16,15 @@ export function useWorldClock() {
         watch(worldTimeScaling, (scaling) => { worldClock.scaling = scaling });
     }
 
+    function reset() {
+        worldClock.pause();
+        worldClock.setTime(0);
+    }
+
     return {
         worldTimeScaling,
         worldClock,
         worldTime,
+        reset,
     };
 }

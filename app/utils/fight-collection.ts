@@ -7,6 +7,7 @@ export type FightCollectionOptions = {
     scene: Bab.Scene;
     worldClock: Clock;
     playerClock: Clock;
+    seed?: string;
     arena?: Arena;
 }
 
@@ -16,6 +17,7 @@ export class FightCollection {
     scene: Bab.Scene;
     worldClock: Clock;
     playerClock: Clock;
+    seed: string;
     arena?: Arena;
     gl?: Bab.GlowLayer;
 
@@ -24,6 +26,22 @@ export class FightCollection {
 
     get groundMesh() { return this.getMeshByName('ground'); }
     get bossMesh() { return this.getMeshByName('boss'); }
+
+    __rand?: ReturnType<typeof mulberry32>;
+
+    // Returns a random number between 0 and 1, based on given seed
+    rand() {
+        if (!this.__rand) {
+            this.__rand = mulberry32(this.seed);
+        }
+
+        return this.__rand();
+    }
+
+    // Returns an int between the min and max, based on given seed
+    randInt(max = 1, min = 0) {
+        return Math.floor(this.rand() * (max - min + 1) + min);
+    }
 
     addGlow(mesh: Bab.Mesh) {
         if (!this.gl) {
@@ -176,6 +194,7 @@ export class FightCollection {
             worldClock: this.worldClock.toJSONSnapshot(),
             playerClock: this.playerClock.toJSONSnapshot(),
             arena: this.arena?.toJSONSnapshot(),
+            seed: this.seed,
 
             // TODO: Snapshot and restore generic meshes
 
@@ -199,6 +218,7 @@ export class FightCollection {
         if (state.worldClock) { this.worldClock.loadJSONSnapshot(state.worldClock); }
         if (state.playerClock) { this.playerClock.loadJSONSnapshot(state.playerClock); }
         if (state.arena && this.arena) { this.arena.loadJSONSnapshot(state.arena); }
+        if (state.seed) { this.seed = state.seed; }
 
         // TODO: Snapshot and restore generic meshes
 
@@ -221,5 +241,6 @@ export class FightCollection {
         this.worldClock = options.worldClock;
         this.scene = options.scene;
         this.arena = options.arena;
+        this.seed = options.seed || `${Math.random() * 1000000}`;
     }
 }
