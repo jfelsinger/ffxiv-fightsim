@@ -33,7 +33,6 @@ sections:
               - label: Effect One
                 item:
                   name: aoe-group
-                  # castName: Ifrit Cast
                   color: 199,42,45
                   outerRadius: 30
                   innerRadius: 0

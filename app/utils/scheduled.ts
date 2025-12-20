@@ -1,17 +1,48 @@
 export type ScheduleMode = 'sequential' | 'parallel';
-export type Scheduled<T> = {
-    item: T
+
+export type ScheduledBase<T> = {
     label?: string
     comment?: string
     repeat?: number
     preStartDelay?: number
     startDelay?: number
     endDelay?: number
-    after?: Scheduled<T> | T
-    afterRepeats?: Scheduled<T> | T
+    after?: ScheduledItem<T> | T
+    afterRepeats?: ScheduledItem<T> | T
 }
 
-export function isScheduled<T>(v: unknown): v is Scheduled<T> {
+export type ScheduledItem<T> = ScheduledBase<T> & {
+    item: T
+}
+
+export type ScheduledGroup<T> = ScheduledBase<T> & {
+    scheduling?: ScheduleMode
+    group: (ScheduledItem<T> | T)[] // TODO: Consider implementing for both group and item as just `Scheduled<T>`
+}
+
+export type Scheduled<T> = ScheduledGroup<T> | ScheduledItem<T>;
+
+// Currently:
+//  A single scheduled contains a single item, everything follows the schedule-execution of the parent
+//
+// New implementation:
+//  A group that can execture multiple items independent of the parent's scheduling type
+//
+// * Parent
+//     Scheduled<Item>[]
+//       item: Item
+
+export function isScheduledGroup<T>(v: unknown): v is ScheduledGroup<T> {
+    return typeof v === 'object' && v != null && 'group' in v;
+}
+
+export function isScheduledItem<T>(v: unknown): v is ScheduledItem<T> {
+    return typeof v === 'object' && v != null && 'item' in v;
+}
+
+// Should be a combination of the above but... :shrug:
+// Being kept as-is for references elsewhere, until everything is refactored
+export function isScheduled<T>(v: unknown): v is ScheduledItem<T> {
     return typeof v === 'object' && v != null && 'item' in v;
 }
 
@@ -21,7 +52,32 @@ export function getScheduledDuration<T>(
 ) {
     let duration = 0;
     duration += scheduled?.startDelay || 0;
-    duration += getItemDuration(scheduled.item);
+
+    if (isScheduledItem(scheduled)) {
+        duration += getItemDuration(scheduled.item);
+    } else {
+        // TODO: Implement scheduling type
+        const len = scheduled.group.length;
+        for (let i = 0; i < len; i++) {
+            const groupItem = scheduled.group[i];
+            if (isScheduledItem(groupItem)) {
+                duration += getScheduledDuration(
+                    groupItem,
+                    getItemDuration,
+                );
+            }
+            else if (isScheduledGroup(groupItem)) {
+                duration += getScheduledDuration(
+                    groupItem as any,
+                    getItemDuration,
+                );
+            }
+            else if (groupItem) {
+                duration += getItemDuration(groupItem);
+            }
+        }
+    }
+
     duration += scheduled?.endDelay || 0;
 
     if (scheduled.after) {
@@ -56,57 +112,60 @@ export type ScheduledParent<T> = {
 }
 
 // Deprecrated - Async/Await timeout usage cannot be rewound
-export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T, n: number, parent?: ScheduledParent<T>) => Promise<any>, clock: Clock, repeatNumber = 0) {
-    if (scheduled.startDelay) {
-        await clock.wait(scheduled.startDelay);
-    }
-
-    await func(scheduled.item, repeatNumber);
-
-    if (scheduled.endDelay) {
-        await clock.wait(scheduled.endDelay);
-    }
-
-    if (scheduled.after) {
-        if (isScheduled(scheduled.after)) {
-            if (scheduled.after.preStartDelay) { await wait(scheduled.after.preStartDelay); }
-            await executeScheduled(
-                scheduled.after,
-                (i, n, p) => {
-                    if (p) { p.parent = { n: repeatNumber, scheduled }; }
-                    else { p = { n: repeatNumber, scheduled }; }
-                    return func(i, n, p);
-                },
-                clock,
-            )
-        } else {
-            await func(scheduled.after, repeatNumber, { n: repeatNumber, scheduled });
-        }
-    }
-
-    if (scheduled.repeat) {
-        if (scheduled.repeat > repeatNumber) {
-            await executeScheduled(scheduled, func, clock, (repeatNumber || 0) + 1)
-        } else if (scheduled.afterRepeats) {
-            if (isScheduled(scheduled.afterRepeats)) {
-                // `preStartDelay` only seems implemented for the two after types, and none actually exist, probably ok
-                // to ignore for now, and revisit the intended functionality later
-                if (scheduled.afterRepeats.preStartDelay) { await wait(scheduled.afterRepeats.preStartDelay); }
-                await executeScheduled(
-                    scheduled.afterRepeats,
-                    (i, n, p) => {
-                        if (p) { p.parent = { n: repeatNumber, scheduled }; }
-                        else { p = { n: repeatNumber, scheduled }; }
-                        return func(i, n, p);
-                    },
-                    clock,
-                )
-            } else {
-                await func(scheduled.afterRepeats, repeatNumber, { n: repeatNumber, scheduled });
-            }
-        }
-    }
-}
+// export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T, n: number, parent?: ScheduledParent<T>) => Promise<any>, clock: Clock, repeatNumber = 0) {
+//     if (scheduled.startDelay) {
+//         await clock.wait(scheduled.startDelay);
+//     }
+//
+//     if (isScheduledItem(scheduled)) {
+//         await func(scheduled.item, repeatNumber);
+//     } else {
+//     }
+//
+//     if (scheduled.endDelay) {
+//         await clock.wait(scheduled.endDelay);
+//     }
+//
+//     if (scheduled.after) {
+//         if (isScheduled(scheduled.after)) {
+//             if (scheduled.after.preStartDelay) { await wait(scheduled.after.preStartDelay); }
+//             await executeScheduled(
+//                 scheduled.after,
+//                 (i, n, p) => {
+//                     if (p) { p.parent = { n: repeatNumber, scheduled }; }
+//                     else { p = { n: repeatNumber, scheduled }; }
+//                     return func(i, n, p);
+//                 },
+//                 clock,
+//             )
+//         } else {
+//             await func(scheduled.after, repeatNumber, { n: repeatNumber, scheduled });
+//         }
+//     }
+//
+//     if (scheduled.repeat) {
+//         if (scheduled.repeat > repeatNumber) {
+//             await executeScheduled(scheduled, func, clock, (repeatNumber || 0) + 1)
+//         } else if (scheduled.afterRepeats) {
+//             if (isScheduled(scheduled.afterRepeats)) {
+//                 // `preStartDelay` only seems implemented for the two after types, and none actually exist, probably ok
+//                 // to ignore for now, and revisit the intended functionality later
+//                 if (scheduled.afterRepeats.preStartDelay) { await wait(scheduled.afterRepeats.preStartDelay); }
+//                 await executeScheduled(
+//                     scheduled.afterRepeats,
+//                     (i, n, p) => {
+//                         if (p) { p.parent = { n: repeatNumber, scheduled }; }
+//                         else { p = { n: repeatNumber, scheduled }; }
+//                         return func(i, n, p);
+//                     },
+//                     clock,
+//                 )
+//             } else {
+//                 await func(scheduled.afterRepeats, repeatNumber, { n: repeatNumber, scheduled });
+//             }
+//         }
+//     }
+// }
 
 export function traverseScheduled<T>(
     scheduled: Scheduled<T>,
@@ -119,14 +178,48 @@ export function traverseScheduled<T>(
     // console.log(`Traversing scheduled, starting at: ${startTime}, repeat #: ${repeatNumber}`, scheduled);
     let delay = scheduled.startDelay || 0;
 
-    func(scheduled.item, repeatNumber, startTime, delay);
-    // if (repeatNumber > 0 && scheduled.repeatedItems?.[repeatNumber - 1]) {
-    //     func(scheduled.repeatedItems[repeatNumber - 1] as T, repeatNumber, startTime, delay);
-    // } else {
-    //     func(scheduled.item, repeatNumber, startTime, delay);
-    // }
+    if (isScheduledItem(scheduled)) {
+        func(scheduled.item, repeatNumber, startTime, delay);
+        // if (repeatNumber > 0 && scheduled.repeatedItems?.[repeatNumber - 1]) {
+        //     func(scheduled.repeatedItems[repeatNumber - 1] as T, repeatNumber, startTime, delay);
+        // } else {
+        //     func(scheduled.item, repeatNumber, startTime, delay);
+        // }
 
-    delay += getItemDuration(scheduled.item);
+        delay += getItemDuration(scheduled.item);
+    } else if (isScheduledGroup(scheduled)) {
+        // TODO: Implement scheduling type
+        // MAKE SURE THE DELAY += is right
+        const len = scheduled.group.length;
+        for (let i = 0; i < len; i++) {
+            const groupItem = scheduled.group[i];
+            if (isScheduledItem(groupItem)) {
+                delay += traverseScheduled(
+                    groupItem,
+                    func,
+                    getItemDuration,
+                    clock,
+                    repeatNumber,
+                    startTime + delay
+                );
+            }
+            else if (isScheduledGroup(groupItem)) {
+                delay += traverseScheduled(
+                    groupItem as any,
+                    func,
+                    getItemDuration,
+                    clock,
+                    repeatNumber,
+                    startTime + delay
+                );
+            }
+            else if (groupItem) {
+                func(groupItem, repeatNumber, startTime, delay);
+                delay += getItemDuration(groupItem);
+            }
+        }
+    }
+
     delay += scheduled?.endDelay || 0;
 
     if (scheduled.after) {
@@ -188,9 +281,20 @@ export function getScheduledJSONSnapshot<T>(scheduled: Scheduled<T>) {
         endDelay: scheduled.endDelay,
     };
 
-    const item: any = scheduled.item;
-    if (item && 'toJSONSnapshot' in item) {
-        result.item = item.toJSONSnapshot();
+    if (isScheduledItem(scheduled)) {
+        const item: any = scheduled.item;
+        if (item && 'toJSONSnapshot' in item) {
+            result.item = item.toJSONSnapshot();
+        }
+    } else {
+        result.scheduling = scheduled.scheduling,
+            result.group = scheduled.group.map((g) => {
+                if (isScheduledItem(g)) { return getScheduledJSONSnapshot(g); }
+                if (isScheduledGroup(g)) { return getScheduledJSONSnapshot(g); }
+                if (g && 'toJSONSnapshot' in g) {
+                    return (g as any).toJSONSnapshot();
+                }
+            });
     }
 
     if (scheduled.after) {
@@ -211,9 +315,30 @@ export function loadScheduledJSONSnapshot<T>(scheduled: Scheduled<T>, snapshot: 
     if (snapshot.startDelay) { scheduled.startDelay = snapshot.startDelay; }
     if (snapshot.endDelay) { scheduled.endDelay = snapshot.endDelay; }
 
-    const item: any = scheduled.item;
-    if (snapshot.item && 'loadJSONSnapshot' in item) {
-        item.loadJSONSnapshot(snapshot.item);
+    if (isScheduledItem(scheduled)) {
+        const item: any = scheduled.item;
+        if (snapshot.item && 'loadJSONSnapshot' in item) {
+            item.loadJSONSnapshot(snapshot.item);
+        }
+    } else {
+        if (snapshot.scheduling) { scheduled.scheduling = snapshot.scheduling; }
+        if (Array.isArray(snapshot.group)) {
+            const len = snapshot.group.length;
+            for (let i = 0; i < len; i++) {
+                const item: any = scheduled?.group?.[i];
+                if (item) {
+                    if (isScheduledItem(item)) {
+                        loadScheduledJSONSnapshot(item, snapshot.group[i]);
+                    }
+                    else if (isScheduledGroup(item)) {
+                        loadScheduledJSONSnapshot(item, snapshot.group[i]);
+                    }
+                    else if (item && 'toJSONSnapshot' in item) {
+                        item.loadJSONSnapshot(snapshot.group[i]);
+                    }
+                }
+            }
+        }
     }
 
     if (scheduled.after && snapshot.after) {
