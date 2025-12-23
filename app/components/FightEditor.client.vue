@@ -7,6 +7,7 @@ const workingCopy = ref<FightOptions>(JSON.parse(JSON.stringify(model.value)));
 
 <template>
     <div class="w-full bg-base-100 rounded-md flex flex-col gap-2">
+        <!--
         <div class="p-2 bg-gray-50 rounded-md">
             <p>{{ workingCopy.name }}</p>
 
@@ -40,5 +41,6 @@ const workingCopy = ref<FightOptions>(JSON.parse(JSON.stringify(model.value)));
         <div class="text-xs m-2">
             <pre><code>{{ JSON.stringify(model, null, 2) }}</code></pre>
         </div>
+        -->
     </div>
 </template>

@@ -113,13 +113,13 @@ export class Fight extends EventEmitter {
         const len = this.sections.length;
         for (let i = 0; i < len; i++) {
             const section = this.sections[i];
-            if (section) {
-                section.item.on('effect-hit', (data: any) => {
+            forEachScheduledItem(section, (item) => {
+                item.on('effect-hit', (data: any) => {
                     this.emit('effect-hit', {
                         ...data,
                     });
                 });
-            }
+            });
         }
 
         this.name = options.name || options.title || 'fight';
@@ -205,13 +205,15 @@ export class Fight extends EventEmitter {
         );
 
         this.totalSections++;
-        section.item.on('start-section', () => { this.emit('start-section', { section }) });
-        section.item.on('end-section', () => {
-            this.emit('end-section', { section })
-            this.endedSections++;
-            if (this.endedSections >= this.totalSections) {
-                this.emit('end-fight');
-            }
+        forEachScheduledItem(section, (item) => {
+            item.on('start-section', () => { this.emit('start-section', { section }) });
+            item.on('end-section', () => {
+                this.emit('end-section', { section })
+                this.endedSections++;
+                if (this.endedSections >= this.totalSections) {
+                    this.emit('end-fight');
+                }
+            });
         });
         return result;
     }
@@ -222,7 +224,9 @@ export class Fight extends EventEmitter {
         this.emit('dispose');
         const len = this.sections.length;
         for (let i = 0; i < len; i++) {
-            this.sections[i]?.item?.dispose();
+            forEachScheduledItem(this.sections[i], (item) => {
+                item?.dispose();
+            });
         }
         this.arena?.dispose();
         this.removeAllListeners();

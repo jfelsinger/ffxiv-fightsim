@@ -11,94 +11,94 @@ const emit = defineEmits<{
     (e: 'update', value: Scheduled<FightSection>): void,
 }>();
 
-const section = computed(() => props.scheduled.item);
-const mechanics = computed(() => section.value.mechanics || []);
-
-const duration = computed(() => props.scheduled ? getScheduledDuration(props.scheduled, (i) => i.getDuration()) : 0 || 0);
-const currentTime = useState<number>('worldTime', () => 0);
-const elapsed = computed(() => Math.min(duration.value, currentTime.value));
-const elapsedPercent = computed(() => (elapsed.value || 0) / (duration.value || 1) * 100);
-
-const language = ref('yaml');
-const encoded = ref(YAML.stringify(props.scheduled).trim());
-
-function isEncodedChanged() {
-    if (language.value === 'yaml') {
-        const encodeCurrent = YAML.stringify(props.scheduled).trim();
-        return YAML.stringify(YAML.parse(encoded.value))?.trim() !== encodeCurrent;
-    } else {
-        const encodeCurrent = JSON.stringify(props.scheduled).trim();
-        return JSON.stringify(JSON.parse(encoded.value))?.trim() !== encodeCurrent;
-    }
-}
-
-function resetEncoded(force = false) {
-    if (language.value === 'yaml') {
-        const resetValue = YAML.stringify(props.scheduled).trim();
-        if (force) {
-            encoded.value = resetValue;
-            return;
-        }
-
-        try {
-            if (isEncodedChanged()) {
-                console.log('reset encoded!');
-                encoded.value = resetValue;
-            }
-        } catch (err) {
-            console.log('reset encoded!', err);
-            encoded.value = resetValue;
-        }
-    } else if (language.value === 'json') {
-        const resetValue = JSON.stringify(props.scheduled, null, 2).trim();
-        if (force) {
-            encoded.value = resetValue;
-            return;
-        }
-
-        try {
-            if (isEncodedChanged()) {
-                encoded.value = resetValue;
-            }
-        } catch (err) {
-            encoded.value = resetValue;
-        }
-    }
-}
-
-watch(language, (newValue: string, oldValue: string) => {
-    if (newValue !== oldValue) {
-        if (newValue === 'json' && oldValue === 'yaml') {
-            encoded.value = JSON.stringify(YAML.parse(encoded.value), null, 2).trim();
-        } else if (newValue === 'yaml' && oldValue === 'json') {
-            encoded.value = YAML.stringify(JSON.parse(encoded.value)).trim();
-        }
-    }
-});
-function onSave() {
-    if (isEncodedChanged() && encoded.value && props.scheduled) {
-        try {
-            const updated = decodeScheduledFightSection(encoded.value, {
-                collection: props.fight.collection,
-                clock: props.fight?.clock,
-            });
-
-            console.log('Save: ', updated);
-            emit('update', updated);
-        } catch (err) {
-            console.error('Save fail: ', err);
-        }
-    }
-}
-
-function updateMechanic(effect: Scheduled<Mechanic>, i: number) {
-    console.log('update mechanic: ', effect, i);
-    const scheduled = props.scheduled;
-    if (scheduled?.item?.mechanics) {
-        scheduled.item.mechanics[i] = effect;
-        emit('update', scheduled);
-    }
-}
+// const section = computed(() => props.scheduled.item);
+// const mechanics = computed(() => section.value.mechanics || []);
+//
+// const duration = computed(() => props.scheduled ? getScheduledDuration(props.scheduled, (i) => i.getDuration()) : 0 || 0);
+// const currentTime = useState<number>('worldTime', () => 0);
+// const elapsed = computed(() => Math.min(duration.value, currentTime.value));
+// const elapsedPercent = computed(() => (elapsed.value || 0) / (duration.value || 1) * 100);
+//
+// const language = ref('yaml');
+// const encoded = ref(YAML.stringify(props.scheduled).trim());
+//
+// function isEncodedChanged() {
+//     if (language.value === 'yaml') {
+//         const encodeCurrent = YAML.stringify(props.scheduled).trim();
+//         return YAML.stringify(YAML.parse(encoded.value))?.trim() !== encodeCurrent;
+//     } else {
+//         const encodeCurrent = JSON.stringify(props.scheduled).trim();
+//         return JSON.stringify(JSON.parse(encoded.value))?.trim() !== encodeCurrent;
+//     }
+// }
+//
+// function resetEncoded(force = false) {
+//     if (language.value === 'yaml') {
+//         const resetValue = YAML.stringify(props.scheduled).trim();
+//         if (force) {
+//             encoded.value = resetValue;
+//             return;
+//         }
+//
+//         try {
+//             if (isEncodedChanged()) {
+//                 console.log('reset encoded!');
+//                 encoded.value = resetValue;
+//             }
+//         } catch (err) {
+//             console.log('reset encoded!', err);
+//             encoded.value = resetValue;
+//         }
+//     } else if (language.value === 'json') {
+//         const resetValue = JSON.stringify(props.scheduled, null, 2).trim();
+//         if (force) {
+//             encoded.value = resetValue;
+//             return;
+//         }
+//
+//         try {
+//             if (isEncodedChanged()) {
+//                 encoded.value = resetValue;
+//             }
+//         } catch (err) {
+//             encoded.value = resetValue;
+//         }
+//     }
+// }
+//
+// watch(language, (newValue: string, oldValue: string) => {
+//     if (newValue !== oldValue) {
+//         if (newValue === 'json' && oldValue === 'yaml') {
+//             encoded.value = JSON.stringify(YAML.parse(encoded.value), null, 2).trim();
+//         } else if (newValue === 'yaml' && oldValue === 'json') {
+//             encoded.value = YAML.stringify(JSON.parse(encoded.value)).trim();
+//         }
+//     }
+// });
+// function onSave() {
+//     if (isEncodedChanged() && encoded.value && props.scheduled) {
+//         try {
+//             const updated = decodeScheduledFightSection(encoded.value, {
+//                 collection: props.fight.collection,
+//                 clock: props.fight?.clock,
+//             });
+//
+//             console.log('Save: ', updated);
+//             emit('update', updated);
+//         } catch (err) {
+//             console.error('Save fail: ', err);
+//         }
+//     }
+// }
+//
+// function updateMechanic(effect: Scheduled<Mechanic>, i: number) {
+//     console.log('update mechanic: ', effect, i);
+//     const scheduled = props.scheduled;
+//     if (scheduled?.item?.mechanics) {
+//         scheduled.item.mechanics[i] = effect;
+//         emit('update', scheduled);
+//     }
+// }
 </script>
 
 <template>
@@ -113,6 +113,7 @@ function updateMechanic(effect: Scheduled<Mechanic>, i: number) {
                     '--thickness': '4px',
                 }" role="progressbar"></div>
             -->
+            <!-- TODO: Update this
             <h2 class="min-w-fit">
                 Fight Section ({{ index + 1 }})
             </h2>
@@ -121,8 +122,10 @@ function updateMechanic(effect: Scheduled<Mechanic>, i: number) {
                 <CodeArea @save="onSave" @update:lang="(l: string) => language = l" :lang="language"
                     v-model="encoded" />
             </CodeButton>
+            -->
         </div>
 
+        <!-- TODO: This too!
         <div class="collapse-content">
             <div v-if="section && mechanics" class="section__mechanics">
                 <div v-for="(mechanic, i) in mechanics">
@@ -131,6 +134,7 @@ function updateMechanic(effect: Scheduled<Mechanic>, i: number) {
                 </div>
             </div>
         </div>
+        -->
     </div>
 </template>
 

@@ -239,18 +239,20 @@ export class Effect extends EventEmitter {
     getPosition(value?: number): Bab.Vector3 {
         // const target = this.getTarget('player')
         const target = this.getTargets();
-        if (this.scheduledParent?.scheduled?.item) {
-            if (this.position === 'parent') {
-                return this.scheduledParent.scheduled.item.getPosition();
-            } else if (this.position === 'parent-end') {
-                return this.scheduledParent.scheduled.item.getPosition(1.0);
-            } else if (this.position === 'parent-start') {
-                return this.scheduledParent.scheduled.item.getPosition(0.0);
-            } else if (typeof (this.position) === 'string' && this.position.startsWith('parent-')) {
-                const v = parseNumber(this.position.split('-').slice(1).join('-'));
-                return this.scheduledParent.scheduled.item.getPosition(v);
+        forEachScheduledItem(this.scheduledParent?.scheduled, (item) => {
+            if (item) {
+                if (this.position === 'parent') {
+                    return item.getPosition();
+                } else if (this.position === 'parent-end') {
+                    return item.getPosition(1.0);
+                } else if (this.position === 'parent-start') {
+                    return item.getPosition(0.0);
+                } else if (typeof (this.position) === 'string' && this.position.startsWith('parent-')) {
+                    const v = parseNumber(this.position.split('-').slice(1).join('-'));
+                    return item.getPosition(v);
+                }
             }
-        }
+        });
 
         if (this.positions) {
             return getInterpolatedPosition({

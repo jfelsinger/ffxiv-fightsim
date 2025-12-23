@@ -118,19 +118,21 @@ export class Mechanic extends EventEmitter {
         const len = this.effects.length;
         for (let i = 0; i < len; i++) {
             const effect = this.effects[i];
-            if (effect?.item?.options) {
-                if (options.duration && !effect.item.options.duration) {
-                    effect.item.setDuration(options.duration);
+            forEachScheduledItem(effect, (item) => {
+                if (item?.options) {
+                    if (options.duration && !item.options.duration) {
+                        item.setDuration(options.duration);
+                    }
+                    if (options.telegraph && !item.options.duration) {
+                        item.setTelegraph(options.telegraph);
+                    }
                 }
-                if (options.telegraph && !effect.item.options.duration) {
-                    effect.item.setTelegraph(options.telegraph);
-                }
-            }
 
-            effect.item.on('effect-hit', (data) => {
-                this.emit('effect-hit', {
-                    ...data,
-                    mechanic: this,
+                item.on('effect-hit', (data) => {
+                    this.emit('effect-hit', {
+                        ...data,
+                        mechanic: this,
+                    });
                 });
             });
         }
@@ -200,8 +202,10 @@ export class Mechanic extends EventEmitter {
 
     initEffect(effect: Scheduled<Effect>, startTime: number) {
         if (effect?.preStartDelay) { startTime += effect.preStartDelay; }
-        effect.item.on('start-effect', () => { this.emit('start-effect', { effect }) });
-        effect.item.on('end-effect', () => { this.emit('end-effect', { effect }) });
+        forEachScheduledItem(effect, (item) => {
+            item.on('start-effect', () => { this.emit('start-effect', { effect }) });
+            item.on('end-effect', () => { this.emit('end-effect', { effect }) });
+        });
         const result = traverseScheduled(
             effect,
             (item, n, st, cd, p) => {
@@ -280,7 +284,9 @@ export class Mechanic extends EventEmitter {
         this.emit('dispose');
         const len = this.effects.length;
         for (let i = 0; i < len; i++) {
-            this.effects[i]?.item?.dispose();
+            forEachScheduledItem(this.effects[i], (item) => {
+                item?.dispose();
+            });
         }
     }
 

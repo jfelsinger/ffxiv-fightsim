@@ -17,7 +17,7 @@ export type ScheduledItem<T> = ScheduledBase<T> & {
 
 export type ScheduledGroup<T> = ScheduledBase<T> & {
     scheduling?: ScheduleMode
-    group: (ScheduledItem<T> | T)[] // TODO: Consider implementing for both group and item as just `Scheduled<T>`
+    group: (Scheduled<T> | T)[]
 }
 
 export type Scheduled<T> = ScheduledGroup<T> | ScheduledItem<T>;
@@ -37,13 +37,40 @@ export function isScheduledGroup<T>(v: unknown): v is ScheduledGroup<T> {
 }
 
 export function isScheduledItem<T>(v: unknown): v is ScheduledItem<T> {
-    return typeof v === 'object' && v != null && 'item' in v;
+    return typeof v === 'object' && v != null && 'item' in v && !('group' in v);
 }
 
 // Should be a combination of the above but... :shrug:
 // Being kept as-is for references elsewhere, until everything is refactored
 export function isScheduled<T>(v: unknown): v is ScheduledItem<T> {
     return typeof v === 'object' && v != null && 'item' in v;
+}
+
+export function forEachScheduledItem<T>(
+    scheduled: Scheduled<T> | undefined,
+    func: (item: T, i?: number) => void,
+) {
+    if (!scheduled) { return; }
+    if (isScheduledItem(scheduled)) {
+        console.log('forEachScheduledItem - item:', scheduled.item);
+        func(scheduled.item);
+    } else if (isScheduledGroup(scheduled)) {
+        scheduled?.group?.forEach((groupItem, i) => {
+            if (isScheduled(groupItem)) {
+                if (isScheduledItem(groupItem)) {
+                    console.log('forEachScheduledItem - scheduled item:', groupItem?.item);
+                    func(groupItem.item, i);
+                } else {
+                    console.log('forEachScheduledItem - scheduled group:', groupItem);
+                    // TODO: Fix how this will work with `i`, since it's nested
+                    forEachScheduledItem(groupItem, func);
+                }
+            } else {
+                console.log('forEachScheduledItem - scheduled X:', groupItem);
+                func(groupItem as T, i);
+            }
+        });
+    }
 }
 
 export function getScheduledDuration<T>(
@@ -53,30 +80,35 @@ export function getScheduledDuration<T>(
     let duration = 0;
     duration += scheduled?.startDelay || 0;
 
-    if (isScheduledItem(scheduled)) {
-        duration += getItemDuration(scheduled.item);
-    } else {
-        // TODO: Implement scheduling type
-        const len = scheduled.group.length;
-        for (let i = 0; i < len; i++) {
-            const groupItem = scheduled.group[i];
-            if (isScheduledItem(groupItem)) {
-                duration += getScheduledDuration(
-                    groupItem,
-                    getItemDuration,
-                );
-            }
-            else if (isScheduledGroup(groupItem)) {
-                duration += getScheduledDuration(
-                    groupItem as any,
-                    getItemDuration,
-                );
-            }
-            else if (groupItem) {
-                duration += getItemDuration(groupItem);
-            }
+    forEachScheduledItem(scheduled, (item) => {
+        if (item) {
+            duration += getItemDuration(item);
         }
-    }
+    })
+    // if (isScheduledItem(scheduled)) {
+    //     duration += getItemDuration(scheduled.item);
+    // } else {
+    //     // TODO: Implement scheduling type
+    //     const len = scheduled.group.length;
+    //     for (let i = 0; i < len; i++) {
+    //         const groupItem = scheduled.group[i];
+    //         if (isScheduledItem(groupItem)) {
+    //             duration += getScheduledDuration(
+    //                 groupItem,
+    //                 getItemDuration,
+    //             );
+    //         }
+    //         else if (isScheduledGroup(groupItem)) {
+    //             duration += getScheduledDuration(
+    //                 groupItem as any,
+    //                 getItemDuration,
+    //             );
+    //         }
+    //         else if (groupItem) {
+    //             duration += getItemDuration(groupItem);
+    //         }
+    //     }
+    // }
 
     duration += scheduled?.endDelay || 0;
 
@@ -175,7 +207,7 @@ export function traverseScheduled<T>(
     repeatNumber = 0,
     startTime = 0
 ) {
-    // console.log(`Traversing scheduled, starting at: ${startTime}, repeat #: ${repeatNumber}`, scheduled);
+    console.log(`Traversing scheduled, starting at: ${startTime}`, scheduled);
     let delay = scheduled.startDelay || 0;
 
     if (isScheduledItem(scheduled)) {
@@ -291,7 +323,7 @@ export function getScheduledJSONSnapshot<T>(scheduled: Scheduled<T>) {
             result.group = scheduled.group.map((g) => {
                 if (isScheduledItem(g)) { return getScheduledJSONSnapshot(g); }
                 if (isScheduledGroup(g)) { return getScheduledJSONSnapshot(g); }
-                if (g && 'toJSONSnapshot' in g) {
+                if (g && (typeof g === 'object') && 'toJSONSnapshot' in g) {
                     return (g as any).toJSONSnapshot();
                 }
             });

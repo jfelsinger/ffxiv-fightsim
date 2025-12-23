@@ -79,10 +79,13 @@ export class FightSection extends EventEmitter {
         const len = this.mechanics.length;
         for (let i = 0; i < len; i++) {
             const mechanic = this.mechanics[i];
-            mechanic.item.on('effect-hit', (data) => {
-                this.emit('effect-hit', {
-                    ...data,
-                    section: this,
+            console.log('Setup mechanics: ', mechanic);
+            forEachScheduledItem(mechanic, (item) => {
+                item.on('effect-hit', (data) => {
+                    this.emit('effect-hit', {
+                        ...data,
+                        section: this,
+                    });
                 });
             });
         }
@@ -142,19 +145,21 @@ export class FightSection extends EventEmitter {
         );
 
         this.totalMechanics++;
-        mechanic.item.on('start-mechanic', () => {
-            console.log('Mechanic started: ', this.label, mechanic);
-            this.emit('start-mechanic', { mechanic });
-        });
+        forEachScheduledItem(mechanic, (item) => {
+            item.on('start-mechanic', () => {
+                console.log('Mechanic started: ', this.label, mechanic);
+                this.emit('start-mechanic', { mechanic });
+            });
 
-        mechanic.item.on('end-mechanic', () => {
-            this.emit('end-mechanic', { mechanic });
-            this.endedMechanics++;
-            if (this.endedMechanics >= this.totalMechanics) {
-                console.log('Section ended: ', this.label, this.endedMechanics);
-                this.emit('end-section');
-            }
-        });
+            item.on('end-mechanic', () => {
+                this.emit('end-mechanic', { mechanic });
+                this.endedMechanics++;
+                if (this.endedMechanics >= this.totalMechanics) {
+                    console.log('Section ended: ', this.label, this.endedMechanics);
+                    this.emit('end-section');
+                }
+            });
+        })
         return result;
     }
 
@@ -162,7 +167,9 @@ export class FightSection extends EventEmitter {
         this.isActive = false;
         const len = this.mechanics.length;
         for (let i = 0; i < len; i++) {
-            this.mechanics[i]?.item?.dispose();
+            forEachScheduledItem(this.mechanics[i], (item) => {
+                item?.dispose();
+            });
         }
     }
 

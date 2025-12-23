@@ -76,9 +76,18 @@ export function decodeScheduled<T>(
     itemBuilder: (data: any, optons: FightDecodeOptions) => T,
     options: FightDecodeOptions,
     getItemDuration: (item: T) => number = getDurationDefault
-): Scheduled<T>[] {
+): Scheduled<T> {
     const repeat = data.repeat || 0;
-    const scheduledResult: Scheduled<T> = {
+    const scheduledResult: Scheduled<T> = repeat ? {
+        ...data,
+        group: [],
+        item: undefined,
+        n: 1,
+        repeat: 0,
+        startDelay: parseNumber(data.startDelay || 0),
+        preStartDelay: parseNumber(data.preStartDelay || 0),
+        endDelay: parseNumber(data.endDelay || 0),
+    } : {
         ...data,
         item: itemBuilder(data.item, options),
         n: 1,
@@ -88,8 +97,14 @@ export function decodeScheduled<T>(
         endDelay: parseNumber(data.endDelay || 0),
     };
 
-    const results: Scheduled<T>[] = [];
-    results.push(scheduledResult);
+    // console.log('Build scheduled item: ', repeat, scheduledResult);
+
+    if (isScheduledGroup(scheduledResult)) {
+        while (scheduledResult.group.length < repeat + 1) {
+            scheduledResult.group.push(itemBuilder(data.item, options));
+        }
+    } else {
+    }
 
     if (data.after) {
         const after =
@@ -98,41 +113,41 @@ export function decodeScheduled<T>(
         scheduledResult.after = Array.isArray(after) ? after[0] : after;
     }
 
-    if (repeat) {
-        let preRepeatDuration = getScheduledDuration(scheduledResult, getItemDuration);
-        for (let i = 0; i < repeat; i++) {
-            const repeatScheduled = {
-                ...data,
-                item: itemBuilder(data.item, options),
-                n: i + 2,
-                repeat: 0,
-                startDelay: preRepeatDuration + parseNumber(data.startDelay || 0),
-                preStartDelay: parseNumber(data.preStartDelay || 0),
-                endDelay: parseNumber(data.endDelay || 0),
-            };
+    // if (repeat) {
+    //     let preRepeatDuration = getScheduledDuration(scheduledResult, getItemDuration);
+    //     for (let i = 0; i < repeat; i++) {
+    //         const repeatScheduled = {
+    //             ...data,
+    //             item: itemBuilder(data.item, options),
+    //             n: i + 2,
+    //             repeat: 0,
+    //             startDelay: preRepeatDuration + parseNumber(data.startDelay || 0),
+    //             preStartDelay: parseNumber(data.preStartDelay || 0),
+    //             endDelay: parseNumber(data.endDelay || 0),
+    //         };
 
-            if (data.after) {
-                const after =
-                    isScheduled(data.after) ? decodeScheduled<T>(data.after, itemBuilder, options) :
-                        itemBuilder(data.after, options);
-                repeatScheduled.after = Array.isArray(after) ? after[0] : after;
-            }
+    //         if (data.after) {
+    //             const after =
+    //                 isScheduled(data.after) ? decodeScheduled<T>(data.after, itemBuilder, options) :
+    //                     itemBuilder(data.after, options);
+    //             repeatScheduled.after = Array.isArray(after) ? after[0] : after;
+    //         }
 
-            results.push(repeatScheduled);
+    //         results.push(repeatScheduled);
 
-            // TODO: If the scheduling is sequential, need to switch how startDelay is handled.
-            //       For parallel scheduling, this should be correct as-is.
+    //         // TODO: If the scheduling is sequential, need to switch how startDelay is handled.
+    //         //       For parallel scheduling, this should be correct as-is.
 
-            // Set to, and don't add, the duration because the startDelay has previous items baked in
-            preRepeatDuration = getScheduledDuration(repeatScheduled, getItemDuration);
-        }
+    //         // Set to, and don't add, the duration because the startDelay has previous items baked in
+    //         preRepeatDuration = getScheduledDuration(repeatScheduled, getItemDuration);
+    //     }
 
-        // const repeatedItems: T[] = [];
-        // while (repeatedItems.length < repeat) {
-        //     repeatedItems.push(itemBuilder(data.item, options));
-        // }
-        // scheduledResult.repeatedItems = repeatedItems;
-    }
+    //     // const repeatedItems: T[] = [];
+    //     // while (repeatedItems.length < repeat) {
+    //     //     repeatedItems.push(itemBuilder(data.item, options));
+    //     // }
+    //     // scheduledResult.repeatedItems = repeatedItems;
+    // }
 
 
     // Instead of a sub-item, we need repeats to broken out and decoded into their own Scheduled objects
@@ -158,7 +173,7 @@ export function decodeScheduled<T>(
     }
 
     // return scheduledResult;
-    return results;
+    return scheduledResult;
 }
 
 export function decodeEffect(data: any, options: FightDecodeOptions) {
