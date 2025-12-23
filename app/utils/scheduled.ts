@@ -2,11 +2,13 @@ export type ScheduleMode = 'sequential' | 'parallel';
 
 export type ScheduledBase<T> = {
     label?: string
+    n?: number
     comment?: string
     repeat?: number
     preStartDelay?: number
     startDelay?: number
     endDelay?: number
+    postEndDelay?: number
     after?: ScheduledItem<T> | T
     afterRepeats?: ScheduledItem<T> | T
 }
@@ -17,6 +19,22 @@ export type ScheduledItem<T> = ScheduledBase<T> & {
 
 export type ScheduledGroup<T> = ScheduledBase<T> & {
     scheduling?: ScheduleMode
+    pickGroup?: string
+
+    distributionType?: // see: effects/distribute.ts
+    | 'ordered'
+    | 'random'
+    | 'random-rotation'
+    | 'random-direction'
+    | 'random-start'
+    // Pick is for (usually randomly) picking an item or number of items from the distribution
+    // - ordered: picks are made in distribution order, without randomness
+    // - unique: each of a pick should be a unique option
+    // - repeating: two of the same option can be picked in an iteration
+    // - fully-unique: picks are removed from future iterations until all have been used
+    pickMode?: 'ordered' | 'unique' | 'repeating' | 'fully-unique'
+    pick?: number[] | number
+
     group: (Scheduled<T> | T)[]
 }
 
@@ -33,44 +51,81 @@ export type Scheduled<T> = ScheduledGroup<T> | ScheduledItem<T>;
 //       item: Item
 
 export function isScheduledGroup<T>(v: unknown): v is ScheduledGroup<T> {
-    return typeof v === 'object' && v != null && 'group' in v;
+    return typeof v === 'object' && v != null && 'group' in v && !('item' in v);
 }
 
 export function isScheduledItem<T>(v: unknown): v is ScheduledItem<T> {
     return typeof v === 'object' && v != null && 'item' in v && !('group' in v);
 }
 
-// Should be a combination of the above but... :shrug:
-// Being kept as-is for references elsewhere, until everything is refactored
-export function isScheduled<T>(v: unknown): v is ScheduledItem<T> {
-    return typeof v === 'object' && v != null && 'item' in v;
+export function isScheduled<T>(v: unknown): v is Scheduled<T> {
+    return typeof v === 'object' && v != null && ('item' in v || 'group' in v);
+}
+
+export function forEachNestedScheduled<T>(
+    scheduled: Scheduled<T> | undefined,
+    func: (item: Scheduled<T>, i?: number) => void,
+    maxDepth = 20,
+    includeSelf = false,
+) {
+    if (!scheduled) { return; }
+    if (includeSelf) {
+        func(scheduled);
+    }
+    if (!maxDepth) { return; }
+
+    if (isScheduledGroup(scheduled)) {
+        scheduled?.group?.forEach((groupItem, i) => {
+            if (isScheduled(groupItem)) {
+                forEachNestedScheduled(groupItem, func, maxDepth - 1, true);
+            }
+        });
+    }
+}
+
+export function forEachScheduledEntry<T>(
+    scheduled: Scheduled<T> | undefined,
+    func: (entry: Scheduled<T> | T, i?: number) => void,
+) {
+    if (!scheduled) { return; }
+    if (isScheduledItem(scheduled)) {
+        func(scheduled.item);
+    } else if (isScheduledGroup(scheduled)) {
+        scheduled?.group?.forEach((groupItem, i) => {
+            func(groupItem);
+        });
+    }
 }
 
 export function forEachScheduledItem<T>(
     scheduled: Scheduled<T> | undefined,
     func: (item: T, i?: number) => void,
 ) {
-    if (!scheduled) { return; }
-    if (isScheduledItem(scheduled)) {
-        console.log('forEachScheduledItem - item:', scheduled.item);
-        func(scheduled.item);
-    } else if (isScheduledGroup(scheduled)) {
-        scheduled?.group?.forEach((groupItem, i) => {
-            if (isScheduled(groupItem)) {
-                if (isScheduledItem(groupItem)) {
-                    console.log('forEachScheduledItem - scheduled item:', groupItem?.item);
-                    func(groupItem.item, i);
-                } else {
-                    console.log('forEachScheduledItem - scheduled group:', groupItem);
-                    // TODO: Fix how this will work with `i`, since it's nested
-                    forEachScheduledItem(groupItem, func);
-                }
-            } else {
-                console.log('forEachScheduledItem - scheduled X:', groupItem);
-                func(groupItem as T, i);
-            }
-        });
-    }
+    forEachScheduledEntry(scheduled, (entry, i) => {
+        if (isScheduled(entry)) {
+            forEachScheduledItem(entry as Scheduled<T>, func);
+        } else {
+            func(entry as T);
+        }
+    });
+
+    // if (!scheduled) { return; }
+    // if (isScheduledItem(scheduled)) {
+    //     func(scheduled.item);
+    // } else if (isScheduledGroup(scheduled)) {
+    //     scheduled?.group?.forEach((groupItem, i) => {
+    //         if (isScheduled(groupItem)) {
+    //             if (isScheduledItem(groupItem)) {
+    //                 func(groupItem.item, i);
+    //             } else {
+    //                 // TODO: Fix how this will work with `i`, since it's nested
+    //                 forEachScheduledItem(groupItem, func);
+    //             }
+    //         } else {
+    //             func(groupItem as T, i);
+    //         }
+    //     });
+    // }
 }
 
 export function getScheduledDuration<T>(
@@ -78,13 +133,19 @@ export function getScheduledDuration<T>(
     getItemDuration: (item: T) => number = (() => 0)
 ) {
     let duration = 0;
+    duration += scheduled?.preStartDelay || 0;
     duration += scheduled?.startDelay || 0;
 
-    forEachScheduledItem(scheduled, (item) => {
-        if (item) {
-            duration += getItemDuration(item);
+    forEachScheduledEntry(scheduled, (entry) => {
+        if (entry) {
+            if (isScheduled(entry)) {
+                duration += getScheduledDuration(entry);
+            } else {
+                duration += getItemDuration(entry);
+            }
         }
     })
+
     // if (isScheduledItem(scheduled)) {
     //     duration += getItemDuration(scheduled.item);
     // } else {
@@ -111,11 +172,12 @@ export function getScheduledDuration<T>(
     // }
 
     duration += scheduled?.endDelay || 0;
+    duration += scheduled?.postEndDelay || 0;
 
     if (scheduled.after) {
         if (isScheduled(scheduled.after)) {
             duration += scheduled?.after?.preStartDelay || 0;
-            duration += getScheduledDuration(scheduled.after, getItemDuration)
+            duration += getScheduledDuration(scheduled.after as Scheduled<T>, getItemDuration)
         } else {
             duration += getItemDuration(scheduled.after);
         }
@@ -209,86 +271,30 @@ export function traverseScheduled<T>(
 ) {
     console.log(`Traversing scheduled, starting at: ${startTime}`, scheduled);
     let delay = 0;
+    delay += scheduled?.preStartDelay || 0;
+    delay += scheduled?.startDelay || 0;
 
-    forEachScheduledItem(scheduled, (item) => {
-        delay += scheduled.startDelay || 0;
-        func(item, repeatNumber, startTime, delay);
-        delay += getItemDuration(item);
-
-        delay += scheduled.endDelay || 0;
-
-        if (scheduled.after) {
-            if (isScheduled(scheduled.after)) {
-                delay += scheduled?.after?.preStartDelay || 0;
-                delay += traverseScheduled(
-                    scheduled.after,
-                    (i, n, st, cd, p) => {
-                        if (p) { p.parent = { n: repeatNumber, scheduled }; }
-                        else { p = { n: repeatNumber, scheduled }; }
-                        return func(i, n, st, cd, p);
-                    },
-                    getItemDuration,
-                    clock,
-                    0,
-                    startTime + delay
-                )
+    forEachScheduledEntry(scheduled, (entry) => {
+        if (entry) {
+            if (isScheduled(entry)) {
+                traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay);
+                delay += getScheduledDuration(entry, getItemDuration);
             } else {
-                func(scheduled.after, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
-                delay += getItemDuration(scheduled.after);
+                func(entry, repeatNumber, startTime, delay);
+                delay += getItemDuration(entry);
             }
         }
-
     });
 
 
-
-    // if (isScheduledItem(scheduled)) {
-    //     func(scheduled.item, repeatNumber, startTime, delay);
-    //     // if (repeatNumber > 0 && scheduled.repeatedItems?.[repeatNumber - 1]) {
-    //     //     func(scheduled.repeatedItems[repeatNumber - 1] as T, repeatNumber, startTime, delay);
-    //     // } else {
-    //     //     func(scheduled.item, repeatNumber, startTime, delay);
-    //     // }
-
-    //     delay += getItemDuration(scheduled.item);
-    // } else if (isScheduledGroup(scheduled)) {
-    //     // TODO: Implement scheduling type
-    //     // MAKE SURE THE DELAY += is right
-    //     const len = scheduled.group.length;
-    //     for (let i = 0; i < len; i++) {
-    //         const groupItem = scheduled.group[i];
-    //         if (isScheduledItem(groupItem)) {
-    //             delay += traverseScheduled(
-    //                 groupItem,
-    //                 func,
-    //                 getItemDuration,
-    //                 clock,
-    //                 repeatNumber,
-    //                 startTime + delay
-    //             );
-    //         }
-    //         else if (isScheduledGroup(groupItem)) {
-    //             delay += traverseScheduled(
-    //                 groupItem as any,
-    //                 func,
-    //                 getItemDuration,
-    //                 clock,
-    //                 repeatNumber,
-    //                 startTime + delay
-    //             );
-    //         }
-    //         else if (groupItem) {
-    //             func(groupItem, repeatNumber, startTime, delay);
-    //             delay += getItemDuration(groupItem);
-    //         }
-    //     }
-    // }
+    delay += scheduled.endDelay || 0;
+    delay += scheduled.postEndDelay || 0;
 
     if (scheduled.afterRepeats) {
         if (isScheduled(scheduled.afterRepeats)) {
             delay += scheduled?.afterRepeats?.preStartDelay || 0;
             delay += traverseScheduled(
-                scheduled.afterRepeats,
+                scheduled.afterRepeats as Scheduled<T>,
                 (i, n, st, cd, p) => {
                     if (p) { p.parent = { n: repeatNumber, scheduled }; }
                     else { p = { n: repeatNumber, scheduled }; }
@@ -304,32 +310,6 @@ export function traverseScheduled<T>(
             delay += getItemDuration(scheduled.afterRepeats);
         }
     }
-
-    // if (scheduled.repeat) {
-    //     // console.log('Shcheduled O has repeats: ', scheduled.repeat, repeatNumber, startTime + delay, scheduled);
-    //     if (scheduled.repeat > repeatNumber) {
-    //         delay += traverseScheduled(scheduled, func, getItemDuration, clock, (repeatNumber || 0) + 1, startTime + delay);
-    //     } else if (scheduled.afterRepeats) {
-    //         if (isScheduled(scheduled.afterRepeats)) {
-    //             delay += scheduled?.afterRepeats?.preStartDelay || 0;
-    //             delay += traverseScheduled(
-    //                 scheduled.afterRepeats,
-    //                 (i, n, st, cd, p) => {
-    //                     if (p) { p.parent = { n: repeatNumber, scheduled }; }
-    //                     else { p = { n: repeatNumber, scheduled }; }
-    //                     return func(i, n, st, cd, p);
-    //                 },
-    //                 getItemDuration,
-    //                 clock,
-    //                 0,
-    //                 startTime + delay
-    //             )
-    //         } else {
-    //             func(scheduled.afterRepeats, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
-    //             delay += getItemDuration(scheduled.afterRepeats);
-    //         }
-    //     }
-    // }
 
     return startTime + delay;
 }
