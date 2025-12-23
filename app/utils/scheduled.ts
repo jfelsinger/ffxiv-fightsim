@@ -108,24 +108,6 @@ export function forEachScheduledItem<T>(
             func(entry as T);
         }
     });
-
-    // if (!scheduled) { return; }
-    // if (isScheduledItem(scheduled)) {
-    //     func(scheduled.item);
-    // } else if (isScheduledGroup(scheduled)) {
-    //     scheduled?.group?.forEach((groupItem, i) => {
-    //         if (isScheduled(groupItem)) {
-    //             if (isScheduledItem(groupItem)) {
-    //                 func(groupItem.item, i);
-    //             } else {
-    //                 // TODO: Fix how this will work with `i`, since it's nested
-    //                 forEachScheduledItem(groupItem, func);
-    //             }
-    //         } else {
-    //             func(groupItem as T, i);
-    //         }
-    //     });
-    // }
 }
 
 export function getScheduledDuration<T>(
@@ -146,31 +128,6 @@ export function getScheduledDuration<T>(
         }
     })
 
-    // if (isScheduledItem(scheduled)) {
-    //     duration += getItemDuration(scheduled.item);
-    // } else {
-    //     // TODO: Implement scheduling type
-    //     const len = scheduled.group.length;
-    //     for (let i = 0; i < len; i++) {
-    //         const groupItem = scheduled.group[i];
-    //         if (isScheduledItem(groupItem)) {
-    //             duration += getScheduledDuration(
-    //                 groupItem,
-    //                 getItemDuration,
-    //             );
-    //         }
-    //         else if (isScheduledGroup(groupItem)) {
-    //             duration += getScheduledDuration(
-    //                 groupItem as any,
-    //                 getItemDuration,
-    //             );
-    //         }
-    //         else if (groupItem) {
-    //             duration += getItemDuration(groupItem);
-    //         }
-    //     }
-    // }
-
     duration += scheduled?.endDelay || 0;
     duration += scheduled?.postEndDelay || 0;
 
@@ -183,19 +140,6 @@ export function getScheduledDuration<T>(
         }
     }
 
-    // Phase out repeats outside of decoding logic
-    // if (scheduled.repeat) {
-    //     duration += duration * scheduled.repeat;
-    //     if (scheduled.afterRepeats) {
-    //         if (isScheduled(scheduled.afterRepeats)) {
-    //             duration += scheduled?.afterRepeats?.preStartDelay || 0;
-    //             duration += getScheduledDuration(scheduled.afterRepeats, getItemDuration)
-    //         } else {
-    //             duration += getItemDuration(scheduled.afterRepeats);
-    //         }
-    //     }
-    // }
-
     return duration;
 }
 
@@ -204,62 +148,6 @@ export type ScheduledParent<T> = {
     n: number,
     parent?: ScheduledParent<T>,
 }
-
-// Deprecrated - Async/Await timeout usage cannot be rewound
-// export async function executeScheduled<T>(scheduled: Scheduled<T>, func: (item: T, n: number, parent?: ScheduledParent<T>) => Promise<any>, clock: Clock, repeatNumber = 0) {
-//     if (scheduled.startDelay) {
-//         await clock.wait(scheduled.startDelay);
-//     }
-//
-//     if (isScheduledItem(scheduled)) {
-//         await func(scheduled.item, repeatNumber);
-//     } else {
-//     }
-//
-//     if (scheduled.endDelay) {
-//         await clock.wait(scheduled.endDelay);
-//     }
-//
-//     if (scheduled.after) {
-//         if (isScheduled(scheduled.after)) {
-//             if (scheduled.after.preStartDelay) { await wait(scheduled.after.preStartDelay); }
-//             await executeScheduled(
-//                 scheduled.after,
-//                 (i, n, p) => {
-//                     if (p) { p.parent = { n: repeatNumber, scheduled }; }
-//                     else { p = { n: repeatNumber, scheduled }; }
-//                     return func(i, n, p);
-//                 },
-//                 clock,
-//             )
-//         } else {
-//             await func(scheduled.after, repeatNumber, { n: repeatNumber, scheduled });
-//         }
-//     }
-//
-//     if (scheduled.repeat) {
-//         if (scheduled.repeat > repeatNumber) {
-//             await executeScheduled(scheduled, func, clock, (repeatNumber || 0) + 1)
-//         } else if (scheduled.afterRepeats) {
-//             if (isScheduled(scheduled.afterRepeats)) {
-//                 // `preStartDelay` only seems implemented for the two after types, and none actually exist, probably ok
-//                 // to ignore for now, and revisit the intended functionality later
-//                 if (scheduled.afterRepeats.preStartDelay) { await wait(scheduled.afterRepeats.preStartDelay); }
-//                 await executeScheduled(
-//                     scheduled.afterRepeats,
-//                     (i, n, p) => {
-//                         if (p) { p.parent = { n: repeatNumber, scheduled }; }
-//                         else { p = { n: repeatNumber, scheduled }; }
-//                         return func(i, n, p);
-//                     },
-//                     clock,
-//                 )
-//             } else {
-//                 await func(scheduled.afterRepeats, repeatNumber, { n: repeatNumber, scheduled });
-//             }
-//         }
-//     }
-// }
 
 export function traverseScheduled<T>(
     scheduled: Scheduled<T>,
