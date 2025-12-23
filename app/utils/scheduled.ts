@@ -208,82 +208,20 @@ export function traverseScheduled<T>(
     startTime = 0
 ) {
     console.log(`Traversing scheduled, starting at: ${startTime}`, scheduled);
-    let delay = scheduled.startDelay || 0;
+    let delay = 0;
 
-    if (isScheduledItem(scheduled)) {
-        func(scheduled.item, repeatNumber, startTime, delay);
-        // if (repeatNumber > 0 && scheduled.repeatedItems?.[repeatNumber - 1]) {
-        //     func(scheduled.repeatedItems[repeatNumber - 1] as T, repeatNumber, startTime, delay);
-        // } else {
-        //     func(scheduled.item, repeatNumber, startTime, delay);
-        // }
+    forEachScheduledItem(scheduled, (item) => {
+        delay += scheduled.startDelay || 0;
+        func(item, repeatNumber, startTime, delay);
+        delay += getItemDuration(item);
 
-        delay += getItemDuration(scheduled.item);
-    } else if (isScheduledGroup(scheduled)) {
-        // TODO: Implement scheduling type
-        // MAKE SURE THE DELAY += is right
-        const len = scheduled.group.length;
-        for (let i = 0; i < len; i++) {
-            const groupItem = scheduled.group[i];
-            if (isScheduledItem(groupItem)) {
+        delay += scheduled.endDelay || 0;
+
+        if (scheduled.after) {
+            if (isScheduled(scheduled.after)) {
+                delay += scheduled?.after?.preStartDelay || 0;
                 delay += traverseScheduled(
-                    groupItem,
-                    func,
-                    getItemDuration,
-                    clock,
-                    repeatNumber,
-                    startTime + delay
-                );
-            }
-            else if (isScheduledGroup(groupItem)) {
-                delay += traverseScheduled(
-                    groupItem as any,
-                    func,
-                    getItemDuration,
-                    clock,
-                    repeatNumber,
-                    startTime + delay
-                );
-            }
-            else if (groupItem) {
-                func(groupItem, repeatNumber, startTime, delay);
-                delay += getItemDuration(groupItem);
-            }
-        }
-    }
-
-    delay += scheduled?.endDelay || 0;
-
-    if (scheduled.after) {
-        if (isScheduled(scheduled.after)) {
-            delay += scheduled?.after?.preStartDelay || 0;
-            delay += traverseScheduled(
-                scheduled.after,
-                (i, n, st, cd, p) => {
-                    if (p) { p.parent = { n: repeatNumber, scheduled }; }
-                    else { p = { n: repeatNumber, scheduled }; }
-                    return func(i, n, st, cd, p);
-                },
-                getItemDuration,
-                clock,
-                0,
-                startTime + delay
-            )
-        } else {
-            func(scheduled.after, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
-            delay += getItemDuration(scheduled.after);
-        }
-    }
-
-    if (scheduled.repeat) {
-        // console.log('Shcheduled O has repeats: ', scheduled.repeat, repeatNumber, startTime + delay, scheduled);
-        if (scheduled.repeat > repeatNumber) {
-            delay += traverseScheduled(scheduled, func, getItemDuration, clock, (repeatNumber || 0) + 1, startTime + delay);
-        } else if (scheduled.afterRepeats) {
-            if (isScheduled(scheduled.afterRepeats)) {
-                delay += scheduled?.afterRepeats?.preStartDelay || 0;
-                delay += traverseScheduled(
-                    scheduled.afterRepeats,
+                    scheduled.after,
                     (i, n, st, cd, p) => {
                         if (p) { p.parent = { n: repeatNumber, scheduled }; }
                         else { p = { n: repeatNumber, scheduled }; }
@@ -295,11 +233,103 @@ export function traverseScheduled<T>(
                     startTime + delay
                 )
             } else {
-                func(scheduled.afterRepeats, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
-                delay += getItemDuration(scheduled.afterRepeats);
+                func(scheduled.after, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
+                delay += getItemDuration(scheduled.after);
             }
         }
+
+    });
+
+
+
+    // if (isScheduledItem(scheduled)) {
+    //     func(scheduled.item, repeatNumber, startTime, delay);
+    //     // if (repeatNumber > 0 && scheduled.repeatedItems?.[repeatNumber - 1]) {
+    //     //     func(scheduled.repeatedItems[repeatNumber - 1] as T, repeatNumber, startTime, delay);
+    //     // } else {
+    //     //     func(scheduled.item, repeatNumber, startTime, delay);
+    //     // }
+
+    //     delay += getItemDuration(scheduled.item);
+    // } else if (isScheduledGroup(scheduled)) {
+    //     // TODO: Implement scheduling type
+    //     // MAKE SURE THE DELAY += is right
+    //     const len = scheduled.group.length;
+    //     for (let i = 0; i < len; i++) {
+    //         const groupItem = scheduled.group[i];
+    //         if (isScheduledItem(groupItem)) {
+    //             delay += traverseScheduled(
+    //                 groupItem,
+    //                 func,
+    //                 getItemDuration,
+    //                 clock,
+    //                 repeatNumber,
+    //                 startTime + delay
+    //             );
+    //         }
+    //         else if (isScheduledGroup(groupItem)) {
+    //             delay += traverseScheduled(
+    //                 groupItem as any,
+    //                 func,
+    //                 getItemDuration,
+    //                 clock,
+    //                 repeatNumber,
+    //                 startTime + delay
+    //             );
+    //         }
+    //         else if (groupItem) {
+    //             func(groupItem, repeatNumber, startTime, delay);
+    //             delay += getItemDuration(groupItem);
+    //         }
+    //     }
+    // }
+
+    if (scheduled.afterRepeats) {
+        if (isScheduled(scheduled.afterRepeats)) {
+            delay += scheduled?.afterRepeats?.preStartDelay || 0;
+            delay += traverseScheduled(
+                scheduled.afterRepeats,
+                (i, n, st, cd, p) => {
+                    if (p) { p.parent = { n: repeatNumber, scheduled }; }
+                    else { p = { n: repeatNumber, scheduled }; }
+                    return func(i, n, st, cd, p);
+                },
+                getItemDuration,
+                clock,
+                0,
+                startTime + delay
+            )
+        } else {
+            func(scheduled.afterRepeats, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
+            delay += getItemDuration(scheduled.afterRepeats);
+        }
     }
+
+    // if (scheduled.repeat) {
+    //     // console.log('Shcheduled O has repeats: ', scheduled.repeat, repeatNumber, startTime + delay, scheduled);
+    //     if (scheduled.repeat > repeatNumber) {
+    //         delay += traverseScheduled(scheduled, func, getItemDuration, clock, (repeatNumber || 0) + 1, startTime + delay);
+    //     } else if (scheduled.afterRepeats) {
+    //         if (isScheduled(scheduled.afterRepeats)) {
+    //             delay += scheduled?.afterRepeats?.preStartDelay || 0;
+    //             delay += traverseScheduled(
+    //                 scheduled.afterRepeats,
+    //                 (i, n, st, cd, p) => {
+    //                     if (p) { p.parent = { n: repeatNumber, scheduled }; }
+    //                     else { p = { n: repeatNumber, scheduled }; }
+    //                     return func(i, n, st, cd, p);
+    //                 },
+    //                 getItemDuration,
+    //                 clock,
+    //                 0,
+    //                 startTime + delay
+    //             )
+    //         } else {
+    //             func(scheduled.afterRepeats, repeatNumber, startTime, delay, { n: repeatNumber, scheduled });
+    //             delay += getItemDuration(scheduled.afterRepeats);
+    //         }
+    //     }
+    // }
 
     return startTime + delay;
 }
