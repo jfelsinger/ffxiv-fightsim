@@ -6,6 +6,7 @@ export const effectsCollection = {
     'aoe-square-grid': AoeSquareGridEffect,
     'aoe-ring': AoeRingEffect,
     'aoe-disc': AoeDiscEffect,
+    'aoe-disk': AoeDiscEffect,
     'aoe-group': AoeGroupEffect,
     'test-aoe': AoeDiscEffect,
     'tether': TetherEffect,

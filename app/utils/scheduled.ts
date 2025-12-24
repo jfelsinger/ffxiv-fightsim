@@ -5,6 +5,7 @@ export type ScheduledBase<T> = {
     n?: number
     comment?: string
     repeat?: number
+    delayOffset?: number
     preStartDelay?: number
     startDelay?: number
     endDelay?: number
@@ -39,6 +40,15 @@ export type ScheduledGroup<T> = ScheduledBase<T> & {
 }
 
 export type Scheduled<T> = ScheduledGroup<T> | ScheduledItem<T>;
+
+export type PickInfo = {
+    pickGroup: string
+    pickCount?: number
+    chioices: number[]
+    picked: (number[] | number)[]
+}
+
+export const PickInfoMapping: Partial<Record<string, PickInfo>> = {};
 
 // Currently:
 //  A single scheduled contains a single item, everything follows the schedule-execution of the parent
@@ -118,15 +128,30 @@ export function getScheduledDuration<T>(
     duration += scheduled?.preStartDelay || 0;
     duration += scheduled?.startDelay || 0;
 
-    forEachScheduledEntry(scheduled, (entry) => {
-        if (entry) {
-            if (isScheduled(entry)) {
-                duration += getScheduledDuration(entry);
-            } else {
-                duration += getItemDuration(entry);
+    if (isScheduledGroup(scheduled) && scheduled.scheduling === 'parallel') {
+        let maxDelay = 0;
+        forEachScheduledEntry(scheduled, (entry) => {
+            if (entry) {
+                if (isScheduled(entry)) {
+                    maxDelay = Math.max(maxDelay, getScheduledDuration(entry, getItemDuration));
+                } else {
+                    maxDelay = Math.max(maxDelay, getItemDuration(entry));
+                }
             }
-        }
-    })
+        })
+
+        duration += maxDelay;
+    } else {
+        forEachScheduledEntry(scheduled, (entry) => {
+            if (entry) {
+                if (isScheduled(entry)) {
+                    duration += getScheduledDuration(entry, getItemDuration);
+                } else {
+                    duration += getItemDuration(entry);
+                }
+            }
+        });
+    }
 
     duration += scheduled?.endDelay || 0;
     duration += scheduled?.postEndDelay || 0;
@@ -162,17 +187,34 @@ export function traverseScheduled<T>(
     delay += scheduled?.preStartDelay || 0;
     delay += scheduled?.startDelay || 0;
 
-    forEachScheduledEntry(scheduled, (entry) => {
-        if (entry) {
-            if (isScheduled(entry)) {
-                traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay);
-                delay += getScheduledDuration(entry, getItemDuration);
-            } else {
-                func(entry, repeatNumber, startTime, delay);
-                delay += getItemDuration(entry);
+    if (isScheduledGroup(scheduled) && scheduled.scheduling === 'parallel') {
+        let maxDelay = 0;
+        forEachScheduledEntry(scheduled, (entry) => {
+            if (entry) {
+                if (isScheduled(entry)) {
+                    traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay);
+                    maxDelay = Math.max(maxDelay, getScheduledDuration(entry, getItemDuration));
+                } else {
+                    func(entry, repeatNumber, startTime, delay);
+                    maxDelay = Math.max(maxDelay, getItemDuration(entry));
+                }
             }
-        }
-    });
+        });
+
+        delay += maxDelay;
+    } else {
+        forEachScheduledEntry(scheduled, (entry) => {
+            if (entry) {
+                if (isScheduled(entry)) {
+                    traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay);
+                    delay += getScheduledDuration(entry, getItemDuration);
+                } else {
+                    func(entry, repeatNumber, startTime, delay);
+                    delay += getItemDuration(entry);
+                }
+            }
+        });
+    }
 
 
     delay += scheduled.endDelay || 0;

@@ -1,0 +1,47 @@
+name: test-one
+scheduling: sequential
+startPosition: 0,-0.45
+startPositionType: arena
+arena:
+  name: m3s-arena
+  shape: square
+  yalms: 37.85
+  floorType: m3s
+  sizeAdjustment: 0.8
+waymarksPositionType: arena
+waymarks:
+  A: 0.0,0.385
+  B: 0.385,0.0
+  C: 0.0,-0.385
+  D: -0.385,0.0
+sections:
+  - item:
+      name: test-one
+      scheduling: parallel
+      mechanics:
+        - label: test-mech-two
+          startDelay: 250
+          endDelay: 500
+          item:
+            name: mech-two
+            castName: Test Two
+            castTime: 800
+            effects:
+              - label: Following Disk
+                repeat: 4
+                preStartDelay: 500
+                startDelay: 800
+                endDelay: 400
+                delayOffset: 1000
+                item:
+                  name: aoe-disc
+                  duration: 550
+                  color: 199,42,45
+                  yalms: 3
+                  positionType: character
+                  position: player
+                  followPosition: true
+                  # target: player
+                  # positionType: arena
+                  # usePlayerTick: true
+                  # telegraph: 0.8

@@ -85,6 +85,7 @@ export function decodeScheduledGroup<T>(
     // TODO: Support repeats
     let scheduledResult: ScheduledGroup<T> = {
         ...rest,
+        scheduling: data.scheduling || 'sequential',
         group: data.group?.map((groupItem: any) => itemBuilder(groupItem, options)) || [],
         pickGroup,
         n,
@@ -95,12 +96,15 @@ export function decodeScheduledGroup<T>(
     };
 
     if (repeat) {
+        const delayOffset = parseNumber(data.delayOffset || 0);
         const scheduledResultGroup: ScheduledGroup<T> = {
             ...rest,
             group: [],
             pickGroup,
             n,
             repeat: 0,
+            scheduling: data.scheduling || (data.delayOffset ? 'parallel' : 'sequential'),
+            delayOffset,
             // Pre-start delay is applied before the repeats, so only done once
             preStartDelay: parseNumber(data.preStartDelay || 0),
             startDelay: 0,
@@ -108,15 +112,17 @@ export function decodeScheduledGroup<T>(
             postEndDelay: parseNumber(data.postEndDelay || 0),
         };
 
+        let i = 0
         while (scheduledResultGroup.group.length < repeat + 1) {
-            n++;
+            i++;
             const pickGroup = data.pickGroup || simpleRandomIdGen(6);
             scheduledResultGroup.group.push({
                 ...rest,
                 group: data.group?.map((groupItem: any) => itemBuilder(groupItem, options)) || [],
                 pickGroup,
-                n,
-                preStartDelay: 0,
+                n: n + i,
+                // preStartDelay: 0,
+                preStartDelay: delayOffset * (i - 1),
                 startDelay: parseNumber(data.startDelay || 0),
                 endDelay: parseNumber(data.endDelay || 0),
                 postEndDelay: 0,
@@ -153,12 +159,15 @@ export function decodeScheduledItem<T>(
 
     if (repeat) {
         const pickGroup = data.pickGroup || simpleRandomIdGen(6);
+        const delayOffset = parseNumber(data.delayOffset || 0);
         const scheduledResultGroup: ScheduledGroup<T> = {
             ...rest,
             group: [],
             pickGroup,
             n,
             repeat: 0,
+            scheduling: data.scheduling || (data.delayOffset ? 'parallel' : 'sequential'),
+            delayOffset,
             // Pre-start delay is applied before the repeats, so only done once
             preStartDelay: parseNumber(data.preStartDelay || 0),
             startDelay: 0,
@@ -166,14 +175,16 @@ export function decodeScheduledItem<T>(
             postEndDelay: parseNumber(data.postEndDelay || 0),
         };
 
+        let i = 0
         while (scheduledResultGroup.group.length < repeat + 1) {
-            n++;
+            i++;
             scheduledResultGroup.group.push({
                 ...rest,
                 item: itemBuilder(data.item, options),
-                n,
+                n: n + i,
                 repeat: 0,
-                preStartDelay: 0,
+                // preStartDelay: 0,
+                preStartDelay: delayOffset * (i - 1),
                 startDelay: parseNumber(data.startDelay || 0),
                 endDelay: parseNumber(data.endDelay || 0),
                 postEndDelay: 0,
