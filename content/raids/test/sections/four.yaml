@@ -1,0 +1,52 @@
+name: test-four
+scheduling: sequential
+startPosition: 0,-0.45
+startPositionType: arena
+arena:
+  name: m3s-arena
+  shape: square
+  yalms: 37.85
+  floorType: m3s
+  sizeAdjustment: 0.8
+waymarksPositionType: arena
+waymarks:
+  A: 0.0,0.385
+  B: 0.385,0.0
+  C: 0.0,-0.385
+  D: -0.385,0.0
+sections:
+  - item:
+      name: test-four
+      scheduling: parallel
+      mechanics:
+        - label: test-mech-four
+          repeat: 4
+          startDelay: 250
+          endDelay: 500
+          item:
+            name: mech-four
+            castName: Test Four
+            castTime: 800
+            effects:
+              - label: In & Outs
+                scheduling: sequential
+                startDelay: 500
+                telegraph: 0.5
+                distributionType: random
+                group:
+                  - label: Scheduled Outer Ring
+                    item:
+                      name: aoe-ring
+                      outerRadius: 30
+                      innerRadius: 6
+                      duration: 1250
+                      positionType: arena
+                      telegraph: 0.5
+                  - label: Scheduled Inner AOE
+                    item:
+                      name: aoe-ring
+                      outerRadius: 6.25
+                      innerRadius: 0
+                      duration: 1250
+                      positionType: arena
+                      telegraph: 0.5

@@ -21,6 +21,7 @@ export type ScheduledItem<T> = ScheduledBase<T> & {
 export type ScheduledGroup<T> = ScheduledBase<T> & {
     scheduling?: ScheduleMode
     pickGroup?: string
+    pickedIndex?: number
 
     distributionType?: // see: effects/distribute.ts
     | 'ordered'
@@ -31,10 +32,15 @@ export type ScheduledGroup<T> = ScheduledBase<T> & {
     // Pick is for (usually randomly) picking an item or number of items from the distribution
     // - ordered: picks are made in distribution order, without randomness
     // - unique: each of a pick should be a unique option
-    // - repeating: two of the same option can be picked in an iteration
     // - fully-unique: picks are removed from future iterations until all have been used
-    pickMode?: 'ordered' | 'unique' | 'repeating' | 'fully-unique'
-    pick?: number[] | number
+    // - repeating: two of the same option can be picked in an iteration
+    pickMode?:
+    | 'ordered'
+    // | 'repeating'
+    | 'unique'
+    | 'fully-unique'
+    // pick?: number[] | number
+    pick?: number
 
     group: (Scheduled<T> | T)[]
 }
@@ -43,9 +49,10 @@ export type Scheduled<T> = ScheduledGroup<T> | ScheduledItem<T>;
 
 export type PickInfo = {
     pickGroup: string
+    lastPickIndex: number
     pickCount?: number
-    chioices: number[]
-    picked: (number[] | number)[]
+    choices: number[]
+    picked: (number[])[]
 }
 
 export const PickInfoMapping: Partial<Record<string, PickInfo>> = {};
@@ -101,7 +108,8 @@ export function forEachScheduledEntry<T>(
     if (isScheduledItem(scheduled)) {
         func(scheduled.item);
     } else if (isScheduledGroup(scheduled)) {
-        scheduled?.group?.forEach((groupItem, i) => {
+        const picks = getScheduledPicks(scheduled);
+        picks?.forEach((groupItem) => {
             func(groupItem);
         });
     }
@@ -128,9 +136,11 @@ export function getScheduledDuration<T>(
     duration += scheduled?.preStartDelay || 0;
     duration += scheduled?.startDelay || 0;
 
-    if (isScheduledGroup(scheduled) && scheduled.scheduling === 'parallel') {
+    const picks = getScheduledPicks(scheduled);
+    const scheduling = ('scheduling' in scheduled && scheduled.scheduling) ? scheduled.scheduling : 'sequential';
+    if (scheduling === 'parallel') {
         let maxDelay = 0;
-        forEachScheduledEntry(scheduled, (entry) => {
+        picks.forEach((entry, i) => {
             if (entry) {
                 if (isScheduled(entry)) {
                     maxDelay = Math.max(maxDelay, getScheduledDuration(entry, getItemDuration));
@@ -138,20 +148,46 @@ export function getScheduledDuration<T>(
                     maxDelay = Math.max(maxDelay, getItemDuration(entry));
                 }
             }
-        })
-
+        });
         duration += maxDelay;
     } else {
-        forEachScheduledEntry(scheduled, (entry) => {
+        picks.forEach((entry, i) => {
             if (entry) {
                 if (isScheduled(entry)) {
                     duration += getScheduledDuration(entry, getItemDuration);
+                    console.log(`Getting duration for scheduled entry: `, entry, duration);
                 } else {
                     duration += getItemDuration(entry);
+                    console.log(`Getting duration for item entry: `, entry, duration);
                 }
             }
         });
     }
+
+    // if (isScheduledGroup(scheduled) && scheduled.scheduling === 'parallel') {
+    //     let maxDelay = 0;
+    //     forEachScheduledEntry(scheduled, (entry) => {
+    //         if (entry) {
+    //             if (isScheduled(entry)) {
+    //                 maxDelay = Math.max(maxDelay, getScheduledDuration(entry, getItemDuration));
+    //             } else {
+    //                 maxDelay = Math.max(maxDelay, getItemDuration(entry));
+    //             }
+    //         }
+    //     })
+
+    //     duration += maxDelay;
+    // } else {
+    //     forEachScheduledEntry(scheduled, (entry) => {
+    //         if (entry) {
+    //             if (isScheduled(entry)) {
+    //                 duration += getScheduledDuration(entry, getItemDuration);
+    //             } else {
+    //                 duration += getItemDuration(entry);
+    //             }
+    //         }
+    //     });
+    // }
 
     duration += scheduled?.endDelay || 0;
     duration += scheduled?.postEndDelay || 0;
@@ -174,6 +210,103 @@ export type ScheduledParent<T> = {
     parent?: ScheduledParent<T>,
 }
 
+export function getScheduledPicks<T>(
+    scheduled: Scheduled<T>,
+): (T | Scheduled<T>)[] {
+    if (isScheduledGroup(scheduled)) {
+        if (scheduled.pickGroup) {
+            let pickGroup: PickInfo = PickInfoMapping[scheduled.pickGroup] || {
+                pickGroup: scheduled.pickGroup,
+                lastPickIndex: -1,
+                pickCount: 0,
+                choices: scheduled.group.map((_, i) => i),
+                picked: [],
+            };
+
+            PickInfoMapping[scheduled.pickGroup] = pickGroup;
+            if (!pickGroup.pickCount) {
+                pickGroup.pickCount = 0;
+                // 1st, apply distribution
+                let choices = scheduled.group.map((_, i) => i);
+                if (scheduled.distributionType === 'random') {
+                    choices = shuffleArray(choices);
+                } else if (scheduled.distributionType === 'random-start') {
+                    choices = rotateArray(choices, Math.floor(Math.random() * choices.length) + 1);
+                } else if (scheduled.distributionType === 'random-direction') {
+                    if (Math.random() < 0.5) {
+                        choices = choices.reverse();
+                    }
+                } else if (scheduled.distributionType === 'random-rotation') {
+                    choices = rotateArray(choices, Math.floor(Math.random() * choices.length) + 1);
+                    if (Math.random() < 0.5) {
+                        choices = choices.reverse();
+                    }
+                }
+                pickGroup.choices = choices;
+            }
+
+            // 2nd, calculate picks
+            let picks: number[] = [];
+            if ((scheduled.pickedIndex || scheduled.pickedIndex === 0) && pickGroup.picked[scheduled.pickedIndex]) {
+                const storedPicks = pickGroup.picked[scheduled.pickedIndex];
+                console.log(`Getting stored picks for pickGroup: ${scheduled.pickGroup}`, scheduled, scheduled.pickedIndex, pickGroup);
+                if (storedPicks) { picks = storedPicks as number[]; }
+            } else {
+                const choicesCount = pickGroup.choices.length;
+
+                if (scheduled.pickMode === 'unique') {
+                    const amountToPick = scheduled.pick || 1;
+                    let availableChoices = pickGroup.choices.slice();
+                    while (availableChoices.length && picks.length < amountToPick) {
+                        const choice = availableChoices.splice(Math.floor(Math.random() * availableChoices.length), 1)[0];
+                        console.log(`Getting unique picks for pickGroup: ${scheduled.pickGroup}`, picks, scheduled, pickGroup, availableChoices, choice);
+                        if (choice || choice === 0) {
+                            picks.push(choice);
+                        }
+                    }
+                    console.log(`Got unique picks for pickGroup: ${scheduled.pickGroup}`, picks, scheduled, pickGroup, availableChoices);
+                } else if (scheduled.pickMode === 'fully-unique') {
+                    const amountToPick = scheduled.pick || 1;
+                    let availableChoices = pickGroup.choices.filter(c => pickGroup.picked.every(p => Array.isArray(p) ? !p.includes(c) : p !== c));
+                    while (availableChoices.length && picks.length < amountToPick) {
+                        const choice = availableChoices.splice(Math.floor(Math.random() * availableChoices.length), 1)[0];
+                        if (choice || choice === 0) {
+                            picks.push(choice);
+                        }
+                    }
+                } else {
+                    const amountToPick = scheduled.pick || choicesCount;
+                    // ordered/default
+                    while (picks.length < amountToPick) {
+                        if (pickGroup.lastPickIndex >= choicesCount - 1) {
+                            pickGroup.lastPickIndex = -1;
+                        }
+                        const choice = pickGroup.choices[++pickGroup.lastPickIndex];
+                        if (choice || choice === 0) {
+                            picks.push(choice);
+                        }
+                    }
+                }
+
+                pickGroup.pickCount++;
+                scheduled.pickedIndex = pickGroup.picked.length;
+                pickGroup.picked.push(picks as number[]);
+            }
+
+            return picks.map((i) => scheduled.group[i]).filter((_) => _) as (Scheduled<T> | T)[];
+        }
+
+        return scheduled.group.filter((_) => _);
+    } else {
+        const { item } = scheduled;
+        if (item) {
+            return [item];
+        }
+    }
+
+    return [];
+}
+
 export function traverseScheduled<T>(
     scheduled: Scheduled<T>,
     func: (item: T, n: number, startTime: number, currentDelay: number, parent?: ScheduledParent<T>) => any,
@@ -187,9 +320,11 @@ export function traverseScheduled<T>(
     delay += scheduled?.preStartDelay || 0;
     delay += scheduled?.startDelay || 0;
 
-    if (isScheduledGroup(scheduled) && scheduled.scheduling === 'parallel') {
+    const picks = getScheduledPicks(scheduled);
+    const scheduling = ('scheduling' in scheduled && scheduled.scheduling) ? scheduled.scheduling : 'sequential';
+    if (scheduling === 'parallel') {
         let maxDelay = 0;
-        forEachScheduledEntry(scheduled, (entry) => {
+        picks.forEach((entry, i) => {
             if (entry) {
                 if (isScheduled(entry)) {
                     traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay);
@@ -200,10 +335,9 @@ export function traverseScheduled<T>(
                 }
             }
         });
-
         delay += maxDelay;
     } else {
-        forEachScheduledEntry(scheduled, (entry) => {
+        picks.forEach((entry, i) => {
             if (entry) {
                 if (isScheduled(entry)) {
                     traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay);
@@ -215,6 +349,34 @@ export function traverseScheduled<T>(
             }
         });
     }
+
+    // if (isScheduledGroup(scheduled) && scheduled.scheduling === 'parallel') {
+    //     let maxDelay = 0;
+    //     forEachScheduledEntry(scheduled, (entry) => {
+    //         if (entry) {
+    //             if (isScheduled(entry)) {
+    //                 traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay);
+    //                 maxDelay = Math.max(maxDelay, getScheduledDuration(entry, getItemDuration));
+    //             } else {
+    //                 func(entry, repeatNumber, startTime, delay);
+    //                 maxDelay = Math.max(maxDelay, getItemDuration(entry));
+    //             }
+    //         }
+    //     });
+    //     delay += maxDelay;
+    // } else {
+    //     forEachScheduledEntry(scheduled, (entry) => {
+    //         if (entry) {
+    //             if (isScheduled(entry)) {
+    //                 traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay);
+    //                 delay += getScheduledDuration(entry, getItemDuration);
+    //             } else {
+    //                 func(entry, repeatNumber, startTime, delay);
+    //                 delay += getItemDuration(entry);
+    //             }
+    //         }
+    //     });
+    // }
 
 
     delay += scheduled.endDelay || 0;

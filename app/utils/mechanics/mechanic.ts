@@ -74,12 +74,17 @@ export class Mechanic extends EventEmitter {
             const len = this.effects.length;
             for (let i = 0; i < len; i++) {
                 const effect = this.effects[i];
-                duration += getScheduledDuration(effect, ((i) => i?.getDuration() || 0));
+                if (effect) {
+                    duration += getScheduledDuration(effect, ((i) => i?.getDuration() || 0));
+                }
             }
         } else {
             duration += Math.max(
                 ...this.effects.map(
-                    (effect) => getScheduledDuration(effect, ((i) => i?.getDuration() || -0))
+                    (effect) => {
+                        console.log('Calculating duration for effect: ', effect);
+                        return getScheduledDuration(effect, ((i) => i?.getDuration() || 0))
+                    }
                 )
             );
         }
@@ -202,15 +207,17 @@ export class Mechanic extends EventEmitter {
 
     initEffect(effect: Scheduled<Effect>, startTime: number) {
         if (effect?.preStartDelay) { startTime += effect.preStartDelay; }
+        console.log('##### ##### ##### ##### ##### #####');
+        console.log('Init effect: ', effect);
         forEachScheduledItem(effect, (item) => {
             item.on('start-effect', () => { this.emit('start-effect', { effect }) });
             item.on('end-effect', () => { this.emit('end-effect', { effect }) });
         });
         const result = traverseScheduled(
             effect,
-            (item, n, st, cd, p) => {
-                console.log(`Init effect ${effect.label || item.name} ${n}: `, st, effect);
-                item.init(n, effect, p, st + cd);
+            (item, n, startTime, delay, parent) => {
+                console.log(`Init effect ${effect.label || item.name} ${n}: `, startTime, effect);
+                item.init(n, effect, parent, startTime + delay);
             },
             ((i) => i?.getDuration() || 0),
             this.clock,

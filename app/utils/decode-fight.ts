@@ -86,7 +86,13 @@ export function decodeScheduledGroup<T>(
     let scheduledResult: ScheduledGroup<T> = {
         ...rest,
         scheduling: data.scheduling || 'sequential',
-        group: data.group?.map((groupItem: any) => itemBuilder(groupItem, options)) || [],
+        group: data.group?.map((groupItem: any) => {
+            if (isScheduled(groupItem)) {
+                console.log('Decoding scheduled group item:', groupItem);
+                return decodeScheduled<T>(groupItem, itemBuilder, options, getItemDuration);
+            }
+            return itemBuilder(groupItem, options)
+        }) || [],
         pickGroup,
         n,
         startDelay: parseNumber(data.startDelay || 0),
@@ -118,7 +124,12 @@ export function decodeScheduledGroup<T>(
             const pickGroup = data.pickGroup || simpleRandomIdGen(6);
             scheduledResultGroup.group.push({
                 ...rest,
-                group: data.group?.map((groupItem: any) => itemBuilder(groupItem, options)) || [],
+                group: data.group?.map((groupItem: any) => {
+                    if (isScheduled(groupItem)) {
+                        return decodeScheduled<T>(groupItem, itemBuilder, options, getItemDuration);
+                    }
+                    return itemBuilder(groupItem, options);
+                }) || [],
                 pickGroup,
                 n: n + i,
                 // preStartDelay: 0,
@@ -146,6 +157,7 @@ export function decodeScheduledItem<T>(
     const repeat = data.repeat || 0;
     let n = data.n || 1;
     const { group, item, ...rest } = data;
+    console.log('Decoding scheduled item:', data);
     let scheduledResult: Scheduled<T> = {
         ...rest,
         item: itemBuilder(data.item, options),
