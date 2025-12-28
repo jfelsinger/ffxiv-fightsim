@@ -13,12 +13,12 @@ sections:
       scheduling: sequential
       mechanics:
         - label: x
-          repeat: 5
+          repeat: 10
           startDelay: 500
           endDelay: 2500
           item:
             name: x-primal-combinations
-            duration: 5600
+            duration: 2600
             telegraph: 0.5
             scheduling: parallel
             effects:
@@ -28,7 +28,7 @@ sections:
                 exclusives:
                   - [0, 1]
                 pickMode: unique
-                duration: 5600
+                duration: 2600
                 group:
                   # Ifrit
                   - label: Ifrit

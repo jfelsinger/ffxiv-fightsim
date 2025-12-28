@@ -23,6 +23,8 @@ export type ScheduledGroup<T> = ScheduledBase<T> & {
     pickGroup?: string
     pickedIndex?: number
 
+    exclusives: (string | number)[][]
+
     distributionType?: // see: effects/distribute.ts
     | 'ordered'
     | 'random'
@@ -253,6 +255,7 @@ export function getScheduledPicks<T>(
                 if (storedPicks) { picks = storedPicks as number[]; }
             } else {
                 const choicesCount = pickGroup.choices.length;
+                const exclusives = scheduled.exclusives || [];
 
                 if (scheduled.pickMode === 'unique') {
                     const amountToPick = scheduled.pick || 1;
@@ -262,6 +265,9 @@ export function getScheduledPicks<T>(
                         console.log(`Getting unique picks for pickGroup: ${scheduled.pickGroup}`, picks, scheduled, pickGroup, availableChoices, choice);
                         if (choice || choice === 0) {
                             picks.push(choice);
+                            exclusives.filter((exclusions) => exclusions.includes(choice)).forEach((exclusions) => {
+                                availableChoices = availableChoices.filter((c) => !exclusions.includes(c));
+                            });
                         }
                     }
                     console.log(`Got unique picks for pickGroup: ${scheduled.pickGroup}`, picks, scheduled, pickGroup, availableChoices);
@@ -272,6 +278,9 @@ export function getScheduledPicks<T>(
                         const choice = availableChoices.splice(Math.floor(Math.random() * availableChoices.length), 1)[0];
                         if (choice || choice === 0) {
                             picks.push(choice);
+                            exclusives.filter((exclusions) => exclusions.includes(choice)).forEach((exclusions) => {
+                                availableChoices = availableChoices.filter((c) => !exclusions.includes(c));
+                            });
                         }
                     }
                 } else {
