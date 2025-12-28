@@ -20,22 +20,20 @@ sections:
       scheduling: parallel
       mechanics:
         - label: test-mech-two
-          startDelay: 250
-          endDelay: 500
+          startDelay: 150
           item:
             name: mech-two
             castName: Test Two
-            castTime: 800
+            castTime: 400
             effects:
               - label: Following Disk
                 repeat: 4
-                preStartDelay: 500
-                startDelay: 800
-                endDelay: 400
-                delayOffset: 1000
+                # preStartDelay: 250
+                delayOffset: 1500
+                scheduling: parallel
                 item:
                   name: aoe-disc
-                  duration: 550
+                  duration: 1200
                   color: 199,42,45
                   yalms: 3
                   positionType: character

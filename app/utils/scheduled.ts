@@ -140,21 +140,27 @@ export function getScheduledDuration<T>(
 
     const picks = getScheduledPicks(scheduled);
     const scheduling = ('scheduling' in scheduled && scheduled.scheduling) ? scheduled.scheduling : 'sequential';
+
+    const delayOffset = parseNumber(scheduled.delayOffset || 0);
+    let n = 0;
+
     if (scheduling === 'parallel') {
         let maxDelay = 0;
         picks.forEach((entry, i) => {
             if (entry) {
                 if (isScheduled(entry)) {
-                    maxDelay = Math.max(maxDelay, getScheduledDuration(entry, getItemDuration));
+                    maxDelay = Math.max(maxDelay, getScheduledDuration(entry, getItemDuration) + (delayOffset * n));
                 } else {
-                    maxDelay = Math.max(maxDelay, getItemDuration(entry));
+                    maxDelay = Math.max(maxDelay, getItemDuration(entry) + (delayOffset * n));
                 }
+                n++;
             }
         });
         duration += maxDelay;
     } else {
         picks.forEach((entry, i) => {
             if (entry) {
+                // duration += (delayOffset * n);
                 if (isScheduled(entry)) {
                     duration += getScheduledDuration(entry, getItemDuration);
                     console.log(`Getting duration for scheduled entry: `, entry, duration);
@@ -162,6 +168,7 @@ export function getScheduledDuration<T>(
                     duration += getItemDuration(entry);
                     console.log(`Getting duration for item entry: `, entry, duration);
                 }
+                // n++;
             }
         });
     }
@@ -331,23 +338,31 @@ export function traverseScheduled<T>(
 
     const picks = getScheduledPicks(scheduled);
     const scheduling = ('scheduling' in scheduled && scheduled.scheduling) ? scheduled.scheduling : 'sequential';
+
+    const delayOffset = parseNumber(scheduled.delayOffset || 0);
+    let n = 0;
+
     if (scheduling === 'parallel') {
         let maxDelay = 0;
         picks.forEach((entry, i) => {
             if (entry) {
+                console.log('Apply offset: ', n, delayOffset, n * delayOffset);
                 if (isScheduled(entry)) {
-                    traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay);
-                    maxDelay = Math.max(maxDelay, getScheduledDuration(entry, getItemDuration));
+                    traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay + (delayOffset * n));
+                    maxDelay = Math.max(maxDelay, getScheduledDuration(entry, getItemDuration) + (delayOffset * n));
                 } else {
-                    func(entry, repeatNumber, startTime, delay);
-                    maxDelay = Math.max(maxDelay, getItemDuration(entry));
+                    func(entry, repeatNumber, startTime, delay + (delayOffset * n));
+                    maxDelay = Math.max(maxDelay, getItemDuration(entry) + (delayOffset * n));
                 }
+                n++;
             }
         });
         delay += maxDelay;
     } else {
         picks.forEach((entry, i) => {
             if (entry) {
+                // console.log('Apply offset: ', n, delayOffset, n * delayOffset);
+                // delay += (delayOffset * n);
                 if (isScheduled(entry)) {
                     traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay);
                     delay += getScheduledDuration(entry, getItemDuration);
@@ -355,6 +370,7 @@ export function traverseScheduled<T>(
                     func(entry, repeatNumber, startTime, delay);
                     delay += getItemDuration(entry);
                 }
+                // n++;
             }
         });
     }
