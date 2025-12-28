@@ -163,10 +163,8 @@ export function getScheduledDuration<T>(
                 // duration += (delayOffset * n);
                 if (isScheduled(entry)) {
                     duration += getScheduledDuration(entry, getItemDuration);
-                    console.log(`Getting duration for scheduled entry: `, entry, duration);
                 } else {
                     duration += getItemDuration(entry);
-                    console.log(`Getting duration for item entry: `, entry, duration);
                 }
                 // n++;
             }
@@ -258,7 +256,7 @@ export function getScheduledPicks<T>(
             let picks: number[] = [];
             if ((scheduled.pickedIndex || scheduled.pickedIndex === 0) && pickGroup.picked[scheduled.pickedIndex]) {
                 const storedPicks = pickGroup.picked[scheduled.pickedIndex];
-                console.log(`Getting stored picks for pickGroup: ${scheduled.pickGroup}`, scheduled, scheduled.pickedIndex, pickGroup);
+                // console.log(`Getting stored picks for pickGroup: ${scheduled.pickGroup}`, scheduled, scheduled.pickedIndex, pickGroup);
                 if (storedPicks) { picks = storedPicks as number[]; }
             } else {
                 const choicesCount = pickGroup.choices.length;
@@ -269,7 +267,7 @@ export function getScheduledPicks<T>(
                     let availableChoices = pickGroup.choices.slice();
                     while (availableChoices.length && picks.length < amountToPick) {
                         const choice = availableChoices.splice(Math.floor(Math.random() * availableChoices.length), 1)[0];
-                        console.log(`Getting unique picks for pickGroup: ${scheduled.pickGroup}`, picks, scheduled, pickGroup, availableChoices, choice);
+                        // console.log(`Getting unique picks for pickGroup: ${scheduled.pickGroup}`, picks, scheduled, pickGroup, availableChoices, choice);
                         if (choice || choice === 0) {
                             picks.push(choice);
                             exclusives.filter((exclusions) => exclusions.includes(choice)).forEach((exclusions) => {
@@ -277,7 +275,7 @@ export function getScheduledPicks<T>(
                             });
                         }
                     }
-                    console.log(`Got unique picks for pickGroup: ${scheduled.pickGroup}`, picks, scheduled, pickGroup, availableChoices);
+                    // console.log(`Got unique picks for pickGroup: ${scheduled.pickGroup}`, picks, scheduled, pickGroup, availableChoices);
                 } else if (scheduled.pickMode === 'fully-unique') {
                     const amountToPick = scheduled.pick || 1;
                     let availableChoices = pickGroup.choices.filter(c => pickGroup.picked.every(p => Array.isArray(p) ? !p.includes(c) : p !== c));
@@ -331,7 +329,7 @@ export function traverseScheduled<T>(
     repeatNumber = 0,
     startTime = 0
 ) {
-    console.log(`Traversing scheduled, starting at: ${startTime}`, scheduled);
+    // console.log(`Traversing scheduled, starting at: ${startTime}`, scheduled);
     let delay = 0;
     delay += scheduled?.preStartDelay || 0;
     delay += scheduled?.startDelay || 0;
@@ -346,7 +344,7 @@ export function traverseScheduled<T>(
         let maxDelay = 0;
         picks.forEach((entry, i) => {
             if (entry) {
-                console.log('Apply offset: ', n, delayOffset, n * delayOffset);
+                // console.log('Apply offset: ', n, delayOffset, n * delayOffset);
                 if (isScheduled(entry)) {
                     traverseScheduled(entry as Scheduled<T>, func, getItemDuration, clock, repeatNumber, startTime + delay + (delayOffset * n));
                     maxDelay = Math.max(maxDelay, getScheduledDuration(entry, getItemDuration) + (delayOffset * n));

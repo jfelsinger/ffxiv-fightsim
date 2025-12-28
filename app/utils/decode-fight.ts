@@ -88,7 +88,7 @@ export function decodeScheduledGroup<T>(
         scheduling: data.scheduling || 'sequential',
         group: data.group?.map((groupItem: any) => {
             if (isScheduled(groupItem)) {
-                console.log('Decoding scheduled group item:', groupItem);
+                // console.log('Decoding scheduled group item:', groupItem);
                 return decodeScheduled<T>(groupItem, itemBuilder, options, getItemDuration);
             }
             return itemBuilder(groupItem, options)
@@ -157,7 +157,7 @@ export function decodeScheduledItem<T>(
     const repeat = data.repeat || 0;
     let n = data.n || 1;
     const { group, item, ...rest } = data;
-    console.log('Decoding scheduled item:', data);
+    // console.log('Decoding scheduled item:', data);
     let scheduledResult: Scheduled<T> = {
         ...rest,
         item: itemBuilder(data.item, options),
@@ -204,7 +204,7 @@ export function decodeScheduledItem<T>(
         }
 
         scheduledResult = scheduledResultGroup;
-        console.log('#### Scheduled Result Group:', scheduledResult);
+        // console.log('#### Scheduled Result Group:', scheduledResult);
     }
 
     decodeScheduledAfters(data, scheduledResult, itemBuilder, options, getItemDuration);

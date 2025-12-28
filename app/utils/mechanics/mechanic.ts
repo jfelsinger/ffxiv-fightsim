@@ -82,7 +82,6 @@ export class Mechanic extends EventEmitter {
             duration += Math.max(
                 ...this.effects.map(
                     (effect) => {
-                        console.log('Calculating duration for effect: ', effect);
                         return getScheduledDuration(effect, ((i) => i?.getDuration() || 0))
                     }
                 )
@@ -207,8 +206,6 @@ export class Mechanic extends EventEmitter {
 
     initEffect(effect: Scheduled<Effect>, startTime: number) {
         if (effect?.preStartDelay) { startTime += effect.preStartDelay; }
-        console.log('##### ##### ##### ##### ##### #####');
-        console.log('Init effect: ', effect);
         forEachScheduledItem(effect, (item) => {
             item.on('start-effect', () => { this.emit('start-effect', { effect }) });
             item.on('end-effect', () => { this.emit('end-effect', { effect }) });
@@ -216,7 +213,6 @@ export class Mechanic extends EventEmitter {
         const result = traverseScheduled(
             effect,
             (item, n, startTime, delay, parent) => {
-                console.log(`Init effect ${effect.label || item.name} ${n}: `, startTime, effect);
                 item.init(n, effect, parent, startTime + delay);
             },
             ((i) => i?.getDuration() || 0),
@@ -250,7 +246,6 @@ export class Mechanic extends EventEmitter {
         this.setStage(MechanicStage.preCleanup);
         this.endTime = this.clock.time;
         this.isActive = false;
-        console.log('End mechanic: ', this.label);
         this.emit('end-mechanic');
         this.setStage(MechanicStage.ended);
     }
